@@ -217,6 +217,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             openTime="2024-08-15 10:00"
             closeTime="2024-08-15 10:30"
             keywords={["콜택시", "반차"]}
+            duration={60}
           />
         </div>
       </div>
