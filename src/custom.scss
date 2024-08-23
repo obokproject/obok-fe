@@ -1,0 +1,17 @@
+//TODO: 이것까지 쓸지 생각해보자
+
+// 부트스트랩 함수와 변수 import
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+// 여기에 커스텀 변수 정의
+$custom-theme-colors: (
+  "primary": #007bff,
+  "secondary": #6c757d,
+  // 필요한 다른 색상들 추가
+);
+
+$theme-colors: map-merge($theme-colors, $custom-theme-colors);
+
+// 부트스트랩 나머지 부분 import
+@import "~bootstrap/scss/bootstrap";
