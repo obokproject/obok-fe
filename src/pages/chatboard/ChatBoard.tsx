@@ -63,6 +63,32 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     }
   }, [roomId, user]); // roomId와 user가 변경될 때마다 실행
 
+  useEffect(() => {
+    if (socket.current) {
+      // 이전 메시지 수신
+      socket.current.on("previousMessages", (messages) => {
+        setMessages(messages);
+      });
+
+      // 이전 키워드 수신
+      socket.current.on("previousKeywords", (keywords: string[]) => {
+        const keywordObject = keywords.reduce((acc, keyword, index) => {
+          acc[keyword] = index;
+          return acc;
+        }, {} as { [key: string]: number });
+
+        setKeywords(keywordObject); // 키워드를 올바른 형식으로 변환하여 상태에 저장
+      });
+    }
+
+    return () => {
+      if (socket.current) {
+        socket.current.off("previousMessages");
+        socket.current.off("previousKeywords");
+      }
+    };
+  }, [socket]);
+
   // 사용자가 메시지를 전송할 때 호출되는 함수
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || !user) return; // 메시지가 비어있거나 사용자가 없으면 반환
@@ -123,10 +149,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   return (
     <div>
-      <h1>{room.name}</h1> {/* 방 이름 표시 */}
-      <p>Type: {room.type}</p> {/* 방 타입 표시 */}
-      <p>Participants: {room.participants.join(", ")}</p>{" "}
-      {/* 참가자 목록 표시 */}
       {/* 채팅 기능 구현 */}
       <div className="flex flex-col h-screen">
         <div className="flex flex-1 overflow-hidden">
@@ -148,14 +170,18 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                   >
                     {showProfile && (
                       <div className="flex items-center mr-4">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <img
+                          src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
+                          alt="User Profile"
+                          className="w-10 h-10 bg-gray-300 rounded-full"
+                        />
                       </div>
                     )}
                     <div className="flex flex-col">
                       {showProfile && (
                         <div className="flex items-center mb-1">
                           <span className="font-bold text-lg text-blue-500 mr-2">
-                            {msg.user_id}
+                            {msg.nickname} {msg.job} {/* 닉네임과 직업 표시 */}
                           </span>
                         </div>
                       )}
@@ -201,7 +227,8 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             </div>
             <div className="flex-1 overflow-y-auto pt-4 border-t border-gray-300">
               <ChatKeyword
-                keywords={Object.keys(keywords)} // 키워드 전달
+                roomId={roomId}
+                socket={socket.current}
                 onKeywordClick={scrollToMessage} // 키워드 클릭 시 메시지로 스크롤
               />
             </div>
