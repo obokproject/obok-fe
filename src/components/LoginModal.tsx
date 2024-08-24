@@ -71,10 +71,16 @@ const LoginModal: React.FC<LoginModalProps> = ({
               로그인함으로써 정책 및 약관에 동의합니다.
             </p>
             <div>
-              <Link to="/terms" className="text-xs mx-2 text-muted ">
+              <Link
+                to="https://glitter-juniper-6f6.notion.site/8d4b93d50a164cb7a0e2533935c60a0b"
+                className="text-xs mx-2 text-muted "
+              >
                 서비스 이용약관
               </Link>
-              <Link to="/privacy" className="text-xs mx-2 text-muted ">
+              <Link
+                to="https://glitter-juniper-6f6.notion.site/32a79e282480462bb267b2cc51be71aa"
+                className="text-xs mx-2 text-muted "
+              >
                 개인정보 처리방침
               </Link>
             </div>

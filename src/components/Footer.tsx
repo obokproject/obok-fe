@@ -42,12 +42,18 @@ const Footer: React.FC = () => {
             <h6 className="mb-2">법적 고지</h6>
             <ul>
               <li>
-                <Link to="/terms" className="text-light">
+                <Link
+                  to="https://glitter-juniper-6f6.notion.site/8d4b93d50a164cb7a0e2533935c60a0b"
+                  className="text-light"
+                >
                   이용약관
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-light">
+                <Link
+                  to="https://glitter-juniper-6f6.notion.site/32a79e282480462bb267b2cc51be71aa"
+                  className="text-light"
+                >
                   개인정보처리방침
                 </Link>
               </li>

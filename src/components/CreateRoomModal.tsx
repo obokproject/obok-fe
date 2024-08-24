@@ -83,86 +83,119 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           </Button>
         </ButtonGroup>
 
-        <div className="flex flex-row bg-gray-300 rounded-md overflow-hidden ">
-          <div className="bg-gray-300 flex items-center justify-center pt-3 ">
-            <p className="text-gray-700 border-r-4 w-20 font-semibold pl-1 h-full">
-              주제
-            </p>
-          </div>
-          <div className="flex-grow">
-            <input
-              type="text"
-              className="w-full px-3 py-2 bg-gray-300 text-gray-700 focus:outline-none"
-              placeholder="공유하고 싶은 주제를 입력하세요"
-            />
-          </div>
-        </div>
-
         <Form>
-          <Form.Group className="mb-3 flex flex-row">
-            <Form.Label className="w-20">주제</Form.Label>
+          <Form.Group className="mb-3">
+            <div className="d-flex bg-light">
+              <Form.Label
+                className="mb-0 p-2 bg-secondary text-white rounded-start"
+                style={{ width: "80px", minWidth: "80px" }}
+              >
+                주제
+              </Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="공유하고 싶은 주제를 정해보세요(20자)"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                maxLength={20}
+                className="bg-secondary text-white no-focus-outline"
+                style={{ outline: "none", boxShadow: "none" }}
+              />
+            </div>
+          </Form.Group>
+
+          {/* <Form.Group className="flex flex-row bg-gray-300 rounded-md overflow-hidden">
+            <Form.Label className="text-gray-700 border-r-4 w-20 font-semibold pl-1 h-full">
+              주제
+            </Form.Label>
             <Form.Control
               type="text"
               placeholder="공유하고 싶은 주제를 정해보세요(20자)"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               maxLength={20}
+              className="w-full px-3 py-2 bg-gray-300 text-gray-700 focus:outline-none"
             />
+          </Form.Group> */}
+
+          <Form.Group className="mb-3">
+            <div className="d-flex bg-light rounded">
+              <Form.Label
+                className="mb-0 p-2 bg-secondary text-white rounded-start"
+                style={{ width: "80px", minWidth: "80px" }}
+              >
+                키워드
+              </Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="#키워드 입력 (2-8자, 최대 3개)"
+                  value={currentKeyword}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    const filteredValue = inputValue.replace(
+                      /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ]/g,
+                      ""
+                    );
+                    setCurrentKeyword(filteredValue);
+                  }}
+                  maxLength={8}
+                  className="border-0 bg-light"
+                  style={{ outline: "none", boxShadow: "none" }}
+                />
+                <Button
+                  variant="outline-secondary"
+                  onClick={addKeyword}
+                  disabled={keywords.length >= 3}
+                >
+                  추가
+                </Button>
+              </InputGroup>
+            </div>
           </Form.Group>
 
           <Row className="mb-3">
-            <Col>
+            <Col xs={6}>
               <Form.Group>
-                <Form.Label>인원</Form.Label>
-                <Form.Control
-                  type="number"
-                  min={2}
-                  max={10}
-                  value={participants}
-                  onChange={(e) => setParticipants(Number(e.target.value))}
-                />
+                <div className="d-flex bg-light rounded">
+                  <Form.Label
+                    className="mb-0 p-2 bg-secondary text-white rounded-start"
+                    style={{ width: "80px", minWidth: "80px" }}
+                  >
+                    인원
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    min={2}
+                    max={10}
+                    value={participants}
+                    onChange={(e) => setParticipants(Number(e.target.value))}
+                    style={{ outline: "none", boxShadow: "none" }}
+                  />
+                </div>
               </Form.Group>
             </Col>
-            <Col>
+            <Col xs={6}>
               <Form.Group>
-                <Form.Label>제한 시간 (분)</Form.Label>
-                <Form.Control
-                  type="number"
-                  min={5}
-                  max={20}
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                />
+                <div className="d-flex bg-light rounded">
+                  <Form.Label
+                    className="mb-0 p-2 bg-secondary text-white rounded-start"
+                    style={{ width: "120px", minWidth: "120px" }}
+                  >
+                    제한 시간 (분)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    min={5}
+                    max={20}
+                    value={duration}
+                    onChange={(e) => setDuration(Number(e.target.value))}
+                    style={{ outline: "none", boxShadow: "none" }}
+                  />
+                </div>
               </Form.Group>
             </Col>
           </Row>
-
-          <Form.Group className="mb-3">
-            <Form.Label>키워드</Form.Label>
-            <InputGroup>
-              <Form.Control
-                type="text"
-                placeholder="#키워드 입력 (2-8자, 최대 3개)"
-                value={currentKeyword}
-                onChange={(e) => {
-                  const inputValue = e.target.value;
-                  const filteredValue = inputValue.replace(
-                    /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ]/g,
-                    ""
-                  );
-                  setCurrentKeyword(filteredValue);
-                }}
-                maxLength={8}
-              />
-              <Button
-                variant="outline-secondary"
-                onClick={addKeyword}
-                disabled={keywords.length >= 3}
-              >
-                추가
-              </Button>
-            </InputGroup>
-          </Form.Group>
 
           <div className="mt-2">
             {keywords.map((keyword, index) => (

@@ -60,7 +60,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mt-4 border border-black">
+    <div className="bg-white p-4 rounded-lg shadow-md m-1 mb-4 border border-black">
       <div className="flex flex-wrap justify-between items-start">
         {/* 주제 및 제안자 정보 */}
         <div className="w-full md:w-1/3 mb-4 md:mb-0">

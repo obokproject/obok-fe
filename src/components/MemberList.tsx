@@ -10,7 +10,7 @@ const members = [
 
 const MemberList: React.FC = () => {
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto border-1 h-[100%] p-2 rounded-lg">
       {members.map((member, index) => (
         <div key={index} className="flex items-center mb-4">
           <div className="w-10 h-10 bg-gray-300 rounded-full mr-2"></div>

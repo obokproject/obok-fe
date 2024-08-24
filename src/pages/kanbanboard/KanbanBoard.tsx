@@ -8,6 +8,7 @@ import {
 } from "react-beautiful-dnd";
 import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
+import { randomBytes } from "crypto";
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -168,36 +169,32 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId, keywords }) => {
     }
   };
 
-  // 키워드를 하이라이트하는 함수
-  const highlightKeywords = (text: string) => {
-    let highlightedText = text;
-    keywords.forEach((keyword) => {
-      const regex = new RegExp(`(${keyword})`, "gi");
-      highlightedText = highlightedText.replace(
-        regex,
-        '<span class="highlight">$1</span>'
-      );
-    });
-    return <span dangerouslySetInnerHTML={{ __html: highlightedText }} />;
-  };
-
   return (
     <Container fluid className="h-100 d-flex flex-column">
+      {/* Kanban board layout starts here */}
       <Row className="flex-grow-1">
-        <Col md={9} className="d-flex flex-column">
-          <h2 className="mb-4">베리 보드</h2>
+        <Col className="d-flex flex-column border-4 ml-3 border-yellow-200 p-2 rounded-lg bg-yellow-50">
           <DragDropContext onDragEnd={onDragEnd}>
+            {/* Row to contain all columns */}
             <Row className="flex-grow-1">
               {columns.map((column) => (
-                <Col key={column.id} md={4}>
-                  <h3>{column.title}</h3>
+                <Col key={column.id}>
+                  {/* Column title */}
+                  <div className="border-red-200 rounded-2xl border-3 d-flex justify-center m-1 pt-3 bg-white">
+                    <h5 className="text-center mb-3">{column.title}</h5>
+                  </div>
+                  {/* Droppable area for cards */}
                   <Droppable droppableId={column.id}>
                     {(provided) => (
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
                         className="kanban-column"
+                        style={{
+                          minHeight: "500px", // Minimum height for column
+                        }}
                       >
+                        {/* Map through cards in the column */}
                         {column.cards.map((card, index) => (
                           <Draggable
                             key={card.id}
@@ -210,7 +207,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId, keywords }) => {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className="mb-2"
+                                style={{
+                                  backgroundColor: "#fef68a", // Lighter yellow for Post-it note effect
+                                  borderColor: "#fdd835", // Darker yellow for border
+                                  boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.1)", // Subtle shadow for lifted effect
+                                }}
                               >
+                                {/* Card content with user info */}
                                 <Card.Body className="d-flex align-items-center">
                                   <img
                                     src={card.user.profile_image}
@@ -223,9 +226,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId, keywords }) => {
                                     }}
                                   />
                                   <div>
-                                    <Card.Text>
-                                      {highlightKeywords(card.content)}
-                                    </Card.Text>
+                                    <Card.Text>{card.content}</Card.Text>
                                     <small className="text-muted">
                                       {card.user.nickname}
                                     </small>
@@ -236,29 +237,69 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId, keywords }) => {
                           </Draggable>
                         ))}
                         {provided.placeholder}
+                        {/* Conditionally render the input field if a card is being added */}
                         {addingCardTo === column.id ? (
-                          <div className="new-card-input">
-                            <Form.Control
-                              ref={inputRef}
-                              type="text"
-                              placeholder="새 카드 내용 (10자 이내)"
-                              value={newCardContent}
-                              onChange={handleCardInputChange}
-                              onKeyDown={(e) =>
-                                handleCardInputKeyPress(e, column.id)
-                              }
-                            />
-                            <small className="text-muted">
-                              {newCardContent.length}/10
-                            </small>
-                          </div>
-                        ) : (
                           <Card
-                            className="add-card-button"
-                            onClick={() => handleAddCardClick(column.id)}
+                            className="mb-2"
+                            style={{
+                              backgroundColor: "#fef68a",
+                              borderColor: "#fdd835",
+                              boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.1)",
+                            }}
                           >
-                            <Card.Body>+</Card.Body>
+                            <Card.Body className="d-flex flex-column">
+                              <Form.Control
+                                ref={inputRef}
+                                type="text"
+                                placeholder="새 카드 내용 (10자 이내)"
+                                value={newCardContent}
+                                onChange={handleCardInputChange}
+                                onKeyDown={(e) =>
+                                  handleCardInputKeyPress(e, column.id)
+                                }
+                                style={{
+                                  backgroundColor: "inherit", // Maintain Post-it background
+                                  border: "none", // Remove default border
+                                  boxShadow: "none", // Remove shadow
+                                  marginBottom: "5px", // Space before character count
+                                }}
+                              />
+                              <small
+                                style={{
+                                  alignSelf: "flex-end",
+                                  color: "#666",
+                                  fontSize: "12px",
+                                  marginTop: "auto",
+                                }}
+                              >
+                                {newCardContent.length}/10
+                              </small>
+                            </Card.Body>
                           </Card>
+                        ) : (
+                          /* Button to add new card */
+                          <div className="d-flex justify-content-center">
+                            <button
+                              className="btn"
+                              onClick={() => handleAddCardClick(column.id)}
+                              style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                color: "#333",
+                                backgroundColor: "#fff",
+                                padding: "10px 20px",
+                                borderRadius: "5px",
+                                textDecoration: "none",
+
+                                borderColor: "#ddd",
+                                borderStyle: "solid",
+
+                                cursor: "pointer",
+                              }}
+                            >
+                              + 카드 추가
+                            </button>
+                          </div>
                         )}
                       </div>
                     )}
