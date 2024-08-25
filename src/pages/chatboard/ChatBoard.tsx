@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom"; // 방 정보를 가져오는 custom hook
 import { useAuth } from "../../contexts/AuthContext"; // 사용자 인증 context
 import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴포넌트
-import MemberList from "../../components/MemberList"; // 멤버 리스트 컴포넌트
+// import MemberList from "../../components/MemberList"; // 멤버 리스트 컴포넌트
 import RoomInfo from "../../components/RoomInfo"; // 방 정보 컴포넌트
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
@@ -11,10 +11,15 @@ interface ChatBoardProps {
   roomId: string;
 }
 
+// 키워드 추출 함수 정의
+const extractKeywords = (content: string): string[] => {
+  const regex = /#[^\s#]+/g;
+  return content.match(regex) || [];
+};
+
 const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
-  const { room, loading, error, fetchRoom, joinRoom, leaveRoom } =
-    useRoom(roomId); // 방 정보 훅
+  const { room, loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
 
   const [messages, setMessages] = useState<any[]>([]); // 메시지 상태
   const [newMessage, setNewMessage] = useState(""); // 새로운 메시지 상태
@@ -22,6 +27,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   const [highlightedMessageIndex, setHighlightedMessageIndex] = useState<
     number | null
   >(null); // 강조된 메시지 인덱스 상태
+  const [members, setMembers] = useState<any[]>([]); // 멤버 상태
   const chatContainerRef = useRef<HTMLDivElement>(null); // 채팅 컨테이너 참조
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]); // 메시지 참조 배열
   const inputRef = useRef<HTMLTextAreaElement>(null); // 입력창 참조
@@ -51,7 +57,54 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       // 서버로부터 메시지 수신
       socket.current.on("message", (message) => {
         console.log("Received message:", message); // 메시지 수신 로그
-        setMessages((prevMessages) => [...prevMessages, message]); // 메시지를 상태에 추가
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages, message];
+
+          // 메시지에 포함된 키워드를 찾아서 인덱스 매핑
+          const keywordsInMessage = extractKeywords(message.content);
+          setKeywords((prevKeywords) => {
+            const newKeywords = { ...prevKeywords };
+            keywordsInMessage.forEach((keyword: string) => {
+              newKeywords[keyword] = updatedMessages.length - 1; // 새로운 메시지의 인덱스
+            });
+            return newKeywords;
+          });
+
+          return updatedMessages;
+        });
+      });
+
+      // 서버로부터 멤버 업데이트 수신
+      socket.current.on("memberUpdate", (updatedMembers) => {
+        console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
+        setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
+      });
+
+      // 이전 메시지 및 키워드, 멤버 수신
+      socket.current.on("previousMessages", (prevMessages) => {
+        setMessages(prevMessages);
+
+        // 이전 키워드를 다시 매핑
+        socket.current?.on("previousKeywords", (keywords: string[]) => {
+          const keywordObject: { [key: string]: number } = {};
+          keywords.forEach((keyword) => {
+            const messageIndex = prevMessages.findIndex((msg: any) =>
+              msg.content.includes(keyword)
+            );
+            if (messageIndex !== -1) {
+              keywordObject[keyword] = messageIndex;
+            }
+          });
+          setKeywords(keywordObject); // 키워드를 올바른 형식으로 변환하여 상태에 저장
+        });
+      });
+
+      socket.current.on("previousMembers", (members) => {
+        console.log(
+          "Received previous members:",
+          JSON.stringify(members, null, 2)
+        );
+        setMembers(members); // 이전 멤버 리스트 상태에 저장
       });
 
       // 컴포넌트 언마운트 시 WebSocket 연결 해제
@@ -63,31 +116,47 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     }
   }, [roomId, user]); // roomId와 user가 변경될 때마다 실행
 
-  useEffect(() => {
-    if (socket.current) {
-      // 이전 메시지 수신
-      socket.current.on("previousMessages", (messages) => {
-        setMessages(messages);
-      });
+  // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수
+  const scrollToMessage = (keyword: string) => {
+    // 모든 메시지 인덱스 찾기
+    const messageIndexes = messages
+      .map((msg, index) => (msg.content.includes(keyword) ? index : -1))
+      .filter((index) => index !== -1);
 
-      // 이전 키워드 수신
-      socket.current.on("previousKeywords", (keywords: string[]) => {
-        const keywordObject = keywords.reduce((acc, keyword, index) => {
-          acc[keyword] = index;
-          return acc;
-        }, {} as { [key: string]: number });
+    if (messageIndexes.length > 0) {
+      const messageIndex = messageIndexes[0]; // 첫 번째 인덱스 선택
 
-        setKeywords(keywordObject); // 키워드를 올바른 형식으로 변환하여 상태에 저장
-      });
-    }
+      if (messageRefs.current[messageIndex] && chatContainerRef.current) {
+        const messageElement = messageRefs.current[messageIndex]; // 해당 메시지 요소
+        const chatContainer = chatContainerRef.current; // 채팅 컨테이너 요소
 
-    return () => {
-      if (socket.current) {
-        socket.current.off("previousMessages");
-        socket.current.off("previousKeywords");
+        if (messageElement && chatContainer) {
+          const messageRect = messageElement.getBoundingClientRect();
+          const containerRect = chatContainer.getBoundingClientRect();
+
+          const offset =
+            messageRect.top - containerRect.top + chatContainer.scrollTop; // 스크롤 위치 계산
+
+          chatContainer.scrollTo({
+            top: offset,
+            behavior: "smooth", // 부드러운 스크롤
+          });
+
+          // 해당 메시지에 하이라이트 효과를 적용
+          setHighlightedMessageIndex(messageIndex);
+
+          // 1초 후 하이라이트 해제
+          setTimeout(() => {
+            setHighlightedMessageIndex(null);
+          }, 1000);
+        }
+      } else {
+        console.error("Message element not found for keyword:", keyword);
       }
-    };
-  }, [socket]);
+    } else {
+      console.error("Message index not found for keyword:", keyword);
+    }
+  };
 
   // 사용자가 메시지를 전송할 때 호출되는 함수
   const handleSendMessage = () => {
@@ -106,33 +175,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     console.log("Sending message:", message); // 추가된 콘솔 로그
     socket.current.emit("message", message); // 메시지를 서버로 전송
     setNewMessage(""); // 입력창 초기화
-  };
-
-  // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수
-  const scrollToMessage = (keyword: string) => {
-    const messageIndex = keywords[keyword]; // 키워드에 해당하는 메시지 인덱스 찾기
-    if (messageRefs.current[messageIndex] && chatContainerRef.current) {
-      const messageElement = messageRefs.current[messageIndex]; // 해당 메시지 요소
-      const chatContainer = chatContainerRef.current; // 채팅 컨테이너 요소
-
-      if (messageElement && chatContainer) {
-        const messageRect = messageElement.getBoundingClientRect();
-        const containerRect = chatContainer.getBoundingClientRect();
-
-        const offset =
-          messageRect.top - containerRect.top + chatContainer.scrollTop; // 스크롤 위치 계산
-
-        chatContainer.scrollTo({
-          top: offset,
-          behavior: "smooth", // 부드러운 스크롤
-        });
-
-        setHighlightedMessageIndex(messageIndex); // 해당 메시지를 강조 표시
-        setTimeout(() => {
-          setHighlightedMessageIndex(null); // 일정 시간 후 강조 해제
-        }, 1000); // 1초 후 강조 표시 해제
-      }
-    }
   };
 
   // 메시지가 추가될 때마다 스크롤을 맨 아래로 이동
@@ -161,7 +203,9 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                 return (
                   <div
                     key={index}
-                    ref={(el) => (messageRefs.current[index] = el)}
+                    ref={(el) => {
+                      messageRefs.current[index] = el;
+                    }}
                     className={`flex items-start mb-2 ${
                       highlightedMessageIndex === index
                         ? "bg-yellow-100 border border-yellow-300"
@@ -223,7 +267,26 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
           <div className="flex flex-col w-96 p-4 border border-gray-300">
             <div className="h-4/5 overflow-y-auto border-b border-gray-300">
-              <MemberList /> {/* 멤버 리스트 표시 */}
+              {/* 멤버 리스트 표시 시작 */}
+              <div className="flex-1 overflow-y-auto border-1 h-[100%] p-2 rounded-lg">
+                {members.map((member, index) => (
+                  <div key={index} className="flex items-center mb-4">
+                    <img
+                      src={member.profile || "default-profile.png"}
+                      alt={member.nickname}
+                      className="w-10 h-10 bg-gray-300 rounded-full mr-2"
+                    />
+                    <div>
+                      <div className="text-lg font-bold">{member.nickname}</div>
+                      <div className="text-sm text-gray-500">{member.job}</div>
+                      <div className="text-sm text-gray-700">
+                        {member.role === "host" && " (Host)"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* 멤버 리스트 표시 끝 */}
             </div>
             <div className="flex-1 overflow-y-auto pt-4 border-t border-gray-300">
               <ChatKeyword
