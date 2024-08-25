@@ -11,26 +11,41 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
   socket,
   onKeywordClick,
 }) => {
-  const [keywords, setKeywords] = useState<string[]>([]); // 상태로 관리
+  const [keywords, setKeywords] = useState<string[]>([]); // 키워드를 상태로 관리
 
   useEffect(() => {
     if (socket) {
+      // 서버로부터 키워드 업데이트 이벤트를 수신
       socket.on("keywordUpdate", (updatedKeywords: string[]) => {
         console.log("Received updated keywords:", updatedKeywords);
+
         setKeywords((prevKeywords) => {
-          // 중복을 제거하고 기존 키워드에 새 키워드를 병합
+          // 새로운 키워드를 기존 키워드에 병합하고 중복 제거
           const newKeywords = [...prevKeywords, ...updatedKeywords];
-          return Array.from(new Set(newKeywords)); // Set을 사용해 중복 제거
+          return Array.from(new Set(newKeywords));
+        });
+      });
+
+      // 방에 처음 입장할 때 서버로부터 이전 키워드를 수신하는 이벤트
+      socket.on("previousKeywords", (previousKeywords: string[]) => {
+        console.log("Received previous keywords:", previousKeywords);
+
+        setKeywords((prevKeywords) => {
+          // 이전 키워드를 기존 키워드에 병합하고 중복 제거
+          const newKeywords = [...prevKeywords, ...previousKeywords];
+          return Array.from(new Set(newKeywords));
         });
       });
     }
 
     return () => {
+      // 컴포넌트가 언마운트되거나 socket이 변경될 때 이벤트 리스너를 정리
       if (socket) {
         socket.off("keywordUpdate");
+        socket.off("previousKeywords");
       }
     };
-  }, [socket, roomId]);
+  }, [socket, roomId]); // socket과 roomId가 변경될 때마다 이 useEffect 실행
 
   return (
     <div className="flex flex-wrap">
