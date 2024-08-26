@@ -34,7 +34,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "14" # 프로젝트에 맞는 Node.js 버전으로 변경하세요
+          node-version: "20" # 프로젝트에 맞는 Node.js 버전으로 변경하세요
       - run: npm ci
       - run: npm test
       - run: npm run build

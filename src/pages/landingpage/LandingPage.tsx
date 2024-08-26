@@ -7,6 +7,7 @@ import { ArrowUp } from "react-bootstrap-icons";
 import Header from "../../components/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import ChatbotButton from "../../components/ChatbotButton";
 
 // 슬라이드 이미지 데이터 (실제 이미지 URL로 교체 필요)
 const slides = [
@@ -157,6 +158,7 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
             </Container>
+            <ChatbotButton />
           </section>
         </main>
 
@@ -167,7 +169,7 @@ const LandingPage: React.FC = () => {
             className="scroll-top-button"
             style={{
               position: "fixed",
-              bottom: "20px",
+              bottom: "180px",
               right: "20px",
               borderRadius: "50%",
               width: "50px",
