@@ -15,53 +15,25 @@ import { useNavigate } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
 
-interface Room {
-  id: string;
-  name: string;
-  type: "chat" | "kanban";
-  participants: string[];
-}
-
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
-  const { room, createRoom, fetchRoom } = useRoom();
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [filter, setFilter] = useState<"all" | "chat" | "kanban">("all");
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [roomsPerPage] = useState(6);
+  const { rooms, fetchRooms, createRoom, loading, error } = useRoom(); // useRoom 훅을 통해 필요한 함수 및 상태 가져오기
+  const [filter, setFilter] = useState<"all" | "chat" | "kanban">("all"); // 필터링 상태
+  const [showCreateModal, setShowCreateModal] = useState(false); // 방 생성 모달 표시 상태
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [roomsPerPage] = useState(6); // 페이지 당 방 개수 설정
 
+  // 컴포넌트가 마운트될 때 방 목록을 가져옴
   useEffect(() => {
-    // 실제 애플리케이션에서는 여기서 모든 룸 목록을 가져오는 API를 호출해야 합니다.
-  }, []);
+    fetchRooms(); // API 호출을 통해 방 목록을 가져옴
+  }, [fetchRooms]);
 
-  useEffect(() => {
-    setRooms(
-      rooms.sort((a, b) =>
-        a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-      )
-    );
-  }, [rooms]);
-
-  const handleCreateRoom = (roomData: any) => {
-    const newRoomId = createRoom(roomData.topic, roomData.type);
-    setRooms([
-      ...rooms,
-      {
-        id: newRoomId,
-        name: roomData.topic,
-        type: roomData.type,
-        participants: [],
-      },
-    ]);
-    setShowCreateModal(false);
-    navigate(`/${roomData.type}/${newRoomId}`);
-  };
-
+  // 방 목록 필터링
   const filteredRooms = rooms.filter(
     (room) => filter === "all" || room.type === filter
   );
 
+  // 현재 페이지에 해당하는 방 목록 계산
   const indexOfLastRoom = currentPage * roomsPerPage;
   const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
   const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom);
@@ -72,6 +44,24 @@ const MainPage: React.FC = () => {
   );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // 방 생성 핸들러 함수
+  const handleCreateRoom = async (roomData: any) => {
+    const newRoomId = await createRoom(
+      roomData.topic, // 방의 제목
+      roomData.type, // 방의 타입 (chat/kanban)
+      roomData.participants, // 최대 인원수
+      roomData.duration, // 제한 시간
+      roomData.keywords // 방 키워드
+    );
+    if (newRoomId) {
+      setShowCreateModal(false);
+      navigate(`/${roomData.type}/${newRoomId}`); // 생성된 방으로 이동
+    }
+  };
+
+  if (loading) return <div>Loading...</div>; // 로딩 중 표시
+  if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
 
   return (
     <Container className="mt-4 ">
@@ -138,15 +128,17 @@ const MainPage: React.FC = () => {
               <Col key={room.id}>
                 <Card>
                   <Card.Body>
-                    <Card.Title>{room.name}</Card.Title>
+                    <Card.Title>{room.title}</Card.Title>
                     <Card.Text>
                       타입: {room.type === "chat" ? "베리 톡" : "베리 보드"}
                       <br />
-                      참여자: {room.participants.length}
+                      참여자: {room.participants}/{room.max_member}
+                      <br />
+                      키워드: {room.keywords.join(", ")}
                     </Card.Text>
                     <Button
                       variant="primary"
-                      onClick={() => navigate(`/${room.type}/${room.id}`)}
+                      onClick={() => navigate(`/${room.type}/${room.uuid}`)}
                     >
                       참여하기
                     </Button>

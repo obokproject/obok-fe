@@ -12,7 +12,7 @@ import {
 interface CreateRoomModalProps {
   show: boolean;
   onHide: () => void;
-  onCreate: (roomData: any) => void;
+  onCreate: (roomData: any) => void; // onCreate 함수가 방 생성 후 호출됩니다.
 }
 
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
@@ -21,8 +21,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   onCreate,
 }) => {
   const [roomType, setRoomType] = useState<"chat" | "kanban">("chat");
-  const [topic, setTopic] = useState("");
-  const [participants, setParticipants] = useState(4);
+  const [title, setTitle] = useState(""); // topic을 title로 변경
+  const [maxMember, setMaxMember] = useState(4); // participants를 maxMember로 변경
   const [duration, setDuration] = useState(5);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [currentKeyword, setCurrentKeyword] = useState("");
@@ -30,8 +30,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const handleCreate = () => {
     onCreate({
       type: roomType,
-      topic,
-      participants,
+      title, // title로 전달
+      max_member: maxMember, // max_member로 전달
       duration,
       keywords,
     });
@@ -95,28 +95,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               <Form.Control
                 type="text"
                 placeholder="공유하고 싶은 주제를 정해보세요(20자)"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
+                value={title} // topic을 title로 변경
+                onChange={(e) => setTitle(e.target.value)}
                 maxLength={20}
                 className="bg-secondary text-white no-focus-outline"
                 style={{ outline: "none", boxShadow: "none" }}
               />
             </div>
           </Form.Group>
-
-          {/* <Form.Group className="flex flex-row bg-gray-300 rounded-md overflow-hidden">
-            <Form.Label className="text-gray-700 border-r-4 w-20 font-semibold pl-1 h-full">
-              주제
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="공유하고 싶은 주제를 정해보세요(20자)"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              maxLength={20}
-              className="w-full px-3 py-2 bg-gray-300 text-gray-700 focus:outline-none"
-            />
-          </Form.Group> */}
 
           <Form.Group className="mb-3">
             <div className="d-flex bg-light rounded">
@@ -168,8 +154,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     type="number"
                     min={2}
                     max={10}
-                    value={participants}
-                    onChange={(e) => setParticipants(Number(e.target.value))}
+                    value={maxMember} // participants를 maxMember로 변경
+                    onChange={(e) => setMaxMember(Number(e.target.value))}
                     style={{ outline: "none", boxShadow: "none" }}
                   />
                 </div>
