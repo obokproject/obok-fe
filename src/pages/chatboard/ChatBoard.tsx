@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { useRoom } from "../../hooks/useRoom"; // 방 정보를 가져오는 custom hook
+import { useRoom } from "../../hooks/useChat"; // 방 정보를 가져오는 custom hook
 import { useAuth } from "../../contexts/AuthContext"; // 사용자 인증 context
 import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴포넌트
 // import MemberList from "../../components/MemberList"; // 멤버 리스트 컴포넌트
