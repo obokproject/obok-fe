@@ -47,16 +47,22 @@ const MainPage: React.FC = () => {
 
   // 방 생성 핸들러 함수
   const handleCreateRoom = async (roomData: any) => {
-    const newRoomId = await createRoom(
-      roomData.topic, // 방의 제목
-      roomData.type, // 방의 타입 (chat/kanban)
-      roomData.participants, // 최대 인원수
-      roomData.duration, // 제한 시간
-      roomData.keywords // 방 키워드
-    );
-    if (newRoomId) {
-      setShowCreateModal(false);
-      navigate(`/${roomData.type}/${newRoomId}`); // 생성된 방으로 이동
+    console.log("Creating room with data:", roomData);
+    try {
+      const newRoomId = await createRoom(
+        roomData.title, // 방 제목
+        roomData.type, // 방 타입
+        roomData.max_member, // 최대 인원
+        roomData.duration, // 제한 시간
+        roomData.keywords // 키워드
+      );
+      if (newRoomId) {
+        setShowCreateModal(false);
+        navigate(`/${roomData.type}/${newRoomId}`); // 생성된 방으로 이동
+      }
+    } catch (error) {
+      console.error("Failed to create room:", error);
+      // 추가적인 오류 메시지를 사용자에게 표시할 수 있음
     }
   };
 
