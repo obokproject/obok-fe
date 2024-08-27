@@ -1,7 +1,7 @@
 # 작업이름
 name: Frontend CI/CD
 
-# 자동 구동 조건 
+# 자동 구동 조건
 on:
   push:
     branches: [main]
@@ -23,7 +23,6 @@ jobs:
       - run: npm test
       - run: npm run build
 
-    
   deploy:
     needs: build-and-test
     runs-on: windows-latest
@@ -31,12 +30,13 @@ jobs:
 
     # Job에서 실행될 각각의 step
     steps:
-      name: configure aws credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          AWS-REGION: ap-northeast-2
+      - name: aws deployment
         run: |
           npm ci
           npm run build
