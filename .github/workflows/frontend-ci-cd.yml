@@ -1,55 +1,43 @@
-# name: GitHub Actions Demo
-# run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-# on: [push]
-# jobs:
-#   Explore-GitHub-Actions:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-#       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-#       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-#       - name: Check out repository code
-#         uses: actions/checkout@v4
-#       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-#       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-#       - name: List files in the repository
-#         run: |
-#           ls ${{ github.workspace }}
-#       - run: echo "🍏 This job's status is ${{ job.status }}."
-
+# 작업이름
 name: Frontend CI/CD
 
+# 자동 구동 조건 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+# 구동할 작업(Job) 생성
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20" # 프로젝트에 맞는 Node.js 버전으로 변경하세요
+          node-version: "20"
       - run: npm ci
       - run: npm test
       - run: npm run build
 
+    
   deploy:
     needs: build-and-test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     if: github.ref == 'refs/heads/main'
 
+    # Job에서 실행될 각각의 step
     steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to S3
-        env:
+      name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
         run: |
-          npm install -g aws-cli
-          aws s3 sync build/ s3://your-bucket-name --delete
+          npm ci
+          npm run build
+          aws s3 sync build/ s3://team05-razvery-bucket --delete
