@@ -11,7 +11,7 @@ on:
 # 구동할 작업(Job) 생성
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -25,19 +25,22 @@ jobs:
 
   deploy:
     needs: build-and-test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     # Job에서 실행될 각각의 step
     steps:
+      - uses: actions/checkout@v3
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS-REGION: ap-northeast-2
-      - name: aws deployment
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: Install dependencies and build
         run: |
           npm ci
           npm run build
-          aws s3 sync build/ s3://team05-razvery-bucket --delete
+      # AWS S3 sync 명령
+      - name: Deploy to S3
+        run: aws s3 sync build/ s3://team05-razvery-bucket --delete
