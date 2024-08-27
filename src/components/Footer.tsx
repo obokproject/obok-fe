@@ -16,9 +16,7 @@ const Footer: React.FC = () => {
         <Row className="align-items-center text-light">
           <Col md={5} className="mb-3 mb-md-0">
             <h5 className="mb-2">RazVery</h5>
-            <p className="mb-0 small">
-              사업자 등록번호: 773-82-00001 | 주소:서울시 강남구 역삼로 160 9층
-            </p>
+            <p className="mb-0 small">주소:서울시 강남구 역삼로 160 9층</p>
             <p className="mb-0 small">
               RazVery &copy; {currentYear} All rights reserved.
             </p>
@@ -27,13 +25,13 @@ const Footer: React.FC = () => {
             <h6 className="mb-2">바로가기</h6>
             <ul>
               <li>
-                <Link to="/about" className="text-light">
-                  소개
+                <Link to="/" className="text-light">
+                  인스타그램
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-light">
-                  문의하기
+                <Link to="/about" className="text-light">
+                  소개
                 </Link>
               </li>
             </ul>
@@ -58,8 +56,7 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
             </ul>
-          </Col>
-          <Col md={1}>
+
             <Dropdown>
               <Dropdown.Toggle
                 variant="outline-light"

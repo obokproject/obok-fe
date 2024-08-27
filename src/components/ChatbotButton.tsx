@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { LucideClover, X, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
+import { Question } from "react-bootstrap-icons";
 
 interface Message {
   text: string;
@@ -9,16 +10,17 @@ interface Message {
 const ChatbotButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const toggleChat = () => setIsOpen(!isOpen);
 
   const handleOptionClick = (option: string) => {
+    setSelectedOption(option);
     setMessages([...messages, { text: option, sender: "user" }]);
 
     let response: string;
     switch (option) {
-      case "Razvery란?":
+      case "라즈베리란?":
         response = "실시간 생각 공유 플랫폼입니다.";
         break;
       case "이용문의":
@@ -31,7 +33,7 @@ const ChatbotButton: React.FC = () => {
         break;
       case "탈퇴문의":
         response =
-          "탈퇴를 원하시나요? 탈퇴 전 주의사항을 확인해 주세요. 추가 문의사항이 있으면 아래 인스타그램으로 메시지 주세요.";
+          "탈퇴를 원하시나요? 탈퇴 전 주의사항을 확인해 주시고, 그래도 탈퇴를 원하시면 인스타그램을 통해 문의해 주세요! 신속히 처리해드리겠습니다^^";
         break;
       default:
         response = "죄송합니다. 해당 옵션에 대한 정보가 없습니다.";
@@ -44,6 +46,7 @@ const ChatbotButton: React.FC = () => {
 
   const handleReset = () => {
     setMessages([]);
+    setSelectedOption(null);
   };
 
   return (
@@ -51,26 +54,32 @@ const ChatbotButton: React.FC = () => {
       {!isOpen && (
         <button
           onClick={toggleChat}
-          className="bg-yellow-200 hover:bg-gray-200 text-black rounded-lg p-3 shadow-lg"
+          className="hover:bg-gray-200 text-black rounded-full p-3 shadow-lg"
+          style={{ backgroundColor: "#ffb561" }}
         >
-          <LucideClover size={32} />
-          <span className="ml-2 font-bold">무엇이 궁금하신가요?</span>
+          <Question size={32} />
         </button>
       )}
 
       {isOpen && (
-        <div className="bg-white rounded-lg shadow-xl w-96 h-[25rem] flex flex-col">
-          <div className="bg-blue-500 text-white p-4 rounded-t-lg flex justify-between items-center">
+        <div className="bg-white rounded-lg shadow-xl w-96 h-[28rem] flex flex-col">
+          <div className="bg-[#f2dcef] p-4 rounded-t-lg flex justify-between items-center">
             <h3 className="font-bold">문의하기!</h3>
+
             <button
               onClick={toggleChat}
-              className="hover:bg-blue-600 p-1 rounded-full transition-colors duration-300"
+              className="hover:text-md p-1 rounded-full transition-colors duration-300"
             >
               <X size={24} />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1  p-4">
+            <div className="col-span-2 mb-2">
+              안녕하세요? 라즈베리입니다!
+              <br />
+              무엇이 궁금하신가요~?^^
+            </div>
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -90,13 +99,13 @@ const ChatbotButton: React.FC = () => {
           </div>
 
           <div className="p-4 border-t">
-            {messages.length === 0 ? (
+            {!selectedOption ? (
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => handleOptionClick("Razvery란?")}
+                  onClick={() => handleOptionClick("라즈베리란?")}
                   className="bg-gray-200 hover:bg-gray-300 rounded p-2"
                 >
-                  Razvery란?
+                  라즈베리란?
                 </button>
                 <button
                   onClick={() => handleOptionClick("이용문의")}
@@ -118,15 +127,13 @@ const ChatbotButton: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <>
-                <button
-                  onClick={handleReset}
-                  className="w-full bg-gray-200 hover:bg-gray-300 rounded p-2 flex items-center justify-center"
-                >
-                  <ArrowLeft size={20} className="mr-2" />
-                  처음으로 돌아가기
-                </button>
-              </>
+              <button
+                onClick={handleReset}
+                className="w-full bg-gray-200 hover:bg-gray-300 rounded p-2 flex items-center justify-center"
+              >
+                <ArrowLeft size={20} className="mr-2" />
+                처음으로 돌아가기
+              </button>
             )}
           </div>
         </div>
@@ -134,5 +141,4 @@ const ChatbotButton: React.FC = () => {
     </div>
   );
 };
-
 export default ChatbotButton;
