@@ -15,7 +15,6 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import MyPage from "./pages/mypage/MyPage";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
-import ContactPage from "./pages/about/ContactPage";
 
 let API_URL;
 
@@ -62,7 +61,6 @@ const AppContent: React.FC = () => {
           <Route path="/kanban/:roomId" element={<KanbanBoardWrapper />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </main>
       <Footer />
