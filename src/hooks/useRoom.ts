@@ -72,7 +72,7 @@ export const useRoom = (initialRoomId?: string) => {
     ) => {
       try {
         const newRoomId = uuidv4(); // 프론트에서 UUID 생성
-        const response = await axios.post("/api/rooms", {
+        const response = await axios.post("/main", {
           uuid: newRoomId,
           title,
           type,
