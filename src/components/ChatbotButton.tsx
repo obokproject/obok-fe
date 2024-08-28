@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { X, ArrowLeft } from "lucide-react";
-import { Question } from "react-bootstrap-icons";
+import { X, ArrowLeft, BotMessageSquare } from "lucide-react";
 
 interface Message {
   text: string;
@@ -57,14 +56,14 @@ const ChatbotButton: React.FC = () => {
           className="hover:bg-gray-200 text-black rounded-full p-3 shadow-lg"
           style={{ backgroundColor: "#ffb561" }}
         >
-          <Question size={32} />
+          <BotMessageSquare size={24} />
         </button>
       )}
 
       {isOpen && (
-        <div className="bg-white rounded-lg shadow-xl w-96 h-[28rem] flex flex-col">
-          <div className="bg-[#f2dcef] p-4 rounded-t-lg flex justify-between items-center">
-            <h3 className="font-bold">문의하기!</h3>
+        <div className="bg-white rounded-lg rounded-[40px] shadow-xl w-96 h-[28rem] flex flex-col overflow-hidden">
+          <div className="bg-[#f2dcef] p-4 flex justify-between items-center  h-[64px]">
+            <h3 className="font-bold">문의하기</h3>
 
             <button
               onClick={toggleChat}
@@ -74,9 +73,12 @@ const ChatbotButton: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex-1  p-4">
-            <div className="col-span-2 mb-2">
-              안녕하세요? 라즈베리입니다!
+          <div className="flex-1 p-4">
+            <div
+              className="col-span-2 p-2 rounded-2xl text-sm w-[208px]"
+              style={{ backgroundColor: "#E5E7EB" }}
+            >
+              안녕하세요. 라즈베리입니다.
               <br />
               무엇이 궁금하신가요~?^^
             </div>
@@ -103,19 +105,19 @@ const ChatbotButton: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleOptionClick("라즈베리란?")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2"
+                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
                 >
                   라즈베리란?
                 </button>
                 <button
                   onClick={() => handleOptionClick("이용문의")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2"
+                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
                 >
                   이용문의
                 </button>
                 <button
                   onClick={() => handleOptionClick("상담문의")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2"
+                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
                 >
                   상담문의
                 </button>

@@ -1,40 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import LoginModal from "../../components/LoginModal";
 import "../../styles/tailwind.css";
 import { ArrowUp } from "react-bootstrap-icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import ChatbotButton from "../../components/ChatbotButton";
-import { Description } from "@headlessui/react";
 
 // 슬라이드 이미지 데이터 (실제 이미지 URL로 교체 필요)
 const slides = [
   {
-    url: "https://picsum.photos/800/440",
+    url: "/images/landing-veryfind.png",
     alt: "Image 1",
+    title: "생각열매 찾기",
+    description:
+      "관심있거나 좋아하는 주제를 찾아, 원하는 프로젝트를 탐색해 보세요!",
+  },
+  {
+    url: "/images/landing-verytalk.png",
+    alt: "Image 2",
     title: "베리톡",
     description:
-      "실시간 대화를 통해서 유저간 의견을 자유롭게 공유할수 있는 채팅방",
+      "실시간 대화를 통해서 유저간 자유롭게 아이디어의 날개를 펼쳐보세요.",
   },
   {
-    url: "https://picsum.photos/800/441",
-    alt: "Image 2",
-    title: "제목",
-    description: "설명",
-  },
-  {
-    url: "https://picsum.photos/800/442",
+    url: "/images/landing-veryboard.png",
     alt: "Image 3",
-    title: "제목",
-    description: "설명",
+    title: "베리보드",
+    description: "직관적인 보드로 아이디어를 체계적으로 관리해보세요.",
   },
   {
-    url: "https://picsum.photos/800/443",
+    url: "/images/landing-verymap.png",
     alt: "Image 4",
-    title: "제목",
-    description: "설명",
+    title: "베리맵(추후공개)",
+    description: "창의력을 시각화하여 생각의 흐름을 자유롭게 확장하세요.",
   },
 ];
 
@@ -79,14 +79,18 @@ const LandingPage: React.FC = () => {
   return (
     <>
       <Container fluid className="p-0 ">
-        <main className="max-w-screen-xl mx-auto">
-          <section className="py-5 text-center bg-light">
+        <main className="p-0">
+          <section className="py-5 text-center">
             <Container fluid>
               <h1 className="display-6 mb-3">실시간 아이디어 공유 플랫폼</h1>
               <p className="lead mb-4">모두와 함께 하는 브레인스토밍</p>
               <button
-                className="flex justify-center items-center col-4 mx-auto rounded-2xl text-5xl font-bold"
-                style={{ backgroundColor: "#F2DCEF", height: "80px" }}
+                className="flex justify-center items-center col-4 mx-auto rounded-full text-5xl font-bold"
+                style={{
+                  backgroundColor: "#F2DCEF",
+                  width: "328px",
+                  height: "80px",
+                }}
                 onClick={handleStartButton}
               >
                 시작하기
@@ -94,21 +98,15 @@ const LandingPage: React.FC = () => {
             </Container>
           </section>
 
-          <section
-            className="py-5"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgb(243 244 246) 67%, #F2DCEF 33%)",
-            }}
-          >
+          <section>
             <Container fluid className="relative z-10">
               <div
-                className="aspect-w-16 aspect-h-9 shadow-2xl rounded-lg overflow-hidden"
+                className="aspect-w-16 aspect-h-9 shadow-2xl rounded-2xl overflow-hidden"
                 style={{
                   maxWidth: "900px",
                   height: "544px",
                   margin: "0 auto",
-                  backgroundColor: "gray",
+                  backgroundColor: "lightgray",
                 }}
               >
                 {/* <iframe
@@ -122,14 +120,11 @@ const LandingPage: React.FC = () => {
             </Container>
           </section>
 
-          <section
-            className="py-5 text-center"
-            style={{ backgroundColor: "#F2DCEF" }}
-          >
+          <section className="pt-[116px] text-center">
             <Container fluid>
               <div className="w-full max-w-[579px] mx-auto p-4 flex flex-col items-center gap-4">
                 <img
-                  className="w-52 h-52"
+                  className=""
                   src="/images/landing-light.png"
                   alt="아이디어 전구 이미지"
                 />
@@ -231,9 +226,9 @@ const LandingPage: React.FC = () => {
           </section>
         </main>
 
+        {/* 스크롤버튼 */}
         {showScrollTopButton && (
           <button
-            // variant="primary"
             onClick={scrollTop}
             className="scroll-top-button fixed sm:right-8 md:right-12 lg:right-20"
             style={{
@@ -252,6 +247,8 @@ const LandingPage: React.FC = () => {
             <ArrowUp size={24} />
           </button>
         )}
+
+        {/* 로그인모달 */}
         <LoginModal
           isOpen={showLoginModal}
           closeModal={closeLoginModal}
