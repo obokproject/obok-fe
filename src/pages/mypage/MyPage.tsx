@@ -2,13 +2,13 @@ import React, { useState, useRef } from "react";
 import {
   Container,
   Form,
-  Button,
   Image,
   Row,
   Col,
   Tab,
   Tabs,
   Modal,
+  Button,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,6 +24,37 @@ const MyPage: React.FC = () => {
 
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // 유효성 검사를 위한 상태 추가
+  const [isNicknameValid, setIsNicknameValid] = useState(true);
+  const [isJobValid, setIsJobValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+
+  // 유효성 검사 함수
+  const validateNickname = (value: string) => {
+    const isValid = value.length >= 2 && value.length <= 20;
+    setIsNicknameValid(isValid);
+    return isValid;
+  };
+
+  const validateJob = (value: string) => {
+    const isValid = value.length <= 12;
+    setIsJobValid(isValid);
+    return isValid;
+  };
+
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(value);
+    setIsEmailValid(isValid);
+    return isValid;
+  };
+
+  // TODO: 필요한가?
+  // const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setNickname(event.target.value);
+  //   validateNickname(event.target.value);
+  // };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,14 +73,47 @@ const MyPage: React.FC = () => {
     setProfileImage(null);
   };
 
-  const handleSubmit = () => {
-    setShowConfirmModal(true);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      validateNickname(nickname) &&
+      validateJob(job) &&
+      validateEmail(email)
+    ) {
+      setShowConfirmModal(true);
+    }
   };
 
   const confirmSave = () => {
-    // 여기에 저장 로직 구현
-    setShowConfirmModal(false);
-    // 메인 페이지로 이동 로직 구현
+    try {
+      //   // API 요청을 통해 사용자 정보를 저장하는 로직
+      //   const response = await fetch("/api/users/me", {
+      //     method: "PUT",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //     },
+      //     body: JSON.stringify({
+      //       nickname,
+      //       job,
+      //       email,
+      //       profileImage,
+      //     }),
+      //   });
+
+      //   if (!response.ok) {
+      //     throw new Error("HTTP error!");
+      //   }
+
+      //   const data = await response.json();
+      //   console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
+
+      setShowConfirmModal(false);
+      navigate("/"); // 이전 페이지로 이동
+    } catch (error) {
+      console.error("사용자 정보 저장 중 오류가 발생했습니다:", error);
+      // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+    }
   };
 
   const handleLogout = async () => {
@@ -58,7 +122,6 @@ const MyPage: React.FC = () => {
       navigate("/"); // 로그아웃 후 랜딩 페이지로 리다이렉트합니다.
     } catch (error) {
       console.error("로그아웃 중 오류가 발생했습니다:", error);
-      // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
     }
   };
 
@@ -73,48 +136,66 @@ const MyPage: React.FC = () => {
       <Tabs
         activeKey={activeTab}
         onSelect={(k) => k && setActiveTab(k)}
-        className="mb-4 justify-content-center"
+        className="mb-4"
+        style={{ paddingLeft: "50px" }}
       >
         <Tab eventKey="profile" title="프로필">
           <Row className="mb-4">
             <Col xs={12} md={6} className="text-center mb-4">
-              {profileImage ? (
-                <Image
-                  src={profileImage}
-                  roundedCircle
-                  width={240}
-                  height={240}
-                  className="mb-3 shadow"
-                />
-              ) : (
-                <div
+              <div
+                style={{
+                  width: "240px",
+                  height: "240px",
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "50%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  margin: "0 auto 1rem",
+                  position: "relative",
+                }}
+              >
+                {profileImage ? (
+                  <Image
+                    src={profileImage}
+                    roundedCircle
+                    className=""
+                    style={{ maxWidth: "100%", maxHeight: "100%" }}
+                  />
+                ) : (
+                  <button
+                    className="btn"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      fontSize: "42px",
+                      fontWeight: "bold",
+                      color: "#9F9F9F",
+                      cursor: "pointer",
+                      background: "none",
+                      border: "none",
+                    }}
+                  >
+                    +
+                  </button>
+                )}
+                <button
+                  onClick={handleImageDelete}
                   style={{
-                    width: 240,
-                    height: 240,
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "50%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontSize: "72px",
-                    margin: "0 auto 1rem",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
                   }}
                 >
-                  {nickname ? nickname.charAt(0) : "U"}
-                </div>
-              )}
-              <div>
-                <Button
-                  variant="outline-primary"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="me-2"
-                >
-                  사진 추가
-                </Button>
-                <Button variant="outline-danger" onClick={handleImageDelete}>
-                  사진 삭제
-                </Button>
+                  <img
+                    src="/images/mypage-x-circle.png"
+                    alt="Delete"
+                    width="24"
+                    height="24"
+                  />
+                </button>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -127,48 +208,79 @@ const MyPage: React.FC = () => {
             <Col xs={12} md={6}>
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>닉네임</Form.Label>
+                  <Form.Label>
+                    닉네임<span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="닉네임"
                     value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
+                    onChange={(e) => {
+                      setNickname(e.target.value);
+                      validateNickname(e.target.value);
+                    }}
                     maxLength={20}
+                    isInvalid={!isNicknameValid}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    닉네임은 2~20자 사이여야 합니다.
+                  </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <div className="mb-3">
                   <Form.Label>직업</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="직업"
-                    value={job}
-                    onChange={(e) => setJob(e.target.value)}
-                    maxLength={12}
-                  />
-                </Form.Group>
+                  <div className="">
+                    <Form.Control
+                      type="text"
+                      placeholder="직업"
+                      value={job}
+                      onChange={(e) => {
+                        setJob(e.target.value);
+                        validateJob(e.target.value);
+                      }}
+                      maxLength={12}
+                      isInvalid={!isJobValid}
+                    />
+                    {!isJobValid && <span className="text-red">X</span>}
+                  </div>
+                </div>
+
                 <Form.Group className="mb-3">
                   <Form.Label>이메일</Form.Label>
                   <Form.Control
                     type="email"
-                    placeholder="이메일"
+                    placeholder="example@email.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      validateEmail(e.target.value);
+                    }}
+                    isInvalid={!isEmailValid}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    유효한 이메일 주소를 입력해주세요.
+                  </Form.Control.Feedback>
                 </Form.Group>
-                <Button
-                  variant="primary"
-                  onClick={handleSubmit}
-                  className="w-100"
-                >
-                  정보 저장
-                </Button>
+
+                <div className="d-flex justify-content-end">
+                  <button
+                    onClick={handleSubmit}
+                    className="w-[210px] h-[44px] font-bold rounded-full"
+                    style={{ backgroundColor: "#ffb561" }}
+                  >
+                    정보 저장
+                  </button>
+                </div>
               </Form>
             </Col>
           </Row>
           <div className="text-center mt-5">
-            <Button variant="outline-secondary" onClick={handleLogout}>
+            <button
+              className="w-[160px] h-[56px] font-bold rounded-full bg-gray-200"
+              onClick={handleLogout}
+            >
               로그아웃
-            </Button>
+            </button>
           </div>
         </Tab>
         <Tab eventKey="history" title="참여 내역">
@@ -176,22 +288,38 @@ const MyPage: React.FC = () => {
         </Tab>
       </Tabs>
 
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>확인</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>정보를 저장하고 메인페이지로 이동합니다.</Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
-          >
-            취소
-          </Button>
-          <Button variant="primary" onClick={confirmSave}>
-            확인
-          </Button>
-        </Modal.Footer>
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        backdrop="static"
+        keyboard={false}
+        dialogClassName="modal-rounded"
+      >
+        <div className="rounded-xl overflow-hidden bg-white">
+          <Modal.Header style={{ border: "none" }}>
+            <Modal.Title className="font-bold ml-3 ">
+              저장하시겠습니까?
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="">
+            정보를 저장하고 이전페이지로 이동합니다.
+          </Modal.Body>
+          <Modal.Footer style={{ border: "none", justifyContent: "center" }}>
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              className="m-1 w-[100px] rounded-full bg-gray-200 text-lg"
+            >
+              취소
+            </button>
+            <button
+              className="w-[100px] rounded-full m-1 text-lg"
+              onClick={confirmSave}
+              style={{ backgroundColor: "#ffb561" }}
+            >
+              확인
+            </button>
+          </Modal.Footer>
+        </div>
       </Modal>
     </Container>
   );
