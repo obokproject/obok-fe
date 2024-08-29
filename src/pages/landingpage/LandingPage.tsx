@@ -101,7 +101,7 @@ const LandingPage: React.FC = () => {
           <section>
             <Container fluid className="relative z-10">
               <div
-                className="aspect-w-16 aspect-h-9 shadow-2xl rounded-2xl overflow-hidden"
+                className="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden"
                 style={{
                   maxWidth: "900px",
                   height: "544px",
@@ -122,7 +122,7 @@ const LandingPage: React.FC = () => {
 
           <section className="pt-[116px] text-center">
             <Container fluid>
-              <div className="w-full max-w-[579px] mx-auto p-4 flex flex-col items-center gap-4">
+              <div className="w-full max-w-[650px] mx-auto p-4 flex flex-col items-center gap-4">
                 <img
                   className=""
                   src="/images/landing-light.png"
@@ -181,7 +181,7 @@ const LandingPage: React.FC = () => {
                 >
                   <IoIosArrowForward size={24} />
                 </button>
-                <div className="overflow-hidden rounded-lg shadow-2xl max-w-3xl mx-auto">
+                <div className="overflow-hidden rounded-lg max-w-3xl mx-auto">
                   {slides.map((slide, index) => (
                     <div
                       key={index}
