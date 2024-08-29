@@ -14,6 +14,7 @@ interface Room {
   keywords: string[];
   user_id: number; // 방을 생성한 사용자의 ID
   nickname: string; // 방을 생성한 사용자의 닉네임
+  createdAt: string;
 }
 
 export const useRoom = (initialRoomId?: string) => {

@@ -21,7 +21,7 @@ const MainPage: React.FC = () => {
   const [filter, setFilter] = useState<"all" | "chat" | "kanban">("all"); // 필터링 상태
   const [showCreateModal, setShowCreateModal] = useState(false); // 방 생성 모달 표시 상태
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
-  const [roomsPerPage] = useState(6); // 페이지 당 방 개수 설정
+  const [roomsPerPage] = useState(9); // 페이지 당 방 개수 설정
 
   // 컴포넌트가 마운트될 때 방 목록을 가져옴
   useEffect(() => {
@@ -44,6 +44,21 @@ const MainPage: React.FC = () => {
   );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const calculateRemainingTime = (
+    createdAt: string,
+    duration: number
+  ): number => {
+    const now = new Date().getTime(); // 현재 시간을 밀리초로 반환
+    const createdTime = new Date(createdAt).getTime(); // 생성 시간을 밀리초로 반환
+    const endTime = createdTime + duration * 60000; // 종료 시간을 밀리초로 계산
+
+    const remainingTimeInMinutes = Math.max(
+      Math.floor((endTime - now) / 60000),
+      0
+    ); // 남은 시간을 분 단위로 계산
+    return remainingTimeInMinutes;
+  };
 
   // 방 생성 핸들러 함수
   const handleCreateRoom = async (roomData: any) => {
@@ -70,15 +85,24 @@ const MainPage: React.FC = () => {
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
 
   return (
-    <Container className="mt-4 ">
-      <h3 className="mb-4"> 베리 생각열매 </h3>
-      <h5 className="mb-20"> 당신의 생각을 보여주세요.</h5>
-      <Row className="mb-4">
+    <Container className="mt-[120px] font-sans">
+      <div className="flex items-center text-[40px] font-[700]">
+        <img
+          src="/images/lightbulb.png"
+          alt="light"
+          style={{ height: "70px", width: "60px" }}
+        ></img>
+        베리 생각열매
+      </div>
+      <div className="mb-20 text-[32px] font-[400] ml-3">
+        당신의 생각을 보여주세요.
+      </div>
+      <Row className="mb-4 pl-[12px]">
         <Col>
           <Button
             variant={filter === "all" ? "primary" : "outline-primary"}
             onClick={() => setFilter("all")}
-            className="me-2"
+            className="me-3 text-[20px] font-[500]"
             style={{
               backgroundColor: filter === "all" ? "black" : "lightgray",
               borderColor: filter === "all" ? "black" : "lightgray",
@@ -91,6 +115,7 @@ const MainPage: React.FC = () => {
           <Button
             variant={filter === "chat" ? "primary" : "outline-primary"}
             onClick={() => setFilter("chat")}
+            className="me-3 text-[20px] font-[500]"
             style={{
               backgroundColor: filter === "chat" ? "black" : "lightgray",
               borderColor: filter === "chat" ? "black" : "lightgray",
@@ -107,6 +132,7 @@ const MainPage: React.FC = () => {
           <Button
             variant={filter === "kanban" ? "primary" : "outline-primary"}
             onClick={() => setFilter("kanban")}
+            className="me-3 text-[20px] font-[500]"
             style={{
               backgroundColor: filter === "kanban" ? "black" : "lightgray",
               borderColor: filter === "kanban" ? "black" : "lightgray",
@@ -122,96 +148,182 @@ const MainPage: React.FC = () => {
           </Button>
         </Col>
         <Col className="text-end">
-          <Button variant="secondary" onClick={() => setShowCreateModal(true)}>
-            만들기 +
-          </Button>
+          <button
+            className="text-[28px] font-[700] bg-[#FFB662]"
+            onClick={() => setShowCreateModal(true)}
+          >
+            만들기 十
+          </button>
         </Col>
       </Row>
-      <section className="bg-teal-50 h-[100vh] mt-10">
-        <Row xs={1} md={2} lg={3} className="g-4 mb-4">
-          {currentRooms.length > 0 ? (
-            currentRooms.map((room) => (
-              <Col key={room.id}>
-                <Card>
-                  <Card.Body>
-                    <Card.Title>{room.title}</Card.Title>
-                    <Card.Text>
-                      타입: {room.type === "chat" ? "베리 톡" : "베리 보드"}
-                      <br />
-                      참여자: {room.participants}/{room.max_member}
-                      <br />
-                      키워드: {room.keywords.join(", ")}
-                    </Card.Text>
-                    <Button
-                      variant="primary"
-                      onClick={() => navigate(`/${room.type}/${room.uuid}`)}
-                    >
-                      참여하기
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))
-          ) : (
-            <Col>
-              <p className="d-flex justify-content-center">
-                현재 진행 중인 룸이 없습니다. 새로운 주제로 대화해 볼까요?
-              </p>
-            </Col>
-          )}
-        </Row>
+      <section className="bg-white h-[60vh] mt-10 pl-12 border-t-4 border-gray-300 pt-10 justify-center">
+        {currentRooms.length > 0 ? (
+          <div className="flex flex-wrap gap-x-6 gap-y-10 mb-4">
+            {currentRooms.map((room) => (
+              <div
+                key={room.id}
+                className="bg-white rounded-[18px] overflow-hidden w-[384px] h-[216px] flex flex-col justify-between"
+                style={{
+                  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.25)",
+                }}
+              >
+                <div className="pl-[16px] pr-[16px] pt-[8px] flex flex-col gap-2 relative">
+                  <div className="text-[28px] font-[700] mb-2 flex flex-row justify-between items-center">
+                    <div>{room.title}</div>
+                    <div className="w-[24px] h-[24px]">
+                      {room.type === "chat" ? (
+                        <img
+                          src="/images/Vector.png"
+                          alt="Vector"
+                          className="w-full"
+                        />
+                      ) : (
+                        <img
+                          src="/images/layout-kanban.png"
+                          alt="layout-kanban"
+                          className="w-full"
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-row justify-between items-center w-full mt-3 mb-2">
+                    <div className="flex gap-1 text-[18px] font-[700] items-center">
+                      <img
+                        src="/images/crown-2.png"
+                        alt="cronw-2"
+                        className="w-full"
+                        style={{ height: "20px", width: "20px" }}
+                      />
+                      {room.nickname}
+                    </div>
+                    <div className="font-[700] text-[18px] flex gap-1">
+                      <img
+                        src="/images/alarm.png"
+                        alt="alarm"
+                        className="w-full"
+                        style={{ height: "24px", width: "24px" }}
+                      />
+                      <div>
+                        남은 시간:{" "}
+                        {calculateRemainingTime(room.createdAt, room.duration)}
+                        분
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="pb-[8px] flex justify-between text-[14px] font-[400]"
+                    style={{ minHeight: "24px" }}
+                  >
+                    <div className="flex-1">
+                      {room.keywords.map((keyword) => `#${keyword}`).join(" ")}
+                    </div>
+                    <div className="flex items-center text-[18px] font-[700] gap-2">
+                      <img
+                        src="/images/person.png"
+                        alt="person"
+                        style={{ height: "16px", width: "16px" }}
+                      />
+                      {room.participants}/{room.max_member}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className={`p-0 h-[42px] bottom-0 border-t-[1px] border-[#323232] ${
+                    room.type === "chat" ? "bg-[#FF8A8A]" : "bg-[#FFE27C]"
+                  }`}
+                >
+                  <button
+                    className={`w-full h-full bottom-0 right-0 left-0 p-0 font-[700] text-[18px] cursor-pointer ${
+                      room.participants >= room.max_member
+                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        : room.type === "chat"
+                        ? "bg-[#FF8A8A] text-black"
+                        : "bg-[#FFE27C] text-black"
+                    }`}
+                    onClick={() => navigate(`/${room.type}/${room.uuid}`)}
+                    disabled={room.participants >= room.max_member}
+                  >
+                    참여하기
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full flex justify-center mt-0">
+            <p className="font-[30px] mt-[150px]">
+              다들 생각중인가봐요...함께 새로운 주제로 대화해 볼까요?
+            </p>
+          </div>
+        )}
       </section>
       <section className="">
-        {/* Pagination */}
-        <Row className="m-4">
-          <Col className="d-flex justify-content-center">
-            <Pagination>
-              <Pagination.First
-                onClick={() => paginate(1)}
-                disabled={currentPage === 1}
-              />
-              <Pagination.Prev
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-              />
+        <div className="flex justify-center items-center my-4">
+          {/* 이전 버튼 */}
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full mx-2 ${
+              currentPage === 1 ? "cursor-default" : "cursor-pointer"
+            }`}
+            style={{ pointerEvents: currentPage === 1 ? "none" : "auto" }}
+          >
+            &#x2039;
+          </button>
 
-              {[...Array(totalPages)].map((_, index) => {
-                if (
-                  index + 1 === currentPage ||
-                  index + 1 === currentPage - 1 ||
-                  index + 1 === currentPage + 1 ||
-                  index + 1 === 1 ||
-                  index + 1 === totalPages
-                ) {
-                  return (
-                    <Pagination.Item
-                      key={index + 1}
-                      active={index + 1 === currentPage}
-                      onClick={() => paginate(index + 1)}
-                    >
-                      {index + 1}
-                    </Pagination.Item>
-                  );
-                } else if (
-                  index + 1 === currentPage - 2 ||
-                  index + 1 === currentPage + 2
-                ) {
-                  return <Pagination.Ellipsis key={index} />;
-                }
-                return null;
-              })}
+          {/* 페이지 번호 */}
+          {[...Array(totalPages)].map((_, index) => {
+            const pageIndex = index + 1;
+            if (
+              pageIndex === currentPage ||
+              pageIndex === 1 ||
+              pageIndex === totalPages ||
+              pageIndex === currentPage - 1 ||
+              pageIndex === currentPage + 1
+            ) {
+              return (
+                <button
+                  key={pageIndex}
+                  onClick={() => paginate(pageIndex)}
+                  className={`mx-1 px-3 py-1 text-[20px] ${
+                    currentPage === pageIndex
+                      ? "text-black font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {pageIndex}
+                </button>
+              );
+            } else if (
+              pageIndex === currentPage - 2 ||
+              pageIndex === currentPage + 2
+            ) {
+              return (
+                <span
+                  key={pageIndex}
+                  className="mx-1 text-[20px] text-gray-600"
+                >
+                  ...
+                </span>
+              );
+            }
+            return null;
+          })}
 
-              <Pagination.Next
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              />
-              <Pagination.Last
-                onClick={() => paginate(totalPages)}
-                disabled={currentPage === totalPages}
-              />
-            </Pagination>
-          </Col>
-        </Row>
+          {/* 다음 버튼 */}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full mx-2 ${
+              currentPage === totalPages ? "cursor-default" : "cursor-pointer"
+            }`}
+            style={{
+              pointerEvents: currentPage === totalPages ? "none" : "auto",
+            }}
+          >
+            &#x203A;
+          </button>
+        </div>
       </section>
 
       <CreateRoomModal
