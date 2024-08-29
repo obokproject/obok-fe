@@ -61,8 +61,8 @@ const ChatbotButton: React.FC = () => {
       )}
 
       {isOpen && (
-        <div className="bg-white rounded-lg rounded-[40px] shadow-xl w-96 h-[28rem] flex flex-col overflow-hidden">
-          <div className="bg-[#f2dcef] p-4 flex justify-between items-center  h-[64px]">
+        <div className="bg-white rounded-[40px] shadow-xl w-96 h-[28rem] flex flex-col overflow-hidden">
+          <div className="bg-[#ffb561] p-4 flex justify-between items-center  h-[64px]">
             <h3 className="font-bold">문의하기</h3>
 
             <button
