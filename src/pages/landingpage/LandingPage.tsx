@@ -98,28 +98,6 @@ const LandingPage: React.FC = () => {
             </Container>
           </section>
 
-          <section>
-            <Container fluid className="relative z-10">
-              <div
-                className="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden"
-                style={{
-                  maxWidth: "900px",
-                  height: "544px",
-                  margin: "0 auto",
-                  backgroundColor: "lightgray",
-                }}
-              >
-                {/* <iframe
-                  src="https://www.youtube.com/embed/BLFF1tla3qc"
-                  title="서비스 소개 영상"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe> */}
-              </div>
-            </Container>
-          </section>
-
           <section className="pt-[116px] text-center">
             <Container fluid>
               <div className="w-full max-w-[650px] mx-auto p-4 flex flex-col items-center gap-4">
@@ -207,7 +185,7 @@ const LandingPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="table p-4 justify-center gap-4 inline-flex mt-[60px]">
+                <div className="table p-4 justify-center gap-4 mt-[60px]">
                   <ul className="dots flex justify-center">
                     {slides.map((_, index) => (
                       <li
@@ -223,6 +201,28 @@ const LandingPage: React.FC = () => {
               </div>
             </Container>
             <ChatbotButton />
+          </section>
+
+          <section>
+            <Container fluid className="relative mb-10 z-10">
+              <div
+                className="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden"
+                style={{
+                  maxWidth: "900px",
+                  height: "544px",
+                  margin: "0 auto",
+                  backgroundColor: "lightgray",
+                }}
+              >
+                {/* <iframe
+                  src="https://www.youtube.com/embed/BLFF1tla3qc"
+                  title="서비스 소개 영상"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe> */}
+              </div>
+            </Container>
           </section>
         </main>
 

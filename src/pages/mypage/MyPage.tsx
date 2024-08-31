@@ -127,12 +127,18 @@ const MyPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <h1
-        className="mb-4 text-center"
-        style={{ fontSize: "28px", fontWeight: "bold" }}
-      >
+      <div className="flex items-center text-[40px] font-bold leading-[60px]">
+        <img
+          src="/images/mypage-pencil.png"
+          alt="pencil"
+          style={{ height: "40px", width: "40px" }}
+        ></img>
         마이페이지
-      </h1>
+      </div>
+      <div className="mb-20 text-[32px] font-[400] ml-3">
+        당신을 알려주세요.
+      </div>
+
       <Tabs
         activeKey={activeTab}
         onSelect={(k) => k && setActiveTab(k)}
@@ -207,25 +213,24 @@ const MyPage: React.FC = () => {
             </Col>
             <Col xs={12} md={6}>
               <Form>
-                <Form.Group className="mb-3">
+                <div className="mb-3">
                   <Form.Label>
                     닉네임<span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="닉네임"
-                    value={nickname}
-                    onChange={(e) => {
-                      setNickname(e.target.value);
-                      validateNickname(e.target.value);
-                    }}
-                    maxLength={20}
-                    isInvalid={!isNicknameValid}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    닉네임은 2~20자 사이여야 합니다.
-                  </Form.Control.Feedback>
-                </Form.Group>
+                  <div className="">
+                    <Form.Control
+                      type="text"
+                      placeholder={nickname}
+                      value={nickname}
+                      onChange={(e) => {
+                        setNickname(e.target.value);
+                        validateNickname(e.target.value);
+                      }}
+                      maxLength={20}
+                      isInvalid={!isNicknameValid}
+                    />
+                  </div>
+                </div>
 
                 <div className="mb-3">
                   <Form.Label>직업</Form.Label>
@@ -241,26 +246,24 @@ const MyPage: React.FC = () => {
                       maxLength={12}
                       isInvalid={!isJobValid}
                     />
-                    {!isJobValid && <span className="text-red">X</span>}
                   </div>
                 </div>
 
-                <Form.Group className="mb-3">
+                <div className="mb-3">
                   <Form.Label>이메일</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="example@email.com"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      validateEmail(e.target.value);
-                    }}
-                    isInvalid={!isEmailValid}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    유효한 이메일 주소를 입력해주세요.
-                  </Form.Control.Feedback>
-                </Form.Group>
+                  <div className="">
+                    <Form.Control
+                      type="email"
+                      placeholder="example@email.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        validateEmail(e.target.value);
+                      }}
+                      isInvalid={!isEmailValid}
+                    />
+                  </div>
+                </div>
 
                 <div className="d-flex justify-content-end">
                   <button
@@ -284,7 +287,74 @@ const MyPage: React.FC = () => {
           </div>
         </Tab>
         <Tab eventKey="history" title="참여 내역">
-          {/* 참여 내역 컨텐츠 */}
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">활동 내역</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-4 py-2 text-left">날짜</th>
+                    <th className="px-4 py-2 text-left">형태</th>
+                    <th className="px-4 py-2 text-left">방 제목</th>
+                    <th className="px-4 py-2 text-left">참여인원</th>
+                    <th className="px-4 py-2 text-left">시간 (분)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/*
+                  // 사용자 정보 타입 정의 필요하고
+                  // 활동내역 타입 정의 필요함
+                  //사용자 정보과 활동내역 가져오는 함수 
+                    interface UserInfo {
+                    email: string;
+                    profileImage: string;
+                  }
+
+                  // 활동 내역 타입 정의
+                  interface Activity {
+                    id: number;
+                    activityDate: string;
+                    activityType: '베리톡' | '베리보드';
+                    roomTitle: string;
+                    participants: number;
+                    durationMinutes: number;
+                  }
+
+                    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+                    const [activities, setActivities] = useState<Activity[]>([]);
+                    useEffect(() => {
+                    setUserInfo({
+                      email: 'user@example.com',
+                          profileImage: '/api/placeholder/100/100'
+                        });
+
+                        setActivities([
+                          { id: 1, activityDate: '2024-08-30 10:00', activityType: '베리톡', roomTitle: '아이디어 회의', participants: 5, durationMinutes: 60 },
+                          { id: 2, activityDate: '2024-08-30 14:30', activityType: '베리보드', roomTitle: '프로젝트 기획', participants: 3, durationMinutes: 90 },
+                          { id: 3, activityDate: '2024-08-31 09:15', activityType: '베리톡', roomTitle: '디자인 리뷰', participants: 4, durationMinutes: 45 },
+                        ]);
+                      }, []);
+                    {activities.map((activity) => (
+                    <tr key={activity.id} className="border-b">
+                      <td className="px-4 py-2">{activity.activityDate}</td>
+                      <td className="px-4 py-2">{activity.activityType}</td>
+                      <td className="px-4 py-2">{activity.roomTitle}</td>
+                      <td className="px-4 py-2">{activity.participants}</td>
+                      <td className="px-4 py-2">{activity.durationMinutes}</td>
+                    </tr>
+                  ))} */}
+
+                  <tr>
+                    <td className="px-2">1</td>
+                    <td className="px-2">2</td>
+                    <td className="px-2">3</td>
+                    <td className="px-2">4</td>
+                    <td className="px-2">5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </Tab>
       </Tabs>
 
