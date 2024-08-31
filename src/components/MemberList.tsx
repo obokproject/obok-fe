@@ -1,22 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const members = [
-  { name: "기획자", job: "기획자" },
-  { name: "택시기사", job: "택시기사" },
-  { name: "바리스타", job: "바리스타" },
-  { name: "무직", job: "무직" },
-  { name: "교사", job: "교사" },
-];
+interface Member {
+  nickname: string;
+  job: string;
+  profile: string;
+  role: "host" | "guest";
+}
+
+interface MemberListProps {
+  members: Member[];
+}
 
 const MemberList: React.FC = () => {
+  const [members, setMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/user`
+        );
+        setMembers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch members:", error);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
   return (
     <div className="flex-1 overflow-y-auto border-1 h-[100%] p-2 rounded-lg">
       {members.map((member, index) => (
         <div key={index} className="flex items-center mb-4">
-          <div className="w-10 h-10 bg-gray-300 rounded-full mr-2"></div>
+          <img
+            src={member.profile || "/default-profile.png"}
+            alt={member.nickname}
+            className="w-10 h-10 bg-gray-300 rounded-full mr-2"
+          />
           <div>
-            <div className="text-lg font-bold">{member.name}</div>
+            <div className="text-lg font-bold">{member.nickname}</div>
             <div className="text-sm text-gray-500">{member.job}</div>
+            <div className="text-sm text-gray-700">
+              {member.role === "host" && " (Host)"}
+            </div>
           </div>
         </div>
       ))}

@@ -33,7 +33,7 @@ const ChatBoardWrapper = () => {
 
 const KanbanBoardWrapper = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  return <KanbanBoard roomId={roomId || ""} keywords={[]} />;
+  return <KanbanBoard roomId={roomId || ""} />;
 };
 
 const AppContent: React.FC = () => {

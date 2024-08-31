@@ -30,7 +30,9 @@ const Header: React.FC<HeaderProps> = ({
               alt="logo"
               style={{ height: "76px" }}
             ></img>
-            <p className="mb-0 ms-2 d-flex align-items-center">라즈베리</p>
+            <p className="mb-0 ms-2 d-flex align-items-center text-[40px] font-bold leading-[60px] tracking-wide">
+              라즈베리
+            </p>
           </span>
         </Navbar.Brand>
         <Nav className="ms-auto">
