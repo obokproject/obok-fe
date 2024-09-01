@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -97,167 +98,196 @@ const MainPage: React.FC = () => {
       <div className="mb-20 text-[32px] font-[400] ml-3">
         당신의 생각을 보여주세요.
       </div>
-      <Row className="mb-4 pl-[12px]">
-        <Col>
-          <Button
-            variant={filter === "all" ? "primary" : "outline-primary"}
-            onClick={() => setFilter("all")}
-            className="me-3 text-[20px] font-[500]"
-            style={{
-              backgroundColor: filter === "all" ? "black" : "lightgray",
-              borderColor: filter === "all" ? "black" : "lightgray",
-              color: filter === "all" ? "white" : "black",
-              borderRadius: "20px",
-            }}
-          >
-            전체{" "}
-          </Button>
-          <Button
-            variant={filter === "chat" ? "primary" : "outline-primary"}
-            onClick={() => setFilter("chat")}
-            className="me-3 text-[20px] font-[500]"
-            style={{
-              backgroundColor: filter === "chat" ? "black" : "lightgray",
-              borderColor: filter === "chat" ? "black" : "lightgray",
-              color: filter === "chat" ? "white" : "black",
-              borderRadius: "20px",
-            }}
-            data-bs-toggle="popover"
-            data-bs-placement="top"
-            title="브레인스토밍 채팅"
-            data-bs-content="채팅"
-          >
-            베리 톡
-          </Button>{" "}
-          <Button
-            variant={filter === "kanban" ? "primary" : "outline-primary"}
-            onClick={() => setFilter("kanban")}
-            className="me-3 text-[20px] font-[500]"
-            style={{
-              backgroundColor: filter === "kanban" ? "black" : "lightgray",
-              borderColor: filter === "kanban" ? "black" : "lightgray",
-              color: filter === "kanban" ? "white" : "black",
-              borderRadius: "20px",
-            }}
-            data-bs-toggle="popover"
-            data-bs-placement="top"
-            title="포스트잇 보드"
-            data-bs-content="칸반보드 형태"
-          >
-            베리 보드
-          </Button>
-        </Col>
-        <Col className="text-end">
-          <button
-            className="text-[28px] font-[700] bg-[#FFB662]"
-            onClick={() => setShowCreateModal(true)}
-          >
-            만들기 十
-          </button>
-        </Col>
+      <Row className="pl-[12px] items-center">
+        <div className="flex items-center">
+          <div>
+            <Button
+              variant={filter === "all" ? "primary" : "outline-primary"}
+              onClick={() => setFilter("all")}
+              className="me-3 text-[20px] font-[500] w-[60px] h-[41.334px] p-0"
+              style={{
+                backgroundColor: filter === "all" ? "#323232" : "#E9ECEF",
+                borderColor: filter === "all" ? "#323232" : "#E9ECEF",
+                color: filter === "all" ? "white" : "#323232",
+                borderRadius: "30px",
+              }}
+            >
+              전체
+            </Button>
+            <Button
+              variant={filter === "chat" ? "primary" : "outline-primary"}
+              onClick={() => setFilter("chat")}
+              className="me-3 text-[20px] font-[500] p-0 h-fit"
+              style={{
+                backgroundColor: filter === "chat" ? "#FF8A8A" : "#E9ECEF",
+                borderColor: filter === "chat" ? "#FF8A8A" : "#E9ECEF",
+                color: filter === "chat" ? "#323232" : "#323232",
+                borderRadius: "20px",
+              }}
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              title="브레인스토밍 채팅"
+              data-bs-content="채팅"
+            >
+              <div className="w-[130px] p-3 h-[40px] flex gap-2 justify-center items-center">
+                <img
+                  src="/images/Vector.png"
+                  alt="Vector"
+                  className="w-[24px] h-[24px]"
+                />
+                베리 톡
+              </div>
+            </Button>{" "}
+            <Button
+              variant={filter === "kanban" ? "primary" : "outline-primary"}
+              onClick={() => setFilter("kanban")}
+              className="me-3 text-[20px] font-[500] p-0 h-fit"
+              style={{
+                backgroundColor: filter === "kanban" ? "#FFE27C" : "#E9ECEF",
+                borderColor: filter === "kanban" ? "#FFE27C" : "#E9ECEF",
+                color: filter === "kanban" ? "#323232" : "#323232",
+                borderRadius: "20px",
+              }}
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              title="포스트잇 보드"
+              data-bs-content="칸반보드 형태"
+            >
+              <div className="w-[130px] p-3 h-[40px] flex gap-2 justify-center items-center">
+                <img
+                  src="/images/layout-kanban.png"
+                  alt="layout-kanban"
+                  className="w-[24px] h-[24px]"
+                />
+                베리 보드
+              </div>
+            </Button>
+          </div>
+          <div className="flex flex-1"></div>
+          <div className="flex w-fit right-0">
+            <button
+              className="text-[28px] font-[700] bg-[#FFB662] rounded-[30px] w-[160px] h-[56px] p-4 items-center flex"
+              onClick={() => setShowCreateModal(true)}
+            >
+              만들기 十
+            </button>
+          </div>
+        </div>
       </Row>
-      <section className="bg-white h-[60vh] mt-10 pl-12 border-t-4 border-gray-300 pt-10 justify-center">
-        {currentRooms.length > 0 ? (
-          <div className="flex flex-wrap gap-x-6 gap-y-10 mb-4">
-            {currentRooms.map((room) => (
-              <div
-                key={room.id}
-                className="bg-white rounded-[18px] overflow-hidden w-[384px] h-[216px] flex flex-col justify-between"
-                style={{
-                  boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.25)",
-                }}
-              >
-                <div className="pl-[16px] pr-[16px] pt-[8px] flex flex-col gap-2 relative">
-                  <div className="text-[28px] font-[700] mb-2 flex flex-row justify-between items-center">
-                    <div>{room.title}</div>
-                    <div className="w-[24px] h-[24px]">
-                      {room.type === "chat" ? (
-                        <img
-                          src="/images/Vector.png"
-                          alt="Vector"
-                          className="w-full"
-                        />
-                      ) : (
-                        <img
-                          src="/images/layout-kanban.png"
-                          alt="layout-kanban"
-                          className="w-full"
-                        />
-                      )}
+      <div className="flex justify-center items-center">
+        <section className="bg-white w-[1400px] h-fit mt-10 pl-12 border-t-4 border-gray-300 pt-10 justify-center">
+          {currentRooms.length > 0 ? (
+            // 카드
+            <div className="flex flex-wrap gap-x-6 gap-y-10 mb-4">
+              {currentRooms.map((room) => (
+                <div
+                  key={room.id}
+                  className="bg-white rounded-[18px] overflow-hidden flex flex-col justify-between"
+                  style={{
+                    width: "384px", // 한 줄에 3개의 카드를 고정
+                    height: "216px", // 고정된 높이
+                    boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.25)",
+                  }}
+                >
+                  <div className="pl-[16px] pr-[16px] pt-[8px] flex flex-col gap-2 relative">
+                    <div className="text-[28px] font-[700] mb-2 flex flex-row justify-between items-center">
+                      <div>{room.title}</div>
+                      <div className="w-[24px] h-[24px]">
+                        {room.type === "chat" ? (
+                          <img
+                            src="/images/Vector.png"
+                            alt="Vector"
+                            className="w-full"
+                          />
+                        ) : (
+                          <img
+                            src="/images/layout-kanban.png"
+                            alt="layout-kanban"
+                            className="w-full"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-row justify-between items-center w-full mt-3 mb-2">
-                    <div className="flex gap-1 text-[18px] font-[700] items-center">
-                      <img
-                        src="/images/crown-2.png"
-                        alt="cronw-2"
-                        className="w-full"
-                        style={{ height: "20px", width: "20px" }}
-                      />
-                      {room.nickname}
+                    <div className="flex flex-row justify-between items-center w-full mt-3 mb-2">
+                      <div className="flex gap-1 text-[18px] font-[700] items-center">
+                        <img
+                          src="/images/crown-2.png"
+                          alt="cronw-2"
+                          className="w-full"
+                          style={{ height: "20px", width: "20px" }}
+                        />
+                        {room.nickname}
+                      </div>
+                      <div className="font-[700] text-[18px] flex gap-1">
+                        <img
+                          src="/images/alarm.png"
+                          alt="alarm"
+                          className="w-full"
+                          style={{ height: "24px", width: "24px" }}
+                        />
+                        <div>
+                          남은 시간:{" "}
+                          {calculateRemainingTime(
+                            room.createdAt,
+                            room.duration
+                          )}
+                          분
+                        </div>
+                      </div>
                     </div>
-                    <div className="font-[700] text-[18px] flex gap-1">
-                      <img
-                        src="/images/alarm.png"
-                        alt="alarm"
-                        className="w-full"
-                        style={{ height: "24px", width: "24px" }}
-                      />
-                      <div>
-                        남은 시간:{" "}
-                        {calculateRemainingTime(room.createdAt, room.duration)}
-                        분
+                    <div
+                      className="pb-[8px] flex justify-between text-[14px] font-[400]"
+                      style={{ minHeight: "24px" }}
+                    >
+                      <div className="flex-1">
+                        {room.keywords
+                          .map((keyword) => `#${keyword}`)
+                          .join(" ")}
+                      </div>
+                      <div className="flex items-center text-[18px] font-[700] gap-2">
+                        <img
+                          src="/images/person.png"
+                          alt="person"
+                          style={{ height: "16px", width: "16px" }}
+                        />
+                        {room.participants}/{room.max_member}
                       </div>
                     </div>
                   </div>
                   <div
-                    className="pb-[8px] flex justify-between text-[14px] font-[400]"
-                    style={{ minHeight: "24px" }}
+                    className={`p-0 h-[42px] bottom-0 border-t-[1px] border-[#323232] ${
+                      room.type === "chat" ? "bg-[#FF8A8A]" : "bg-[#FFE27C]"
+                    }`}
                   >
-                    <div className="flex-1">
-                      {room.keywords.map((keyword) => `#${keyword}`).join(" ")}
-                    </div>
-                    <div className="flex items-center text-[18px] font-[700] gap-2">
-                      <img
-                        src="/images/person.png"
-                        alt="person"
-                        style={{ height: "16px", width: "16px" }}
-                      />
-                      {room.participants}/{room.max_member}
-                    </div>
+                    <button
+                      className={`w-full h-full bottom-0 right-0 left-0 p-0 font-[700] text-[18px] cursor-pointer ${
+                        room.participants >= room.max_member
+                          ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                          : room.type === "chat"
+                          ? "bg-[#FF8A8A] text-[#323232]"
+                          : "bg-[#FFE27C] text-[#323232]"
+                      }`}
+                      onClick={() => navigate(`/${room.type}/${room.uuid}`)}
+                      disabled={room.participants >= room.max_member}
+                    >
+                      참여하기
+                    </button>
                   </div>
                 </div>
-                <div
-                  className={`p-0 h-[42px] bottom-0 border-t-[1px] border-[#323232] ${
-                    room.type === "chat" ? "bg-[#FF8A8A]" : "bg-[#FFE27C]"
-                  }`}
-                >
-                  <button
-                    className={`w-full h-full bottom-0 right-0 left-0 p-0 font-[700] text-[18px] cursor-pointer ${
-                      room.participants >= room.max_member
-                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                        : room.type === "chat"
-                        ? "bg-[#FF8A8A] text-black"
-                        : "bg-[#FFE27C] text-black"
-                    }`}
-                    onClick={() => navigate(`/${room.type}/${room.uuid}`)}
-                    disabled={room.participants >= room.max_member}
-                  >
-                    참여하기
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="w-full flex justify-center mt-0">
-            <p className="font-[30px] mt-[150px]">
-              다들 생각중인가봐요...함께 새로운 주제로 대화해 볼까요?
-            </p>
-          </div>
-        )}
-      </section>
-      <section className="">
+              ))}
+            </div>
+          ) : (
+            <div className="w-full flex justify-center mt-0">
+              <p className="font-[30px] mt-[150px]">
+                다들 생각중인가봐요...함께 새로운 주제로 대화해 볼까요?
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/*페이지네이션*/}
+      <section className="mt-[152px] mb-[130px]">
         <div className="flex justify-center items-center my-4">
           {/* 이전 버튼 */}
           <button
@@ -268,7 +298,7 @@ const MainPage: React.FC = () => {
             }`}
             style={{ pointerEvents: currentPage === 1 ? "none" : "auto" }}
           >
-            &#x2039;
+            <IoIosArrowBack />
           </button>
 
           {/* 페이지 번호 */}
@@ -287,7 +317,7 @@ const MainPage: React.FC = () => {
                   onClick={() => paginate(pageIndex)}
                   className={`mx-1 px-3 py-1 text-[20px] ${
                     currentPage === pageIndex
-                      ? "text-black font-bold"
+                      ? "text-[#323232] font-bold"
                       : "text-gray-600"
                   }`}
                 >
@@ -321,7 +351,7 @@ const MainPage: React.FC = () => {
               pointerEvents: currentPage === totalPages ? "none" : "auto",
             }}
           >
-            &#x203A;
+            <IoIosArrowForward />
           </button>
         </div>
       </section>

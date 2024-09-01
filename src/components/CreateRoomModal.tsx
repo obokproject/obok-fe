@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Modal, ButtonGroup } from "react-bootstrap";
 
 interface CreateRoomModalProps {
   show: boolean;
@@ -61,85 +60,118 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         show ? "block" : "hidden"
       }`}
     >
-      <div className="bg-white rounded-lg shadow-lg w-[960px]">
-        <div className="border-b border-gray-300 p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold w-100 text-center">
+      <div className="bg-white rounded-[40px] shadow-lg w-[960px] h-[700px] pt-[40px] pb-[40px] flex flex-col items-center">
+        <div className="w-full h-fit border-b-[1px] border-[#323232] flex flex-col items-center">
+          <div className="text-[42px] font-[500px] w-[300px] h-[115px] pt-[10px] pb-[42px] flex text-center">
             프로젝트 만들기
-          </h2>
-          <button
-            onClick={onHide}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-          >
-            ✕
-          </button>
+          </div>
         </div>
-        <div className="bg-gray-100 p-6 rounded-lg space-y-4">
+        <div className="bg-white rounded-lg mt-[32px] mb-[32px] ml-[160px] mr-[160px] flex flex-col items-start w-[640px] h-[368px] gap-[24px]">
           {/* 베리톡 / 베리보드 선택 버튼 */}
-          <div className="flex justify-center mb-4">
+          <div className="flex">
             <button
-              className={`py-2 px-4 rounded-l-full ${
+              className={`rounded-[40px] ${
                 roomType === "chat"
                   ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-500"
+                  : "bg-[#E9ECEF] text-[#323232]"
               }`}
               onClick={() => setRoomType("chat")}
             >
-              베리톡
+              <div className="flex items-center justify-center w-[180px] h-[52px] p-0 gap-2 text-[28px] font-[500]">
+                <img
+                  src={
+                    roomType === "chat"
+                      ? "/images/Vector2.png"
+                      : "/images/Vector.png"
+                  }
+                  alt="Vector"
+                  className="w-[40px] h-[40px]"
+                />
+                <div>베리톡</div>
+              </div>
             </button>
-            <div className="w-2"></div> {/* 두 버튼 사이 간격 조절 */}
+            <div className="w-4"></div> {/* 두 버튼 사이 간격 조절 */}
             <button
-              className={`py-2 px-4 rounded-r-full ${
+              className={` rounded-[40px] ${
                 roomType === "kanban"
                   ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-500"
+                  : "bg-[#E9ECEF] text-[#323232]"
               }`}
               onClick={() => setRoomType("kanban")}
             >
-              베리보드
+              <div className="flex items-center justify-center w-[184px] p-0 gap-2 text-[28px] font-[500]">
+                <img
+                  src="/images/layout-kanban.png"
+                  alt="layout-kanban"
+                  className="w-[40px] h-[40px]"
+                />
+                베리보드
+              </div>
             </button>
           </div>
 
-          <form className="space-y-4">
-            {/* 주제 입력 필드 */}
-            <div className="flex items-center bg-white p-4 rounded-md shadow-sm">
-              <label className="w-20 text-gray-500">주제</label>
+          {/* 주제 입력 필드 */}
+          <div className="flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500]">
+            <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
+              주제
+            </div>
+            <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
                 type="text"
                 placeholder="공유하고 싶은 주제를 정해보세요(20자)"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={20}
-                className="flex-grow bg-gray-100 text-gray-700 p-2 rounded-md outline-none"
+                className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none w-full"
               />
             </div>
+          </div>
 
-            {/* 인원 및 제한시간 설정 */}
-            <div className="flex items-center bg-white p-4 rounded-md shadow-sm">
-              <label className="w-20 text-gray-500">인원</label>
+          {/* 인원 및 제한시간 설정 */}
+          <div className="flex items-center w-full h-[52px] pt-2 pb-2 text-[24px] font-[500]">
+            <div className="w-[123px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D] bg-[#E9ECEF] rounded-l-[30px]">
+              인원
+            </div>
+            <div className="w-[120px] pt-2 pb-2 pl-6 text-[#323232] text-center rounded-r-[30px] bg-[#E9ECEF] border-[#6C757D]">
               <input
                 type="number"
                 min={2}
                 max={10}
                 value={maxMember}
                 onChange={(e) => setMaxMember(Number(e.target.value))}
-                className="flex-grow bg-gray-100 text-gray-700 p-2 rounded-md outline-none appearance-none"
+                className="flex-grow w-[50px] bg-[#E9ECEF] text-[#323232] rounded-md outline-none appearance-none"
                 onKeyDown={(e) => e.preventDefault()} // 입력 차단
+                style={{
+                  MozAppearance: "textfield", // Firefox에서 기본 숫자 입력 스타일 제거
+                  WebkitAppearance: "textfield", // Chrome, Safari에서 기본 숫자 입력 스타일 제거
+                  appearance: "textfield", // 기본 숫자 입력 스타일 제거
+                  position: "relative",
+                }}
               />
-              <label className="w-28 text-gray-500 ml-4">제한시간 (분)</label>
+            </div>
+
+            <div className="w-[123px] pt-2 pb-2 pr-3 pl-3 text-[#323232] text-center border-r-[3px] border-[#6C757D] bg-[#E9ECEF] ml-[80px] rounded-l-[30px]">
+              제한시간
+            </div>
+            <div className="w-[120px] pt-2 pb-2 pl-6 text-[#323232] text-center rounded-r-[30px] bg-[#E9ECEF] border-[#6C757D]">
               <input
                 type="number"
                 min={5}
                 max={20}
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="flex-grow bg-gray-100 text-gray-700 p-2 rounded-md outline-none appearance-none"
+                className="flex-grow w-[50px] bg-[#E9ECEF] text-[#323232] rounded-md outline-none appearance-none"
                 onKeyDown={(e) => e.preventDefault()} // 입력 차단
               />
             </div>
+          </div>
 
-            {/* 키워드 입력 필드 */}
-            <div className="flex items-center bg-white p-4 rounded-md shadow-sm">
-              <label className="w-20 text-gray-500">키워드</label>
+          {/* 키워드 입력 필드 */}
+          <div className="flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500]">
+            <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
+              키워드
+            </div>
+            <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
                 type="text"
                 placeholder="#키워드 입력 (2-8자, 최대 3개)"
@@ -153,41 +185,44 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                   setCurrentKeyword(filteredValue);
                 }}
                 maxLength={8}
-                className="flex-grow bg-gray-100 text-gray-700 p-2 rounded-md outline-none"
+                className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none"
                 onKeyPress={handleKeywordInput}
               />
             </div>
+          </div>
 
-            {/* 추가된 키워드 목록 */}
-            <div className="mt-2 flex flex-wrap">
-              {keywords.map((keyword, index) => (
-                <div
-                  key={index}
-                  className="flex items-center bg-gray-200 text-gray-700 p-1 m-1 rounded-full"
-                >
-                  <span className="mr-2">#{keyword}</span>
-                  <button
-                    onClick={() => removeKeyword(keyword)}
-                    className="text-gray-500 hover:text-gray-800 text-sm px-1"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </form>
+          {/* 추가된 키워드 목록 */}
+          <div className="flex items-center w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500] gap-2">
+            {keywords.map((keyword, index) => (
+              <div
+                key={index}
+                className="flex items-center bg-[#E9ECEF] text-[#323232] pt-[8px] pb-[8px] pr-[8px] pl-[16px] rounded-[30px]"
+              >
+                <span>#{keyword}</span>
+                <button onClick={() => removeKeyword(keyword)} className="">
+                  <div className="flex w-[47px] p-2 justify-center items-center">
+                    <img
+                      src="/images/x-lg.png"
+                      alt="x-lg"
+                      className="w-[17px] h-[17x]"
+                    />
+                  </div>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="border-t border-gray-300 p-4 flex justify-center">
+        <div className="p-4 flex justify-center">
           {/* 취소 및 만들기 버튼 */}
           <button
             onClick={onHide}
-            className="py-2 px-6 rounded-full bg-gray-200 text-gray-700 mr-2"
+            className="p-[10px] mr-4 rounded-[40px] bg-[#E2E2E2] text-[#323232] w-[232px] h-[74px] text-center text-[36px]"
           >
             취소
           </button>
           <button
             onClick={handleCreate}
-            className="py-2 px-6 rounded-full bg-orange-400 text-white"
+            className="p-[10px] mr-4 rounded-[40px]  bg-[#FFB662] text-[#323232] w-[232px] h-[74px] text-center text-[36px]"
           >
             만들기
           </button>
