@@ -12,23 +12,23 @@ interface MemberListProps {
   members: Member[];
 }
 
-const MemberList: React.FC = () => {
-  const [members, setMembers] = useState<Member[]>([]);
+const MemberList: React.FC<MemberListProps> = ({ members }) => {
+  // const [members, setMembers] = useState<Member[]>([]);
 
-  useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/user`
-        );
-        setMembers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch members:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchMembers = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}/api/user`
+  //       );
+  //       setMembers(response.data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch members:", error);
+  //     }
+  //   };
 
-    fetchMembers();
-  }, []);
+  //   fetchMembers();
+  // }, []);
 
   return (
     <div className="flex-1 overflow-y-auto border-1 h-[100%] p-2 rounded-lg">
