@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Set Production API Endpoint
+        run: echo "REACT_APP_NODE_ENV_PROD=http://3.34.234.154" > .env
       - run: npm ci
       # - run: npm test
       - run: npm run build
