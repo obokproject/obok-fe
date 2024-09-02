@@ -237,7 +237,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
                 type="text"
-                placeholder="#최대3개#최대6자#스페이스로확정)"
+                placeholder="#최대3개#최대6자#스페이스로확정"
                 value={currentKeyword}
                 onChange={(e) => {
                   const inputValue = e.target.value;

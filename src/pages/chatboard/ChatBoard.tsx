@@ -36,6 +36,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
 
+  const [hostId, setHostId] = useState<string | null>(null); // 호스트의 ID를 상태로 관리
   // 방 정보 및 메시지 로드, WebSocket 연결 설정
   useEffect(() => {
     if (roomId && user) {
@@ -77,6 +78,12 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       socket.current.on("memberUpdate", (updatedMembers) => {
         console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
         setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
+
+        // 여기에 호스트 식별 코드 추가
+        const host = updatedMembers.find((member: any) => member.isHost); // 호스트를 식별하는 로직
+        if (host) {
+          setHostId(host.id); // 호스트의 ID를 상태로 저장
+        }
       });
 
       // 이전 메시지 및 키워드, 멤버 수신
@@ -189,11 +196,11 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   if (!room) return <div>Room not found</div>; // 방 정보가 없을 때 표시
 
   return (
-    <div className="bg-pink-50 h-screen flex flex-col p-4">
+    <div className="bg-pink-50 h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
       <div className="flex-1 flex overflow-hidden">
         {/* 채팅 영역(1)과 방 정보(4) */}
         <div className="flex flex-col w-3/4 pr-4">
-          <div className="flex flex-col flex-1 bg-white rounded-tl-lg border-2 border-pink-200 overflow-hidden">
+          <div className="flex flex-col flex-1 bg-white rounded-tl-lg border-2 border-[#A6046D] overflow-hidden rounded-[20px]">
             {/* 채팅 영역 */}
             <div className="flex-1 overflow-y-auto p-4" ref={chatContainerRef}>
               {messages.map((msg, index) => {
@@ -206,39 +213,50 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                     ref={(el) => {
                       messageRefs.current[index] = el;
                     }}
-                    className={`flex items-start mb-2 p-2 rounded-lg ${
+                    className={`flex items-start h-fit rounded-[20px] ${
                       highlightedMessageIndex === index
                         ? "bg-yellow-100 border border-yellow-300"
                         : "bg-white"
-                    }`}
+                    } ${showProfile ? "mt-4" : "mt-1"}`} // pt-4 또는 pt-1을 조건부로 적용
                   >
                     {showProfile && (
-                      <div className="flex items-center mr-4">
+                      <div className="flex items-center mr-4 pt-1">
                         <img
                           src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
                           alt="User Profile"
-                          className="w-10 h-10 bg-gray-300 rounded-full"
+                          className="w-10 h-full bg-gray-300 rounded-full"
                         />
                       </div>
                     )}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col h-fit">
                       {showProfile && (
-                        <div className="flex items-center mb-1">
-                          <span className="font-bold text-lg text-blue-500 mr-2">
-                            {msg.nickname} {msg.job} {/* 닉네임과 직업 표시 */}
+                        <div className="flex items-center">
+                          <span className="font-bold text-lg mr-2">
+                            <span className="text-[#323232] mr-1 text-[16px] font-[700]">
+                              {msg.nickname}
+                            </span>
+                            {"     "}
+                            <span className="text-[#A6046D] text-[16px] font-500]">
+                              {msg.job}
+                            </span>{" "}
+                            {/* 닉네임과 직업에 다른 색상 적용 */}
                           </span>
                         </div>
                       )}
-                      <div className={`${showProfile ? "" : "ml-14"}`}>
-                        <p className="text-gray-700">{msg.content}</p>
+                      <div
+                        className={`${
+                          showProfile ? "" : "ml-14"
+                        } mb-0 h-[25px]`}
+                      >
+                        <p className="text-gray-700 mb-0">{msg.content}</p>
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="p-4 border-t border-gray-200">
-              <div className="flex items-center bg-white rounded-full border-2 border-red-400 px-4 py-2">
+            <div className="p-4">
+              <div className="flex items-center bg-white rounded-[30px] border-[1px] border-[#BD2130] p-[2px] h-fit">
                 {/* 프로필 이미지 추가 */}
                 <img
                   src={user?.profile} // 사용자 프로필 이미지 추가
@@ -300,24 +318,22 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
         {/* 멤버 리스트(2)와 키워드 영역(3) */}
         <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-pink-200">
-          <div className="h-1/2 overflow-y-auto p-4 border-b border-pink-200">
+          <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
             <div className="flex-1 overflow-y-auto p-2">
               {members && members.length > 0 ? (
                 members.map((member, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center mb-4 p-2 bg-pink-50 rounded-lg border border-pink-200"
-                  >
+                  <div key={index} className="flex items-center mb-4 py-[1px]">
                     <img
                       src={member.profile || "default-profile.png"}
                       alt={member.nickname}
                       className="w-10 h-10 bg-gray-300 rounded-full mr-2"
                     />
-                    <div>
-                      <div className="text-lg font-bold">{member.nickname}</div>
-                      <div className="text-sm text-gray-500">{member.job}</div>
-                      <div className="text-sm text-gray-700">
-                        {member.role === "host" && " (Host)"}
+                    <div className="">
+                      <div className="text-[16px] font-[700] text-[#323232]">
+                        {member.nickname}
+                      </div>
+                      <div className="text-[16px] text-[#A6046D]">
+                        {member.job}
                       </div>
                     </div>
                   </div>
@@ -327,11 +343,12 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
               )}
             </div>
           </div>
-          <div className="h-1/2 overflow-y-auto p-4">
+          <div className="h-1/2 overflow-y-auto py-4">
             <ChatKeyword
               roomId={roomId}
               socket={socket.current}
               onKeywordClick={scrollToMessage} // 키워드 클릭 시 메시지로 스크롤
+              hostId={hostId} // 호스트의 ID를 전달
             />
           </div>
         </div>

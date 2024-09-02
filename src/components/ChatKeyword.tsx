@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ChatKeywordProps {
   roomId: string;
   socket: any;
   onKeywordClick: (keyword: string) => void;
+  hostId: string | null; // 호스트의 ID를 Prop으로 받음
 }
 
 const ChatKeyword: React.FC<ChatKeywordProps> = ({
   roomId,
   socket,
   onKeywordClick,
+  hostId,
 }) => {
   const [keywords, setKeywords] = useState<string[]>([]); // 키워드를 상태로 관리
+  const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
 
   useEffect(() => {
     if (socket) {
@@ -47,21 +51,60 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
     };
   }, [socket, roomId]); // socket과 roomId가 변경될 때마다 이 useEffect 실행
 
+  const handleDeleteKeyword = (keyword: string) => {
+    if (!user) return;
+
+    // 서버에 키워드 삭제 요청
+    socket.emit(
+      "deleteKeyword",
+      { roomId, keyword, userId: user.id },
+      (response: any) => {
+        if (response.success) {
+          // 삭제 성공 시 클라이언트 상태에서 키워드 제거
+          setKeywords((prevKeywords) =>
+            prevKeywords.filter((kw) => kw !== keyword)
+          );
+        } else {
+          console.error("Failed to delete keyword:", response.error);
+        }
+      }
+    );
+  };
+
   return (
-    <div className="flex flex-wrap">
-      {keywords.length === 0 ? (
-        <p>No keywords available</p>
-      ) : (
-        keywords.map((keyword, index) => (
-          <span
-            key={index}
-            className="px-2 py-1 rounded-full mr-2 mb-2 text-sm cursor-pointer bg-gray-200 text-gray-700"
-            onClick={() => onKeywordClick(keyword)}
-          >
-            {keyword}
-          </span>
-        ))
-      )}
+    <div
+      className="w-full h-full border-2 border-[#A6046D] rounded-[20px]"
+      style={{
+        backgroundImage: `url('/images/logo_fix2.png')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="flex flex-wrap p-2">
+        {keywords.length === 0 ? (
+          <p> </p>
+        ) : (
+          keywords.map((keyword, index) => (
+            <div key={index} className="flex items-center mr-2 mb-2">
+              <span
+                className="pl-2 pr-3 py-2 rounded-[30px] text-sm cursor-pointer bg-[#E4606D] text-[#FCF8FC] text-[16px]"
+                onClick={() => onKeywordClick(keyword)}
+              >
+                {keyword}
+              </span>
+              {user?.id === hostId && ( // 호스트만 삭제 버튼을 볼 수 있도록 조건 추가
+                <button
+                  className="ml-2 text-red-500 text-sm"
+                  onClick={() => handleDeleteKeyword(keyword)}
+                >
+                  삭제
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };
