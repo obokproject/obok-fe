@@ -120,7 +120,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         }
       };
     }
-  }, [roomId, user]); // roomId와 user가 변경될 때마다 실행
+  }, [roomId, user, fetchRoom]); // roomId와 user가 변경될 때마다 실행
 
   // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수
   const scrollToMessage = (keyword: string) => {
