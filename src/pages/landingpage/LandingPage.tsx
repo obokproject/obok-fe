@@ -137,6 +137,7 @@ const LandingPage: React.FC = () => {
                   <img
                     className="w-[302px] h-[302px]"
                     src="/images/landing-hug.png"
+                    alt="hug"
                   />
                 </div>
               </div>
