@@ -16,15 +16,15 @@ import MyPage from "./pages/mypage/MyPage";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
 
-let API_URL;
+// let API_URL;
 
-if (process.env.NODE_ENV === "production") {
-  API_URL = process.env.NODE_ENV_PROD;
-} else if (process.env.NODE_ENV === "development") {
-  API_URL = process.env.NODE_ENV_DEV;
-} else {
-  API_URL = process.env.NODE_ENV;
-}
+// if (process.env.NODE_ENV === "production") {
+//   API_URL = process.env.NODE_ENV_PROD;
+// } else if (process.env.NODE_ENV === "development") {
+//   API_URL = process.env.NODE_ENV_DEV;
+// } else {
+//   API_URL = process.env.NODE_ENV;
+// }
 
 const ChatBoardWrapper = () => {
   const { roomId } = useParams<{ roomId: string }>();
