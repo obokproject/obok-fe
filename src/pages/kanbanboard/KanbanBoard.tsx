@@ -11,6 +11,9 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
+const apiUrl =
+  process.env.REACT_APP_NODE_ENV || process.env.REACT_APP_NODE_ENV_PROD;
+
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
   id: string; // 카드의 고유 식별자
@@ -55,7 +58,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       fetchRoom(roomId); // 방 정보 로드
 
       // WebSocket 연결 초기화
-      socket.current = io("http://localhost:5000", {
+      socket.current = io(`${apiUrl}`, {
         transports: ["websocket"], // WebSocket을 우선 사용
       });
 
