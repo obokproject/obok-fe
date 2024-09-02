@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,6 +15,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import MyPage from "./pages/mypage/MyPage";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
+import ScrolltoTop from "./components/ScrolltoTop";
 
 // let API_URL;
 
@@ -77,6 +78,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
+        <ScrolltoTop />
         <AppContent />
       </Router>
     </AuthProvider>
