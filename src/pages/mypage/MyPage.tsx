@@ -26,6 +26,7 @@ const MyPage: React.FC = () => {
   // 유효성 검사를 위한 상태 추가
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNicknameValid, setIsNicknameValid] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isJobValid, setIsJobValid] = useState(true);
 
   useEffect(() => {
