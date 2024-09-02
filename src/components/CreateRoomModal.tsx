@@ -18,16 +18,50 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [keywords, setKeywords] = useState<string[]>([]);
   const [currentKeyword, setCurrentKeyword] = useState("");
 
+  // 유효성 검사 상태
+  const [titleError, setTitleError] = useState(false);
+  const [keywordError, setKeywordError] = useState(false);
+
   // 방 생성 핸들러 함수
   const handleCreate = () => {
-    onCreate({
-      type: roomType,
-      title, // title로 전달
-      max_member: maxMember, // max_member로 전달
-      duration,
-      keywords,
-    });
-    onHide();
+    // 유효성 검사
+    let isValid = true;
+
+    // 제목 유효성 검사
+    if (title.length < 2 || title.length > 20) {
+      setTitleError(true);
+      isValid = false;
+    } else {
+      setTitleError(false);
+    }
+
+    // 키워드 유효성 검사
+    const invalidKeyword = keywords.some(
+      (keyword) => keyword.length < 2 || keyword.length > 6
+    );
+
+    if (
+      invalidKeyword ||
+      (currentKeyword.length > 0 &&
+        (currentKeyword.length < 2 || currentKeyword.length > 6))
+    ) {
+      setKeywordError(true);
+      isValid = false;
+    } else {
+      setKeywordError(false);
+    }
+
+    // 유효성 검사를 통과한 경우에만 방 생성
+    if (isValid) {
+      onCreate({
+        type: roomType,
+        title, // title로 전달
+        max_member: maxMember, // max_member로 전달
+        duration,
+        keywords,
+      });
+      onHide();
+    }
   };
 
   // 키워드 추가 함수
@@ -35,7 +69,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     if (
       currentKeyword &&
       keywords.length < 3 &&
-      !keywords.includes(currentKeyword)
+      !keywords.includes(currentKeyword) &&
+      currentKeyword.length >= 1 && // 최소 2자
+      currentKeyword.length <= 6 // 최대 6자
     ) {
       setKeywords([...keywords, currentKeyword]);
       setCurrentKeyword("");
@@ -87,7 +123,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                   alt="Vector"
                   className="w-[40px] h-[40px]"
                 />
-                <div>베리톡</div>
+                <div
+                  className={`${
+                    roomType === "chat"
+                      ? "bg-black text-white"
+                      : "bg-[#E9ECEF] text-[#323232]"
+                  }`}
+                >
+                  베리톡
+                </div>
               </div>
             </button>
             <div className="w-4"></div> {/* 두 버튼 사이 간격 조절 */}
@@ -101,27 +145,42 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             >
               <div className="flex items-center justify-center w-[184px] p-0 gap-2 text-[28px] font-[500]">
                 <img
-                  src="/images/layout-kanban.png"
+                  src={
+                    roomType === "kanban"
+                      ? "/images/layout-kanban2.png"
+                      : "/images/layout-kanban.png"
+                  }
                   alt="layout-kanban"
                   className="w-[40px] h-[40px]"
                 />
-                베리보드
+                <div
+                  className={`${
+                    roomType === "kanban"
+                      ? "bg-black text-white"
+                      : "bg-[#E9ECEF] text-[#323232]"
+                  }`}
+                >
+                  베리보드
+                </div>
               </div>
             </button>
           </div>
 
           {/* 주제 입력 필드 */}
-          <div className="flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500]">
+          <div
+            className={`flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500] ${
+              titleError ? "border-2 border-red-500" : ""
+            }`}
+          >
             <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
               주제
             </div>
             <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
                 type="text"
-                placeholder="공유하고 싶은 주제를 정해보세요(20자)"
+                placeholder="공유하고 싶은 주제를 정해보세요(2-20자)"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                maxLength={20}
                 className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none w-full"
               />
             </div>
@@ -167,25 +226,29 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           </div>
 
           {/* 키워드 입력 필드 */}
-          <div className="flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500]">
+          <div
+            className={`flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500] ${
+              keywordError ? "border-2 border-red-500" : ""
+            }`}
+          >
             <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
               키워드
             </div>
             <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
                 type="text"
-                placeholder="#키워드 입력 (2-8자, 최대 3개)"
+                placeholder="#최대3개#최대6자#스페이스로확정)"
                 value={currentKeyword}
                 onChange={(e) => {
                   const inputValue = e.target.value;
                   const filteredValue = inputValue.replace(
-                    /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ]/g,
+                    /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9]/g,
                     ""
                   );
+
                   setCurrentKeyword(filteredValue);
                 }}
-                maxLength={8}
-                className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none"
+                className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none w-full"
                 onKeyPress={handleKeywordInput}
               />
             </div>
@@ -212,7 +275,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             ))}
           </div>
         </div>
-        <div className="p-4 flex justify-center">
+        <div className="p-4 pt-0 flex justify-center">
           {/* 취소 및 만들기 버튼 */}
           <button
             onClick={onHide}

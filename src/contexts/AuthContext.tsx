@@ -38,7 +38,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         withCredentials: true,
       });
       if (response.data) {
-        setUser(response.data);
+        const { id, email, profile_image, nickname } = response.data;
+
+        // profile_image를 profile로 매핑
+        const user: User = {
+          id,
+          email,
+          profile: profile_image, // profile_image를 profile로 사용
+          nickname,
+        };
+        setUser(user);
       }
     } catch (error) {
       // if (axios.isAxiosError(error)) {
