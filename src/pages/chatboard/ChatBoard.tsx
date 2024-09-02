@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
 import { useRoom } from "../../hooks/useChat"; // 방 정보를 가져오는 custom hook
 import { useAuth } from "../../contexts/AuthContext"; // 사용자 인증 context
 import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴포넌트
@@ -22,6 +21,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   const [messages, setMessages] = useState<any[]>([]); // 메시지 상태
   const [newMessage, setNewMessage] = useState(""); // 새로운 메시지 상태
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [keywords, setKeywords] = useState<{ [key: string]: number }>({}); // 키워드 상태
   const [highlightedMessageIndex, setHighlightedMessageIndex] = useState<
     number | null

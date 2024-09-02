@@ -18,6 +18,7 @@ interface Room {
 }
 
 export const useRoom = (initialRoomId?: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<Room | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);

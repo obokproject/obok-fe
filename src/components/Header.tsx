@@ -13,12 +13,12 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
   openLoginModal,
 }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const handleLogout = () => {
-    onLogout();
-    navigate("/");
-  };
+  // const handleLogout = () => {
+  //   onLogout();
+  //   navigate("/");
+  // };
 
   return (
     <Navbar className="h-100">

@@ -16,18 +16,17 @@ const MyPage: React.FC = () => {
   const { user } = useAuth();
   const [nickname, setNickname] = useState("");
   const [job, setJob] = useState("");
-  const [email, setEmail] = useState("");
   const [profile, setProfile] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [value, setValue] = useState("");
-
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   // 유효성 검사를 위한 상태 추가
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNicknameValid, setIsNicknameValid] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isJobValid, setIsJobValid] = useState(true);
 
   useEffect(() => {
@@ -115,7 +114,6 @@ const MyPage: React.FC = () => {
           body: JSON.stringify({
             nickname,
             job,
-            email,
             profile,
           }),
         });
