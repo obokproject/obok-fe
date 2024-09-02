@@ -6,13 +6,6 @@ import { Plus } from "lucide-react";
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const [isOpen, setIsOpen] = useState(false);
-  const familySites = [
-    { name: "TMD", url: "http://tmdedu.com/" },
-    { name: "강남구청", url: "https://www.gangnam.go.kr/" },
-    { name: "서울시", url: "https://www.seoul.go.kr/" },
-  ];
-  const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
     <footer className="p-[40px] mt-auto h-[300px] border-t-[1px] border-t-[#323232]">
