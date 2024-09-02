@@ -29,6 +29,12 @@ const MyPage: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isJobValid, setIsJobValid] = useState(true);
 
+  const [isMounted, setIsMounted] = useState(true);
+
+  useEffect(() => {
+    return () => setIsMounted(false);
+  }, []);
+
   useEffect(() => {
     setNickname(user?.nickname ?? "");
     setJob(user?.job ?? "");
@@ -123,13 +129,15 @@ const MyPage: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
-
-        setShowConfirmModal(false);
-        navigate("/main"); // 이전 페이지로 이동
+        if (isMounted) {
+          console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
+          setShowConfirmModal(false);
+          navigate("/main");
+        }
       } catch (error) {
-        console.error("사용자 정보 저장 중 오류가 발생했습니다:", error);
-        // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+        if (isMounted) {
+          console.error("사용자 정보 저장 중 오류가 발생했습니다:", error);
+        }
       }
     }
   };
