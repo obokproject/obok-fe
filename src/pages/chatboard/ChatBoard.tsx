@@ -21,7 +21,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   const [messages, setMessages] = useState<any[]>([]); // 메시지 상태
   const [newMessage, setNewMessage] = useState(""); // 새로운 메시지 상태
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [keywords, setKeywords] = useState<{ [key: string]: number }>({}); // 키워드 상태
   const [highlightedMessageIndex, setHighlightedMessageIndex] = useState<
     number | null
