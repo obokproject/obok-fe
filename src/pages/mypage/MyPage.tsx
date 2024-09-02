@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Container,
   Form,
@@ -8,19 +8,20 @@ import {
   Tab,
   Tabs,
   Modal,
-  Button,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 const MyPage: React.FC = () => {
+  const { user } = useAuth();
   const [nickname, setNickname] = useState("");
   const [job, setJob] = useState("");
   const [email, setEmail] = useState("");
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profile, setProfile] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [value, setValue] = useState("");
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -28,11 +29,16 @@ const MyPage: React.FC = () => {
   // 유효성 검사를 위한 상태 추가
   const [isNicknameValid, setIsNicknameValid] = useState(true);
   const [isJobValid, setIsJobValid] = useState(true);
-  const [isEmailValid, setIsEmailValid] = useState(true);
+
+  useEffect(() => {
+    setNickname(user?.nickname ?? "");
+    setJob(user?.job ?? "");
+    setProfile(user?.profile ?? null);
+  }, [user]);
 
   // 유효성 검사 함수
   const validateNickname = (value: string) => {
-    const isValid = value.length >= 2 && value.length <= 20;
+    const isValid = value.length >= 2 && value.length <= 10;
     setIsNicknameValid(isValid);
     return isValid;
   };
@@ -43,25 +49,12 @@ const MyPage: React.FC = () => {
     return isValid;
   };
 
-  const validateEmail = (value: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isValid = emailRegex.test(value);
-    setIsEmailValid(isValid);
-    return isValid;
-  };
-
-  // TODO: 필요한가?
-  // const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setNickname(event.target.value);
-  //   validateNickname(event.target.value);
-  // };
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.size <= 3 * 1024 * 1024) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string);
+        setProfile(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
@@ -69,50 +62,77 @@ const MyPage: React.FC = () => {
     }
   };
 
-  const handleImageDelete = () => {
-    setProfileImage(null);
+  const handleImageDelete = async () => {
+    try {
+      // 서버에 이미지 삭제 요청
+      const response = await fetch("/api/delete-profile-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 필요한 경우 인증 토큰 추가
+        },
+        body: JSON.stringify({ userId: user?.id }), // 현재 사용자 ID
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete image");
+      }
+
+      // 서버 응답 확인
+      const result = await response.json();
+
+      if (result.success) {
+        // 로컬 상태 업데이트
+        setProfile(null);
+        // 필요한 경우 사용자 정보 상태도 업데이트
+        // setUser(prevUser => ({ ...prevUser, profileImage: null }));
+      } else {
+        throw new Error(result.message || "Failed to delete image");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      // 사용자에게 에러 메시지 표시
+      alert("이미지 삭제에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      validateNickname(nickname) &&
-      validateJob(job) &&
-      validateEmail(email)
-    ) {
+    if (validateNickname(nickname) && validateJob(job)) {
       setShowConfirmModal(true);
     }
   };
 
-  const confirmSave = () => {
-    try {
-      //   // API 요청을 통해 사용자 정보를 저장하는 로직
-      //   const response = await fetch("/api/users/me", {
-      //     method: "PUT",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //     },
-      //     body: JSON.stringify({
-      //       nickname,
-      //       job,
-      //       email,
-      //       profileImage,
-      //     }),
-      //   });
+  const confirmSave = async () => {
+    if (validateNickname(nickname) && validateJob(job)) {
+      try {
+        const response = await fetch("/api/users/update", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            nickname,
+            job,
+            email,
+            profile,
+          }),
+        });
 
-      //   if (!response.ok) {
-      //     throw new Error("HTTP error!");
-      //   }
+        if (!response.ok) {
+          throw new Error("HTTP error!");
+        }
 
-      //   const data = await response.json();
-      //   console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
+        const data = await response.json();
+        console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
 
-      setShowConfirmModal(false);
-      navigate("/"); // 이전 페이지로 이동
-    } catch (error) {
-      console.error("사용자 정보 저장 중 오류가 발생했습니다:", error);
-      // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+        setShowConfirmModal(false);
+        navigate("/main"); // 이전 페이지로 이동
+      } catch (error) {
+        console.error("사용자 정보 저장 중 오류가 발생했습니다:", error);
+        // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+      }
     }
   };
 
@@ -147,7 +167,7 @@ const MyPage: React.FC = () => {
       >
         <Tab eventKey="profile" title="프로필">
           <Row className="mb-4">
-            <Col xs={12} md={6} className="text-center mb-4">
+            <Col xs={12} md={6} className="text-center pt-[80px] pb-[80px]">
               <div
                 style={{
                   width: "240px",
@@ -161,12 +181,12 @@ const MyPage: React.FC = () => {
                   position: "relative",
                 }}
               >
-                {profileImage ? (
+                {user?.profile ? (
                   <Image
-                    src={profileImage}
+                    src={user?.profile}
                     roundedCircle
                     className=""
-                    style={{ maxWidth: "100%", maxHeight: "100%" }}
+                    style={{ width: "100%", height: "100%" }}
                   />
                 ) : (
                   <button
@@ -218,24 +238,29 @@ const MyPage: React.FC = () => {
                     닉네임<span className="text-danger">*</span>
                   </Form.Label>
                   <div className="">
-                    <Form.Control
+                    <input
                       type="text"
-                      placeholder={nickname}
+                      placeholder="닉네임"
                       value={nickname}
                       onChange={(e) => {
-                        setNickname(e.target.value);
-                        validateNickname(e.target.value);
+                        if (e.target.value.length < 10) {
+                          setNickname(e.target.value);
+                          validateNickname(e.target.value);
+                        }
                       }}
-                      maxLength={20}
-                      isInvalid={!isNicknameValid}
+                      className={`form-control`}
                     />
                   </div>
+                  <p>
+                    한글 최대 10글자까지 입력가능합니다. 띄어쓰기, 특수문자
+                    사용불가.
+                  </p>
                 </div>
 
                 <div className="mb-3">
                   <Form.Label>직업</Form.Label>
                   <div className="">
-                    <Form.Control
+                    <input
                       type="text"
                       placeholder="직업"
                       value={job}
@@ -244,9 +269,12 @@ const MyPage: React.FC = () => {
                         validateJob(e.target.value);
                       }}
                       maxLength={12}
-                      isInvalid={!isJobValid}
+                      className={`form-control`}
                     />
                   </div>
+                  <p>
+                    한글, 영어 사용가능 최대 8글자. 숫자, 특수문자 사용불가.
+                  </p>
                 </div>
 
                 <div className="mb-3">
@@ -255,12 +283,8 @@ const MyPage: React.FC = () => {
                     <Form.Control
                       type="email"
                       placeholder="example@email.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        validateEmail(e.target.value);
-                      }}
-                      isInvalid={!isEmailValid}
+                      value={user?.email}
+                      readOnly
                     />
                   </div>
                 </div>
@@ -271,7 +295,7 @@ const MyPage: React.FC = () => {
                     className="w-[210px] h-[44px] font-bold rounded-full"
                     style={{ backgroundColor: "#ffb561" }}
                   >
-                    정보 저장
+                    저장
                   </button>
                 </div>
               </Form>

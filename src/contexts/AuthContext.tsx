@@ -5,7 +5,8 @@ interface User {
   id: string;
   email: string;
   profile: string;
-  nickname?: string;
+  nickname: string;
+  job: string;
 }
 
 interface AuthContextType {
@@ -38,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         withCredentials: true,
       });
       if (response.data) {
-        const { id, email, profile_image, nickname } = response.data;
+        const { id, email, profile_image, nickname, job } = response.data;
 
         // profile_image를 profile로 매핑
         const user: User = {
@@ -46,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           email,
           profile: profile_image, // profile_image를 profile로 사용
           nickname,
+          job,
         };
         setUser(user);
       }
