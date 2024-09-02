@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { useRoom } from "../../hooks/useChat"; // 방 정보를 가져오는 custom hook
 import { useAuth } from "../../contexts/AuthContext"; // 사용자 인증 context
 import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴포넌트
 import RoomInfo from "../../components/RoomInfo"; // 방 정보 컴포넌트
 import io from "socket.io-client"; // socket.io-client 라이브러리
+
+const apiUrl =
+  process.env.REACT_APP_NODE_ENV || process.env.REACT_APP_NODE_ENV_PROD;
 
 interface ChatBoardProps {
   roomId: string;
@@ -21,7 +25,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   const [messages, setMessages] = useState<any[]>([]); // 메시지 상태
   const [newMessage, setNewMessage] = useState(""); // 새로운 메시지 상태
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [keywords, setKeywords] = useState<{ [key: string]: number }>({}); // 키워드 상태
   const [highlightedMessageIndex, setHighlightedMessageIndex] = useState<
     number | null
@@ -43,7 +46,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       fetchRoom(roomId); // 방 정보 로드
 
       // WebSocket 연결 초기화
-      socket.current = io("http://localhost:5000", {
+      socket.current = io(`${apiUrl}`, {
         transports: ["websocket"], // WebSocket을 우선 사용
       });
 
@@ -120,7 +123,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         }
       };
     }
-  }, [roomId, user, fetchRoom]); // roomId와 user가 변경될 때마다 실행
+  }, [roomId, user]); // roomId와 user가 변경될 때마다 실행
 
   // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수
   const scrollToMessage = (keyword: string) => {
