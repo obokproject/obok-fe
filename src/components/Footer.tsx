@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Dropdown } from "react-bootstrap";
+import React from "react";
+import { Container, Row, Col } from "react-bootstrap";
 import { Instagram } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
