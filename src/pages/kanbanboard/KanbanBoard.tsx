@@ -42,11 +42,13 @@ const SECTIONS: KanbanSection[] = [
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 칸반 보드의 상태를 관리하는 state
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
-  const { room, loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
+  const [room, setRoom] = useState<any>(null);
+  const { loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
   const [sections, setSections] = useState<KanbanSection[]>(SECTIONS);
   const [newCardContent, setNewCardContent] = useState("");
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
+  const [creator, setCreator] = useState({ name: "", job: "" });
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -55,48 +57,70 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // useEffect hook: roomId, user가 변경될 때만 useEffect hook을 실행
   useEffect(() => {
     if (roomId && user) {
-      fetchRoom(roomId); // 방 정보 로드
+      fetchRoom(roomId);
 
       // WebSocket 연결 초기화
       socket.current = io(`${apiUrl}`, {
-        transports: ["websocket"], // WebSocket을 우선 사용
+        transports: ["websocket"],
       });
 
       // WebSocket 서버에 연결 성공시
       socket.current.on("connect", () => {
         console.log("Connected to the WebSocket server");
-        socket.current?.emit("joinRoom", { roomId, userId: user.id }); // 방에 참여
+        socket.current?.emit("joinRoom", { roomId, userId: user.id });
       });
 
-      socket.current.on("boardUpdate", (updatedSections) => {
-        console.log("Received board update:", updatedSections);
-        setSections(updatedSections);
-      });
+      // 이벤트 리스너 설정
+      const setupSocketListeners = () => {
+        socket.current?.on("boardUpdate", (updatedSections) => {
+          console.log("Received board update:", updatedSections);
+          setSections(updatedSections);
+        });
+        //이전 보드 불러오기
+        socket.current?.on("previousBoardData", (prevSections) => {
+          console.log("Received previous board data:", prevSections);
+          setSections(prevSections);
+        });
+        //멤버 수신
+        socket.current?.on("memberUpdate", (updatedMembers) => {
+          console.log("Received member update:", updatedMembers);
+          setMembers(updatedMembers);
+        });
 
-      // 이전 칸반 데이터 수신
-      socket.current.on("previousBoardData", (prevSections) => {
-        console.log("Received previous board data:", prevSections);
-        setSections(prevSections);
-      });
+        socket.current?.on("roomInfo", (info) => {
+          setRoom(info);
+          setCreator(info.creator || { name: "", job: "" });
+        });
 
-      //멤버 수신
-      socket.current?.on("memberUpdate", (updatedMembers) => {
-        console.log("Received member update:", updatedMembers);
-        setMembers(updatedMembers);
-      });
-
-      socket.current.on("connect_error", (error) => {
-        console.error("Connection error:", error);
         // 에러 처리 로직
-      });
+        socket.current?.on("connect_error", (error) => {
+          console.error("Connection error:", error);
+        });
 
-      socket.current.on("reconnect", (attemptNumber) => {
-        console.log("Reconnected on attempt: ", attemptNumber);
         // 재연결 성공 시 로직
-      });
+        socket.current?.on("reconnect", (attemptNumber) => {
+          console.log("Reconnected on attempt: ", attemptNumber);
+        });
+      };
+
+      // // creator 정보 설정
+      // if (room && room.User) {
+      //   setCreator({
+      //     name: room.User.username || "",
+      //     job: room.User.job || "",
+      //   });
+      // }
+
+      setupSocketListeners();
 
       return () => {
         if (socket.current) {
+          socket.current.off("boardUpdate");
+          socket.current.off("previousBoardData");
+          socket.current.off("memberUpdate");
+          socket.current.off("roomInfo");
+          socket.current.off("connect_error");
+          socket.current.off("reconnect");
           socket.current.disconnect(); // WebSocket 연결 해제
         }
       };
@@ -179,26 +203,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const roomInfoProps = room
-    ? {
-        title: room.title,
-        creator: {
-          name: room.nickname,
-          job: "Unknown",
-        },
-        participants: room.participants,
-        maxParticipants: room.max_member,
-        openTime: room.createdAt,
-        closeTime: new Date(
-          new Date(room.createdAt).getTime() + room.duration * 60000
-        ).toISOString(),
-        keywords: room.keywords,
-        duration: room.duration,
-      }
-    : null;
-
   return (
-    <div className="container mx-auto px-4 mt-5 mb-[120px] flex flex-grow h-screen">
+    <div className="container w-[1177px] h-[718px] mx-auto px-4 mt-5 mb-[120px] flex flex-grow  bg-gray-300">
       <div className="flex flex-col w-[100%]">
         <div className="flex-grow border-4 border-yellow-200 p-2 rounded-3xl">
           <DragDropContext onDragEnd={onDragEnd}>
@@ -242,7 +248,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
                         {section.id === "생성" &&
                           (isAddingCard ? (
-                            <div className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2">
+                            <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2">
                               <input
                                 ref={inputRef}
                                 type="text"
@@ -253,7 +259,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                 className="w-full bg-transparent border-none focus:outline-none"
                               />
                               <small className="text-gray-600 text-right block">
-                                {newCardContent.length} / 80
+                                {newCardContent.length} / 7
                               </small>
                             </div>
                           ) : (
@@ -276,10 +282,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         </div>
 
         <div className="w-full mt-2 p-4 h-[120px]  border-yellow-300 rounded-2xl">
-          {roomInfoProps && <RoomInfo {...roomInfoProps} />}
+          <RoomInfo uuid={roomId} socket={socket.current} />
         </div>
       </div>
-      <div className="flex flex-col w-[256px] ml-2 p-4 border border-yellow-300 rounded-2xl">
+      <div className="flex flex-col w-[280px] h-full ml-2 p-4 border border-yellow-300 rounded-2xl">
         <MemberList members={members} />
       </div>
     </div>
