@@ -5,14 +5,14 @@ interface ChatKeywordProps {
   roomId: string;
   socket: any;
   onKeywordClick: (keyword: string) => void;
-  hostId: string | null; // 호스트의 ID를 Prop으로 받음
+  isHost: boolean; // isHost를 prop으로 받음
 }
 
 const ChatKeyword: React.FC<ChatKeywordProps> = ({
   roomId,
   socket,
   onKeywordClick,
-  hostId,
+  isHost, // isHost를 prop으로 사용
 }) => {
   const [keywords, setKeywords] = useState<string[]>([]); // 키워드를 상태로 관리
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
@@ -93,9 +93,9 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
               >
                 {keyword}
               </span>
-              {user?.id === hostId && ( // 호스트만 삭제 버튼을 볼 수 있도록 조건 추가
+              {isHost && (
                 <button
-                  className="ml-2 text-red-500 text-sm"
+                  className="ml-2 text-red-500 text-sm bg-black"
                   onClick={() => handleDeleteKeyword(keyword)}
                 >
                   삭제

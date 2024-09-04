@@ -59,6 +59,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     if (roomId && user) {
       fetchRoom(roomId);
 
+      // http://localhost:5000
       // WebSocket 연결 초기화
       socket.current = io(`${apiUrl}`, {
         transports: ["websocket"],
@@ -88,6 +89,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         });
 
         socket.current?.on("roomInfo", (info) => {
+          console.log(">>>>>>>>>>>>>>>>");
+          console.log(info);
+          console.log("info : '" + info + "'");
           setRoom(info);
           setCreator(info.creator || { name: "", job: "" });
         });

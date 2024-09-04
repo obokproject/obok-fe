@@ -27,6 +27,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     number | null
   >(null); // 강조된 메시지 인덱스 상태
   const [members, setMembers] = useState<any[]>([]); // 멤버 상태
+  const [isHost, setIsHost] = useState<boolean>(false); // 호스트 여부 상태
   const chatContainerRef = useRef<HTMLDivElement>(null); // 채팅 컨테이너 참조
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]); // 메시지 참조 배열
   const inputRef = useRef<HTMLTextAreaElement>(null); // 입력창 참조
@@ -79,10 +80,14 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
         setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
 
-        // 여기에 호스트 식별 코드 추가
-        const host = updatedMembers.find((member: any) => member.isHost); // 호스트를 식별하는 로직
-        if (host) {
-          setHostId(host.id); // 호스트의 ID를 상태로 저장
+        // 현재 사용자가 호스트인지 확인
+        const currentUser = updatedMembers.find(
+          (member: any) => member.userId === user.id
+        );
+        if (currentUser && currentUser.role === "host") {
+          setIsHost(true); // 현재 사용자가 호스트인 경우 true로 설정
+        } else {
+          setIsHost(false); // 호스트가 아닌 경우 false
         }
       });
 
@@ -196,160 +201,161 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   if (!room) return <div>Room not found</div>; // 방 정보가 없을 때 표시
 
   return (
-    <div className="bg-pink-50 h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
-      <div className="flex-1 flex overflow-hidden">
-        {/* 채팅 영역(1)과 방 정보(4) */}
-        <div className="flex flex-col w-3/4 pr-4">
-          <div className="flex flex-col flex-1 bg-white rounded-tl-lg border-2 border-[#A6046D] overflow-hidden rounded-[20px]">
-            {/* 채팅 영역 */}
-            <div className="flex-1 overflow-y-auto p-4" ref={chatContainerRef}>
-              {messages.map((msg, index) => {
-                const showProfile =
-                  index === 0 || messages[index - 1].user_id !== msg.user_id;
+    <div className="  min-w-[1336px] flex justify-center overflow-x-scroll">
+      <div className="bg-pink-50 h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
+        <div className="flex-1 flex overflow-hidden">
+          {/* 채팅 영역(1)과 방 정보(4) */}
+          <div className="flex flex-col w-3/4 pr-4">
+            <div className="flex flex-col flex-1 bg-white border-2 border-[#A6046D] overflow-hidden rounded-[20px]">
+              {/* 채팅 영역 */}
+              <div
+                className="flex-1 overflow-y-auto p-4"
+                ref={chatContainerRef}
+              >
+                {messages.map((msg, index) => {
+                  const showProfile =
+                    index === 0 || messages[index - 1].user_id !== msg.user_id;
 
-                return (
-                  <div
-                    key={index}
-                    ref={(el) => {
-                      messageRefs.current[index] = el;
-                    }}
-                    className={`flex items-start h-fit rounded-[20px] ${
-                      highlightedMessageIndex === index
-                        ? "bg-yellow-100 border border-yellow-300"
-                        : "bg-white"
-                    } ${showProfile ? "mt-4" : "mt-1"}`} // pt-4 또는 pt-1을 조건부로 적용
-                  >
-                    {showProfile && (
-                      <div className="flex items-center mr-4 pt-1">
-                        <img
-                          src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
-                          alt="User Profile"
-                          className="w-10 h-full bg-gray-300 rounded-full"
-                        />
-                      </div>
-                    )}
-                    <div className="flex flex-col h-fit">
+                  return (
+                    <div
+                      key={index}
+                      ref={(el) => {
+                        messageRefs.current[index] = el;
+                      }}
+                      className={`flex items-start h-fit rounded-[20px] ${
+                        highlightedMessageIndex === index
+                          ? "bg-yellow-100 border border-yellow-300"
+                          : "bg-white"
+                      } ${showProfile ? "mt-4" : "mt-1"}`} // pt-4 또는 pt-1을 조건부로 적용
+                    >
                       {showProfile && (
-                        <div className="flex items-center">
-                          <span className="font-bold text-lg mr-2">
-                            <span className="text-[#323232] mr-1 text-[16px] font-[700]">
-                              {msg.nickname}
-                            </span>
-                            {"     "}
-                            <span className="text-[#A6046D] text-[16px] font-500]">
-                              {msg.job}
-                            </span>{" "}
-                            {/* 닉네임과 직업에 다른 색상 적용 */}
-                          </span>
+                        <div className="flex items-center mr-4 pt-1">
+                          <img
+                            src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
+                            alt="User Profile"
+                            className="w-10 h-full bg-gray-300 rounded-full"
+                          />
                         </div>
                       )}
-                      <div
-                        className={`${
-                          showProfile ? "" : "ml-14"
-                        } mb-0 h-[25px]`}
-                      >
-                        <p className="text-gray-700 mb-0">{msg.content}</p>
+                      <div className="flex flex-col h-fit">
+                        {showProfile && (
+                          <div className="flex items-center">
+                            <span className="font-bold text-lg mr-2">
+                              <span className="text-[#323232] mr-1 text-[16px] font-[700]">
+                                {msg.nickname}
+                              </span>
+                              {"     "}
+                              <span className="text-[#A6046D] text-[16px] font-500]">
+                                {msg.job}
+                              </span>{" "}
+                              {/* 닉네임과 직업에 다른 색상 적용 */}
+                            </span>
+                          </div>
+                        )}
+                        <div
+                          className={`${
+                            showProfile ? "" : "ml-14"
+                          } mb-0 h-[25px]`}
+                        >
+                          <p className="text-gray-700 mb-0">{msg.content}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="p-4">
-              <div className="flex items-center bg-white rounded-[30px] border-[1px] border-[#BD2130] p-[2px] h-fit">
-                {/* 프로필 이미지 추가 */}
-                <img
-                  src={user?.profile} // 사용자 프로필 이미지 추가
-                  alt="User Profile"
-                  className="w-10 h-10 bg-gray-300 rounded-full mr-4"
-                />
-                <textarea
-                  placeholder="내용을 입력해주세요."
-                  className="flex-1 bg-transparent border-none text-gray-700 resize-none focus:outline-none"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  ref={inputRef}
-                  rows={1}
-                  maxLength={maxChars}
-                />
-                <button
-                  onClick={handleSendMessage}
-                  className="ml-2 p-2 bg-transparent text-red-400 rounded-lg hover:bg-red-100 focus:outline-none"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-6 h-6"
+                  );
+                })}
+              </div>
+              <div className="p-4">
+                <div className="flex items-center bg-white rounded-[30px] border-[1px] border-[#BD2130] p-[2px] h-fit">
+                  {/* 프로필 이미지 추가 */}
+                  <img
+                    src={user?.profile} // 사용자 프로필 이미지 추가
+                    alt="User Profile"
+                    className="w-10 h-10 bg-gray-300 rounded-full mr-4"
+                  />
+                  <textarea
+                    placeholder="내용을 입력해주세요."
+                    className="flex-1 bg-transparent border-none text-gray-700 resize-none focus:outline-none"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    ref={inputRef}
+                    rows={1}
+                    maxLength={maxChars}
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    className="ml-2 p-2 bg-transparent text-red-400 rounded-lg hover:bg-red-100 focus:outline-none"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* 방 정보(4) */}
-          <div className="mt-4">
-            <RoomInfo
-              title="주제"
-              creator={{ name: "기획자", job: "기획자" }}
-              participants={6}
-              maxParticipants={6}
-              openTime="2024-08-15 10:00"
-              closeTime="2024-08-15 10:30"
-              keywords={["콜택시", "반차"]}
-              duration={60}
-            />
-          </div>
-        </div>
-
-        {/* 멤버 리스트(2)와 키워드 영역(3) */}
-        <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-pink-200">
-          <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
-            <div className="flex-1 overflow-y-auto p-2">
-              {members && members.length > 0 ? (
-                members.map((member, index) => (
-                  <div key={index} className="flex items-center mb-4 py-[1px]">
-                    <img
-                      src={member.profile || "default-profile.png"}
-                      alt={member.nickname}
-                      className="w-10 h-10 bg-gray-300 rounded-full mr-2"
-                    />
-                    <div className="">
-                      <div className="text-[16px] font-[700] text-[#323232]">
-                        {member.nickname}
-                      </div>
-                      <div className="text-[16px] text-[#A6046D]">
-                        {member.job}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-gray-500 text-center">멤버 로딩중...</div>
-              )}
+            {/* 방 정보(4) */}
+            <div className="mt-4">
+              <RoomInfo uuid={roomId} socket={socket.current} />
             </div>
           </div>
-          <div className="h-1/2 overflow-y-auto py-4">
-            <ChatKeyword
-              roomId={roomId}
-              socket={socket.current}
-              onKeywordClick={scrollToMessage} // 키워드 클릭 시 메시지로 스크롤
-              hostId={hostId} // 호스트의 ID를 전달
-            />
+
+          {/* 멤버 리스트(2)와 키워드 영역(3) */}
+          <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-pink-200">
+            <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
+              <div className="flex-1 overflow-y-auto p-2">
+                {members && members.length > 0 ? (
+                  members.map((member, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center mb-4 py-[1px]"
+                    >
+                      <img
+                        src={member.profile || "default-profile.png"}
+                        alt={member.nickname}
+                        className="w-10 h-10 bg-gray-300 rounded-full mr-2"
+                      />
+                      <div className="">
+                        <div className="text-[16px] font-[700] text-[#323232]">
+                          {member.nickname}
+                        </div>
+                        <div className="text-[16px] text-[#A6046D]">
+                          {member.job}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-500 text-center">
+                    멤버 로딩중...
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="h-1/2 overflow-y-auto py-4">
+              <ChatKeyword
+                roomId={roomId}
+                socket={socket.current}
+                onKeywordClick={scrollToMessage} // 키워드 클릭 시 메시지로 스크롤
+                isHost={isHost} // 호스트의 ID를 전달
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -96,13 +96,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         show ? "block" : "hidden"
       }`}
     >
-      <div className="bg-white rounded-[40px] shadow-lg w-[960px] h-[700px] pt-[40px] pb-[40px] flex flex-col items-center">
-        <div className="w-full h-fit border-b-[1px] border-[#323232] flex flex-col items-center">
-          <div className="text-[42px] font-[500px] w-[300px] h-[115px] pt-[10px] pb-[42px] flex text-center">
+      <div className="bg-white rounded-[40px] shadow-lg w-[800px] h603px] pt-[24px] pb-[16px] flex flex-col items-center">
+        <div className="w-full h-[103px] border-b-[1px] border-[#323232] flex flex-col items-center justify-center">
+          <div className="text-[42px] font-[500px] w-[300px] h-[87px] flex text-center">
             프로젝트 만들기
           </div>
         </div>
-        <div className="bg-white rounded-lg mt-[32px] mb-[32px] ml-[160px] mr-[160px] flex flex-col items-start w-[640px] h-[368px] gap-[24px]">
+        <div className="bg-white rounded-lg mt-[24px] mb-[24px] ml-[160px] mr-[160px] flex flex-col items-start w-[640px] h-[368px] gap-[24px]">
           {/* 베리톡 / 베리보드 선택 버튼 */}
           <div className="flex">
             <button
@@ -169,7 +169,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* 주제 입력 필드 */}
           <div
             className={`flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500] ${
-              titleError ? "border-2 border-red-500" : ""
+              titleError && title !== "" ? "border-2 border-red-500" : ""
             }`}
           >
             <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
@@ -180,7 +180,23 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 type="text"
                 placeholder="공유하고 싶은 주제를 정해보세요(2-20자)"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  const newTitle = e.target.value;
+                  setTitle(newTitle);
+
+                  // 제목이 비어 있으면 에러를 제거
+                  if (newTitle === "") {
+                    setTitleError(false);
+                  }
+                  // 제목이 2자 이상 20자 이하일 경우 에러를 제거
+                  else if (newTitle.length >= 2 && newTitle.length <= 20) {
+                    setTitleError(false);
+                  }
+                  // 유효성 조건을 만족하지 않으면 에러 설정
+                  else {
+                    setTitleError(true);
+                  }
+                }}
                 className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none w-full"
               />
             </div>
@@ -279,13 +295,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* 취소 및 만들기 버튼 */}
           <button
             onClick={onHide}
-            className="p-[10px] mr-4 rounded-[40px] bg-[#E2E2E2] text-[#323232] w-[232px] h-[74px] text-center text-[36px]"
+            className="p-[10px] mr-4 rounded-[40px] bg-[#E2E2E2] text-[#323232] w-[216px] h-[68px] text-center text-[36px]"
           >
             취소
           </button>
           <button
             onClick={handleCreate}
-            className="p-[10px] mr-4 rounded-[40px]  bg-[#FFB662] text-[#323232] w-[232px] h-[74px] text-center text-[36px]"
+            className="p-[10px] mr-4 rounded-[40px]  bg-[#FFB662] text-[#323232] w-[216px] h-[68px] text-center text-[36px]"
           >
             만들기
           </button>
