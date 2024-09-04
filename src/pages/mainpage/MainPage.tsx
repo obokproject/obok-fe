@@ -71,7 +71,7 @@ const MainPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>; // 로딩 중 표시
+  if (loading) return <div></div>; // 로딩 중 표시
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
 
   return (
@@ -92,7 +92,10 @@ const MainPage: React.FC = () => {
           <div>
             <Button
               variant={filter === "all" ? "primary" : "outline-primary"}
-              onClick={() => setFilter("all")}
+              onClick={() => {
+                setFilter("all");
+                setCurrentPage(1);
+              }}
               className="me-3 text-[20px] font-[500] w-[60px] h-[41.334px] p-0"
               style={{
                 backgroundColor: filter === "all" ? "#323232" : "#E9ECEF",
@@ -105,7 +108,10 @@ const MainPage: React.FC = () => {
             </Button>
             <Button
               variant={filter === "chat" ? "primary" : "outline-primary"}
-              onClick={() => setFilter("chat")}
+              onClick={() => {
+                setFilter("chat");
+                setCurrentPage(1);
+              }}
               className="me-3 text-[20px] font-[500] p-0 h-fit"
               style={{
                 backgroundColor: filter === "chat" ? "#FF8A8A" : "#E9ECEF",
@@ -129,7 +135,10 @@ const MainPage: React.FC = () => {
             </Button>{" "}
             <Button
               variant={filter === "kanban" ? "primary" : "outline-primary"}
-              onClick={() => setFilter("kanban")}
+              onClick={() => {
+                setFilter("kanban");
+                setCurrentPage(1);
+              }}
               className="me-3 text-[20px] font-[500] p-0 h-fit"
               style={{
                 backgroundColor: filter === "kanban" ? "#FFE27C" : "#E9ECEF",
@@ -180,7 +189,10 @@ const MainPage: React.FC = () => {
                 >
                   <div className="pl-[16px] pr-[16px] pt-[8px] flex flex-col gap-2 relative">
                     <div className="text-[28px] font-[700] mb-2 flex flex-row justify-between items-center">
-                      <div>{room.title}</div>
+                      <div className="overflow-hidden text-ellipsis whitespace-nowrap h-[42px] max-w-[300px]">
+                        {room.title}
+                      </div>
+
                       <div className="w-[24px] h-[24px]">
                         {room.type === "chat" ? (
                           <img
