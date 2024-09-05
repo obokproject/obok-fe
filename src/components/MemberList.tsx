@@ -30,7 +30,7 @@ const MemberList: React.FC<MemberListProps> = ({ members }) => {
   // }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto border-1 h-[100%] p-2 rounded-lg">
+    <div className="flex-1 overflow-y-auto h-[100%] p-2 rounded-lg">
       {members.map((member, index) => (
         <div key={index} className="flex items-center mb-4">
           <img

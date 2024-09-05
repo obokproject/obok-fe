@@ -11,8 +11,8 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const apiUrl =
-  process.env.REACT_APP_NODE_ENV || process.env.REACT_APP_NODE_ENV_PROD;
+// const SERVER_URL =
+//   process.env.REACT_APP_NODE_ENV_PROD || process.env.REACT_APP_NODE_ENV;
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -42,13 +42,16 @@ const SECTIONS: KanbanSection[] = [
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 칸반 보드의 상태를 관리하는 state
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<any>(null);
   const { loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
   const [sections, setSections] = useState<KanbanSection[]>(SECTIONS);
   const [newCardContent, setNewCardContent] = useState("");
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [creator, setCreator] = useState({ name: "", job: "" });
+  const [userRole, setUserRole] = useState<string>("guest");
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -59,9 +62,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     if (roomId && user) {
       fetchRoom(roomId);
 
-      // http://localhost:5000
       // WebSocket 연결 초기화
-      socket.current = io(`${apiUrl}`, {
+      // socket.current = io(SERVER_URL as string, {
+      //   transports: ["websocket"],
+      // });
+
+      socket.current = io("http://localhost:5000", {
         transports: ["websocket"],
       });
 
@@ -94,6 +100,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           console.log("info : '" + info + "'");
           setRoom(info);
           setCreator(info.creator || { name: "", job: "" });
+
+          // 사용자의 role 설정
+          const currentUserMember = info.members.find(
+            (member: any) => member.id === user.id
+          );
+          setUserRole(currentUserMember?.role || "guest");
         });
 
         // 에러 처리 로직
@@ -133,6 +145,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = (result: DropResult) => {
+    if (userRole !== "host") return;
     const { source, destination } = result;
 
     // 유효하지 않은 목적지인 경우 (예: 보드 밖으로 드래그) 함수 종료
@@ -203,94 +216,128 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       setIsAddingCard(false);
     }
   };
+  // 카드 삭제 핸들러
+  const deleteCard = (sectionId: string, cardId: string) => {
+    if (userRole !== "host") return;
+
+    const newSections = sections.map((section) =>
+      section.id === sectionId
+        ? {
+            ...section,
+            cards: section.cards.filter((card) => card.id !== cardId),
+          }
+        : section
+    );
+
+    setSections(newSections);
+    socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container w-[1177px] h-[718px] mx-auto px-4 mt-5 mb-[120px] flex flex-grow  bg-gray-300">
+    <div className="container w-[1177px] h-[718px] mx-auto px-4  mt-5 mb-[120px] flex flex-grow">
       <div className="flex flex-col w-[100%]">
-        <div className="flex-grow border-4 border-yellow-200 p-2 rounded-3xl">
+        <div className="flex-grow border-2 border-yellow-200 bg-yellow-50 p-2 mb-2 rounded-[20px]">
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex">
-              {sections.map((section) => (
+            <div className="flex gap-10 relative">
+              {sections.map((section, index) => (
                 <div key={section.id} className="flex-1 px-2">
-                  <div className="border-2 border-yellow-200 rounded-2xl flex justify-center m-1 pt-3 bg-white">
+                  <div className="border-2 border-yellow-200 rounded-[20px] flex justify-center m-1 pt-3 bg-white">
                     <h5 className="text-center mb-3">{section.title}</h5>
                   </div>
-                  <Droppable droppableId={section.id}>
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="min-h-[500px]"
-                      >
-                        {section.cards.map((card, index) => (
-                          <Draggable
-                            key={card.id}
-                            draggableId={card.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2 flex items-center"
-                              >
-                                <p className="flex-grow">{card.content}</p>
-                                <img
-                                  src={card.profile}
-                                  alt="User profile"
-                                  className="w-8 h-8 rounded-full ml-2"
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-
-                        {section.id === "생성" &&
-                          (isAddingCard ? (
-                            <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2">
-                              <input
-                                ref={inputRef}
-                                type="text"
-                                placeholder="새 카드 내용 (80자 이내)"
-                                value={newCardContent}
-                                onChange={handleCardInputChange}
-                                onKeyDown={handleCardInputKeyPress}
-                                className="w-full bg-transparent border-none focus:outline-none"
-                              />
-                              <small className="text-gray-600 text-right block">
-                                {newCardContent.length} / 7
-                              </small>
-                            </div>
-                          ) : (
-                            <div className="flex justify-center">
-                              <button
-                                onClick={handleAddCardClick}
-                                className="bg-white text-gray-800 font-bold py-2 px-4 rounded border border-gray-300 hover:bg-gray-100"
-                              >
-                                + 카드 추가
-                              </button>
-                            </div>
+                  <div className="relative flex gap-10">
+                    <Droppable droppableId={section.id}>
+                      {(provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className="min-h-[500px] flex-1 overflow-auto"
+                        >
+                          {section.cards.map((card, index) => (
+                            <Draggable
+                              key={card.id}
+                              draggableId={card.id}
+                              index={index}
+                              isDragDisabled={userRole !== "host"}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2 flex items-center"
+                                >
+                                  <p className="flex-grow">{card.content}</p>
+                                  <img
+                                    src={card.profile}
+                                    alt="User profile"
+                                    className="w-8 h-8 rounded-full ml-2"
+                                  />
+                                  {userRole === "host" && (
+                                    <button
+                                      onClick={() =>
+                                        deleteCard(section.id, card.id)
+                                      }
+                                      className="ml-2 text-red-500 hover:text-red-700"
+                                    >
+                                      X
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </Draggable>
                           ))}
-                      </div>
+                          {provided.placeholder}
+
+                          {section.id === "생성" &&
+                            (isAddingCard ? (
+                              <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2">
+                                <input
+                                  ref={inputRef}
+                                  type="text"
+                                  placeholder="새 카드 내용 (80자 이내)"
+                                  value={newCardContent}
+                                  onChange={handleCardInputChange}
+                                  onKeyDown={handleCardInputKeyPress}
+                                  className="w-full bg-transparent border-none focus:outline-none"
+                                />
+                                <small className="text-gray-600 text-right block">
+                                  {newCardContent.length} / 7
+                                </small>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={handleAddCardClick}
+                                  className="bg-white text-gray-800 font-bold py-2 px-4 rounded border border-gray-300 hover:bg-gray-100"
+                                >
+                                  + 카드 추가
+                                </button>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </Droppable>
+                    {index < sections.length - 1 && (
+                      <div className="absolute top-0 bottom-0 right-[-20px] w-px bg-yellow-300"></div>
                     )}
-                  </Droppable>
+                  </div>
                 </div>
               ))}
             </div>
           </DragDropContext>
         </div>
 
-        <div className="w-full mt-2 p-4 h-[120px]  border-yellow-300 rounded-2xl">
+        <div className="w-full p-4 border-2 border-yellow-200 rounded-[20px] bg-white">
           <RoomInfo uuid={roomId} socket={socket.current} />
         </div>
       </div>
-      <div className="flex flex-col w-[280px] h-full ml-2 p-4 border border-yellow-300 rounded-2xl">
-        <MemberList members={members} />
+      <div className="flex flex-col w-[280px] h-full ml-2 border-2 border-yellow-200 rounded-[20px] bg-white">
+        <div className="flex-1 overflow-y-auto p-4">
+          <MemberList members={members} />
+        </div>
       </div>
     </div>
   );
