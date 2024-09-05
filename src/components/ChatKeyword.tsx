@@ -92,15 +92,16 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
                 onClick={() => onKeywordClick(keyword)}
               >
                 {keyword}
+
+                {isHost && (
+                  <button
+                    className="ml-2 text-[#FCF8FC] text-sm bg-[#E4606D]"
+                    onClick={() => handleDeleteKeyword(keyword)}
+                  >
+                    x
+                  </button>
+                )}
               </span>
-              {isHost && (
-                <button
-                  className="ml-2 text-red-500 text-sm bg-black"
-                  onClick={() => handleDeleteKeyword(keyword)}
-                >
-                  삭제
-                </button>
-              )}
             </div>
           ))
         )}

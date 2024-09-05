@@ -37,7 +37,8 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
 
-  const [hostId, setHostId] = useState<string | null>(null); // 호스트의 ID를 상태로 관리
+  const [roomHostId, setroomHostId] = useState<number | null>(null); // 호스트의 ID를 상태로 관리
+
   // 방 정보 및 메시지 로드, WebSocket 연결 설정
   useEffect(() => {
     if (roomId && user) {
@@ -52,12 +53,18 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       socket.current.on("connect", () => {
         console.log("Connected to the WebSocket server");
         socket.current?.emit("joinRoom", { roomId, userId: user.id }); // 방에 참여
-        console.log("Joined room:", roomId); // 추가된 콘솔 로그
+        console.log("Joined room:", roomId); // 추가된 콘솔 로그]
       });
-
+      // 서버로부터 realRoom 데이터를 수신
+      socket.current?.on("realRoom", (realRoom) => {
+        console.log("Received realRoom data from server:", realRoom);
+        // roomHostId 상태 업데이트
+        setroomHostId(realRoom.userId);
+      });
       // 서버로부터 메시지 수신
       socket.current.on("message", (message) => {
         console.log("Received message:", message); // 메시지 수신 로그
+
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages, message];
 
@@ -80,15 +87,19 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
         setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
 
-        // 현재 사용자가 호스트인지 확인
-        const currentUser = updatedMembers.find(
-          (member: any) => member.userId === user.id
-        );
-        if (currentUser && currentUser.role === "host") {
-          setIsHost(true); // 현재 사용자가 호스트인 경우 true로 설정
-        } else {
-          setIsHost(false); // 호스트가 아닌 경우 false
-        }
+        // updatedMembers가 배열이 아닌 경우 예외 처리
+        const intervalId = setInterval(() => {
+          if (Array.isArray(updatedMembers)) {
+            const currentUser = updatedMembers.find(
+              (member) => member.userId === user.id
+            );
+
+            setIsHost(currentUser?.role === "host");
+            clearInterval(intervalId); // 배열로 확인되면 더 이상 재시도하지 않음
+          } else {
+            console.log("Waiting for updatedMembers to become an array...");
+          }
+        }, 500); // 0.5초 간격으로 배열 여부를 계속 확인
       });
 
       // 이전 메시지 및 키워드, 멤버 수신
@@ -229,12 +240,32 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                       } ${showProfile ? "mt-4" : "mt-1"}`} // pt-4 또는 pt-1을 조건부로 적용
                     >
                       {showProfile && (
-                        <div className="flex items-center mr-4 pt-1">
+                        <div className="flex items-center mr-4 pt-1 relative">
                           <img
                             src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
                             alt="User Profile"
                             className="w-10 h-full bg-gray-300 rounded-full"
                           />
+                          {(() => {
+                            // roomHostId와 msg.user_id를 콘솔에 출력
+                            console.log("roomHostId:", roomHostId);
+                            console.log("msg.user_id:", msg.user_id);
+
+                            // 두 값이 같을 때 이미지를 렌더링
+                            return roomHostId == msg.user_id ? (
+                              <img
+                                src="/images/crown.png"
+                                className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
+                                alt="Crown"
+                              />
+                            ) : null;
+                          })()}
+                          {roomHostId == msg.user_id && (
+                            <img
+                              src="/images/crown.png"
+                              className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
+                            />
+                          )}
                         </div>
                       )}
                       <div className="flex flex-col h-fit">
@@ -326,11 +357,19 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                       key={index}
                       className="flex items-center mb-4 py-[1px]"
                     >
-                      <img
-                        src={member.profile || "default-profile.png"}
-                        alt={member.nickname}
-                        className="w-10 h-10 bg-gray-300 rounded-full mr-2"
-                      />
+                      <div className="relative">
+                        <img
+                          src={member.profile || "default-profile.png"}
+                          alt={member.nickname}
+                          className="w-10 h-10 bg-gray-300 rounded-full mr-2"
+                        />
+                        {member.role === "host" && (
+                          <img
+                            src="/images/crown.png"
+                            className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-[8px]"
+                          />
+                        )}
+                      </div>
                       <div className="">
                         <div className="text-[16px] font-[700] text-[#323232]">
                           {member.nickname}
