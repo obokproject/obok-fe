@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import io, { Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
+
 interface RoomInfoProps {
   uuid: string; // room uuid를 prop으로 받습니다.
   socket: Socket | null;
 }
+
 interface RoomData {
   title: string;
+  user_id: number;
   creator: {
     name: string;
     job: string;
+    profile_image: string;
   };
   member: number;
   maxMember: number;
   keywords: string[];
   duration: number; // 방 생성 시 설정한 제한 시간 (분)
+  createAt: Date;
+  type: string;
 }
 
 const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
@@ -22,13 +28,27 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
+  // 방 정보를 서버로부터 가져오는 useEffect
   useEffect(() => {
     if (socket) {
       socket.emit("getRoomInfo", uuid);
 
       const handleRoomInfo = (data: RoomData) => {
         setRoomData(data);
-        setTimeLeft(data.duration * 60);
+
+        // 방의 생성 시간과 남은 시간을 제대로 계산
+        const now = new Date().getTime(); // 현재 시간 (밀리초)
+        const createdAtTime = new Date(data.createAt).getTime(); // 방 생성 시간 (밀리초)
+        const totalDurationInSeconds = data.duration * 60; // 제한 시간 (초)
+        const elapsedTime = (now - createdAtTime) / 1000; // 방이 만들어진 후 경과된 시간 (초)
+
+        const remainingTime = totalDurationInSeconds - elapsedTime; // 남은 시간 (초)
+
+        if (remainingTime > 0) {
+          setTimeLeft(remainingTime); // 남은 시간 설정
+        } else {
+          setTimeLeft(0); // 시간이 다 지나면 0으로 설정
+        }
       };
 
       const handleRoomError = (error: any) => {
@@ -38,31 +58,38 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
       socket.on("roomInfo", handleRoomInfo);
       socket.on("roomError", handleRoomError);
 
+      const refreshRoomInfo = () => {
+        socket.emit("getRoomInfo", uuid); // 방 정보 다시 요청
+      };
+
+      socket.on("roomUpdated", refreshRoomInfo); // 서버에서 roomUpdated 이벤트 수신
+
       return () => {
         socket.off("roomInfo", handleRoomInfo);
         socket.off("roomError", handleRoomError);
+        socket.off("roomUpdated", refreshRoomInfo); // 이벤트 클린업
       };
     }
   }, [uuid, socket]);
 
+  // 남은 시간을 1초마다 감소시키는 타이머
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 0) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
+    if (timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0)); // 1초마다 시간 감소
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+      return () => clearInterval(timer); // 컴포넌트가 언마운트될 때 타이머 정리
+    }
+  }, [timeLeft]);
 
-  // 남은 시간을 분 단위로 변환하고 올림하는 함수
+  // 남은 시간을 분과 초로 변환하는 함수
   const formatTimeLeft = (seconds: number): string => {
-    const minutes = Math.ceil(seconds / 60);
-    return `${minutes}분`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}분 ${
+      remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds
+    }초`;
   };
 
   const handleLeaveRoom = () => {
@@ -84,7 +111,18 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
         <div className="w-full md:w-1/3 mb-4 md:mb-0">
           <h2 className="text-xl font-bold mb-2">주제: {roomData.title}</h2>
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gray-300 rounded-full mr-2"></div>
+            <div className="w-10 h-10 bg-gray-300 rounded-full mr-2 relative">
+              <img
+                src={roomData.creator.profile_image || "default-profile.png"}
+                alt={roomData.creator.name}
+                className="w-10 h-10 bg-gray-300 rounded-full mr-2"
+              />
+              <img
+                src="/images/crown.png"
+                className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
+                alt="Crown"
+              />
+            </div>
             <div>
               <div className="text-lg font-bold">{roomData.creator.name}</div>
               <div className="text-sm text-blue-500">
