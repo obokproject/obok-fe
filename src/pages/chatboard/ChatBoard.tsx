@@ -252,7 +252,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                             console.log("msg.user_id:", msg.user_id);
 
                             // 두 값이 같을 때 이미지를 렌더링
-                            return roomHostId == msg.user_id ? (
+                            return roomHostId === msg.user_id ? (
                               <img
                                 src="/images/crown.png"
                                 className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
@@ -260,10 +260,11 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                               />
                             ) : null;
                           })()}
-                          {roomHostId == msg.user_id && (
+                          {roomHostId === msg.user_id && (
                             <img
                               src="/images/crown.png"
                               className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
+                              alt="crown"
                             />
                           )}
                         </div>
@@ -342,7 +343,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             </div>
 
             {/* 방 정보(4) */}
-            <div className="mt-4">
+            <div className="w-full p-4 border-2 border-[#A6046D] rounded-[20px] bg-white">
               <RoomInfo uuid={roomId} socket={socket.current} />
             </div>
           </div>
@@ -367,6 +368,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                           <img
                             src="/images/crown.png"
                             className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-[8px]"
+                            alt="crown"
                           />
                         )}
                       </div>
