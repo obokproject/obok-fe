@@ -11,8 +11,7 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-// const SERVER_URL =
-//   process.env.REACT_APP_NODE_ENV_PROD || process.env.REACT_APP_NODE_ENV;
+const socketUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000"; // 기본값으로 로컬 서버를 사용
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -56,8 +55,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const socketUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000"; // 기본값으로 로컬 서버를 사용
 
   // useEffect hook: roomId, user가 변경될 때만 useEffect hook을 실행
   useEffect(() => {
