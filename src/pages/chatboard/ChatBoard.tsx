@@ -5,7 +5,7 @@ import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴�
 import RoomInfo from "../../components/RoomInfo"; // 방 정보 컴포넌트
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const socketUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000"; // 기본값으로 로컬 서버를 사용
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
 
 interface ChatBoardProps {
   roomId: string;
@@ -47,7 +47,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       fetchRoom(roomId); // 방 정보 로드
 
       // WebSocket 연결 초기화
-      socket.current = io(socketUrl, {
+      socket.current = io(`${apiUrl}`, {
         transports: ["websocket"], // WebSocket을 우선 사용
       });
 

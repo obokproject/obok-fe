@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios"; // axios를 사용하여 API 호출
 
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+
 interface Room {
   id: number;
   uuid: string;
@@ -27,7 +29,7 @@ export const useRoom = (initialRoomId?: string) => {
   const fetchRooms = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/main");
+      const response = await axios.get(`${apiUrl}/main`);
       setRooms(response.data);
     } catch (err) {
       setError("Failed to fetch rooms");
@@ -74,7 +76,7 @@ export const useRoom = (initialRoomId?: string) => {
     ) => {
       try {
         const newRoomId = uuidv4(); // 프론트에서 UUID 생성
-        const response = await axios.post("/main", {
+        const response = await axios.post(`${apiUrl}/main`, {
           uuid: newRoomId,
           title,
           type,
