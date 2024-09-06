@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: "20"
       - name: Set Production API Endpoint
-        run: echo "REACT_APP_NODE_ENV_PROD=http://3.34.234.154" > .env
+        run: echo "REACT_APP_NODE_ENV=http://3.34.234.154:5000" > .env
       - run: npm ci
       # - run: npm test
       - run: npm run build
