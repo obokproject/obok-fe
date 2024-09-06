@@ -105,65 +105,82 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
   }
 
   return (
-    // <div className="bg-white p-4 rounded-lg shadow-md m-1 mb-4 ">
-    <div className="flex flex-wrap justify-between items-start">
-      {/* 주제 및 제안자 정보 */}
-      <div className="w-full md:w-1/3 mb-4 md:mb-0">
-        <h2 className="text-xl font-bold mb-2">주제: {roomData.title}</h2>
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-gray-300 rounded-full mr-2 relative">
-            <img
-              src={roomData.creator.profile_image || "default-profile.png"}
-              alt={roomData.creator.name}
-              className="w-10 h-10 bg-gray-300 rounded-full mr-2"
-            />
-            <img
-              src="/images/crown.png"
-              className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
-              alt="Crown"
-            />
+    <div className="flex max-h-[120px]">
+      <div className="flex-grow flex flex-col">
+        {/* 첫 번째 행: 주제, 참여자, 키워드 */}
+        <div className="flex justify-between gap-[96px] mb-2">
+          <h2 className="flex items-center gap-3 text-[24px] font-bold text-[#323232]">
+            <img src="/images/Union.png" alt="union" className="w-6" />
+            주제: {roomData.title}
+          </h2>
+
+          <div className="flex items-center text-[16px] font-bold text-[#323232]">
+            <img src="/images/person.png" alt="person" className="mr-2" />
+            참여자: {roomData.member}/{roomData.maxMember}
           </div>
-          <div>
-            <div className="text-lg font-bold">{roomData.creator.name}</div>
-            <div className="text-sm text-blue-500">{roomData.creator.job}</div>
+
+          <div className="flex flex-wrap items-center">
+            <img src="/images/tags.png" alt="tags" className="mr-2" />
+            {roomData.keywords.map((keyword, index) => (
+              <span
+                key={index}
+                className=" text-[#323232] px-2 py-1 mr-2 mb-2 text-[16px] font-bold"
+              >
+                #{keyword}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* 두 번째 행: 주최자, 남은 시간 */}
+        <div className="flex gap-[104px] items-center">
+          <div className="flex items-center ">
+            <div className="w-[83px] h-10 relative mr-2">
+              <img
+                src={roomData.creator.profile_image || "/default-profile.png"}
+                alt={roomData.creator.name}
+                className="w-10 h-10 bg-gray-300 rounded-full"
+              />
+              <img
+                src="/images/crown.png"
+                className="w-[15px] h-[15px] absolute top-0 right-0"
+                alt="Crown"
+              />
+            </div>
+            <div>
+              <div className="text-lg font-bold">{roomData.creator.name}</div>
+              <div className="text-sm text-blue-500">
+                {roomData.creator.job}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center text-[16px] font-bold text-[#323232]">
+            <img src="/images/alarm.png" alt="alarm" className="mr-2" />
+            남은 시간: {formatTimeLeft(timeLeft)}
           </div>
         </div>
       </div>
 
-      {/* 참여자 및 시간 정보 */}
-      <div className="flex flex-col items-center w-1/3 text-center">
-        <div className="text-sm text-gray-500 mb-2">
-          참여자: {roomData.member}/{roomData.maxMember}
-        </div>
-
-        <div className="text-xl text-gray-500 mt-2">
-          남은 시간: {formatTimeLeft(timeLeft)}
-        </div>
-      </div>
-
-      {/* 키워드 정보 및 나가기 버튼 */}
-      <div className="w-full md:w-1/3">
-        <div className="flex flex-wrap justify-end mb-2">
-          {roomData.keywords.map((keyword, index) => (
-            <span
-              key={index}
-              className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full mr-2 mb-2 text-sm"
-            >
-              #{keyword}
-            </span>
-          ))}
-        </div>
-        <div className="flex justify-end">
-          <button
-            onClick={handleLeaveRoom}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none"
-          >
-            나가기
-          </button>
-        </div>
+      {/* 나가기 버튼 열 */}
+      <div className="flex items-center ml-4">
+        <button
+          onClick={handleLeaveRoom}
+          className="bg-[#FFC107] rounded-full hover:bg-gray-300 focus:outline-none w-[84px] h-[32px] text-[14px] flex items-center justify-center"
+        >
+          <div className="flex flex-row items-center">
+            <img
+              src="/images/logout.png"
+              alt="logout"
+              className="w-[16px] h-[16px]"
+            />
+            <a className="text-[#FCF8FC]" style={{ textDecoration: "none" }}>
+              나가기
+            </a>
+          </div>
+        </button>
       </div>
     </div>
-    // </div>
   );
 };
 

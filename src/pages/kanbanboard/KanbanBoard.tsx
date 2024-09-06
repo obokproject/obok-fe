@@ -11,7 +11,8 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const socketUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000"; // 기본값으로 로컬 서버를 사용
+// const SERVER_URL =
+//   process.env.REACT_APP_NODE_ENV_PROD || process.env.REACT_APP_NODE_ENV;
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -50,7 +51,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   const [members, setMembers] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [creator, setCreator] = useState({ name: "", job: "" });
-  const [userRole, setUserRole] = useState<string>("guest");
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -66,7 +66,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       //   transports: ["websocket"],
       // });
 
-      socket.current = io(socketUrl, {
+      socket.current = io("http://localhost:5000", {
         transports: ["websocket"],
       });
 
@@ -99,12 +99,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           console.log("info : '" + info + "'");
           setRoom(info);
           setCreator(info.creator || { name: "", job: "" });
-
-          // 사용자의 role 설정
-          const currentUserMember = info.members.find(
-            (member: any) => member.id === user.id
-          );
-          setUserRole(currentUserMember?.role || "guest");
         });
 
         // 에러 처리 로직
@@ -117,14 +111,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           console.log("Reconnected on attempt: ", attemptNumber);
         });
       };
-
-      // // creator 정보 설정
-      // if (room && room.User) {
-      //   setCreator({
-      //     name: room.User.username || "",
-      //     job: room.User.job || "",
-      //   });
-      // }
 
       setupSocketListeners();
 
@@ -144,7 +130,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = (result: DropResult) => {
-    if (userRole !== "host") return;
     const { source, destination } = result;
 
     // 유효하지 않은 목적지인 경우 (예: 보드 밖으로 드래그) 함수 종료
@@ -215,22 +200,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       setIsAddingCard(false);
     }
   };
-  // 카드 삭제 핸들러
-  const deleteCard = (sectionId: string, cardId: string) => {
-    if (userRole !== "host") return;
-
-    const newSections = sections.map((section) =>
-      section.id === sectionId
-        ? {
-            ...section,
-            cards: section.cards.filter((card) => card.id !== cardId),
-          }
-        : section
-    );
-
-    setSections(newSections);
-    socket.current?.emit("boardUpdate", { roomId, sections: newSections });
-  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -259,7 +228,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                               key={card.id}
                               draggableId={card.id}
                               index={index}
-                              isDragDisabled={userRole !== "host"}
                             >
                               {(provided) => (
                                 <div
@@ -274,16 +242,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                     alt="User profile"
                                     className="w-8 h-8 rounded-full ml-2"
                                   />
-                                  {userRole === "host" && (
-                                    <button
-                                      onClick={() =>
-                                        deleteCard(section.id, card.id)
-                                      }
-                                      className="ml-2 text-red-500 hover:text-red-700"
-                                    >
-                                      X
-                                    </button>
-                                  )}
                                 </div>
                               )}
                             </Draggable>
