@@ -1,8 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 
-const apiUrl =
-  process.env.REACT_APP_NODE_ENV || process.env.REACT_APP_NODE_ENV_PROD;
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
 
 interface User {
   id: string;
