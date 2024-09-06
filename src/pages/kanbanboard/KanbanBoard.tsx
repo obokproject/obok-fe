@@ -57,6 +57,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const socketUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000"; // 기본값으로 로컬 서버를 사용
+
   // useEffect hook: roomId, user가 변경될 때만 useEffect hook을 실행
   useEffect(() => {
     if (roomId && user) {
@@ -67,7 +69,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       //   transports: ["websocket"],
       // });
 
-      socket.current = io("http://localhost:5000", {
+      socket.current = io(socketUrl, {
         transports: ["websocket"],
       });
 
