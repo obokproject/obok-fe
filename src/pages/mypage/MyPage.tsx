@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+
 // 활동 내역 타입 정의
 interface Activity {
   id: number;
@@ -61,7 +63,7 @@ const MyPage: React.FC = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await axios.get("/auth/room-history");
+        const response = await axios.get(`${apiUrl}/auth/room-history`);
         setActivities(response.data);
         setRoomHistory(response.data); // roomHistory 상태도 업데이트
       } catch (err) {
