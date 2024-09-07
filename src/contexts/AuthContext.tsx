@@ -72,11 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const loginWithGoogle = async () => {
     const url = `${apiUrl}/auth/google`;
     console.log("Redirecting to:", url);
-    if (isAdmin()) {
-      window.location.href = `${url}/admin`;
-    } else {
-      window.location.href = url;
-    }
+    window.location.href = url;
   };
 
   const logout = async () => {

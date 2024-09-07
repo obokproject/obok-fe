@@ -14,6 +14,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+
 interface MonthlySignup {
   month: number;
   count: number;
@@ -31,7 +33,7 @@ interface User {
   created_at: string;
 }
 const AdminPage: React.FC = () => {
-  const { isLoggedIn, isAdmin, user } = useAuth();
+  const { isLoggedIn, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState<User[]>([]);
@@ -40,26 +42,28 @@ const AdminPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get("/api/auth/users");
+      const response = await axios.get(`${apiUrl}/admin/users`);
       setUsers(response.data);
     } catch (error) {
       console.error("사용자 목록 조회 중 오류 발생:", error);
     }
-  };
-  const fetchAvailableYears = async () => {
+  }, []);
+  const fetchAvailableYears = useCallback(async () => {
     try {
-      const response = await axios.get("/api/auth/available-years");
+      const response = await axios.get(`${apiUrl}/admin/available-years`);
       setAvailableYears(response.data);
     } catch (error) {
       console.error("연도 목록 조회 중 오류 발생:", error);
     }
-  };
+  }, []);
 
   const fetchMonthlySignups = useCallback(async (year: number) => {
     try {
-      const response = await axios.get(`/api/auth/monthly-signups/${year}`);
+      const response = await axios.get(
+        `${apiUrl}/admin/monthly-signups/${year}`
+      );
       setMonthlySignups(response.data);
     } catch (error) {
       console.error("월별 가입자 통계 조회 중 오류 발생:", error);
