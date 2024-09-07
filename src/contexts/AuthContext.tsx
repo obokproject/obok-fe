@@ -9,11 +9,13 @@ interface User {
   profile: string;
   nickname: string;
   job: string;
+  role: "user" | "admin";
 }
 
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
+  isAdmin: boolean; // 관리자 여부를 나타내는 필드
   loginWithGoogle: () => Promise<void>;
   logout: () => void;
   showLoginModal: boolean;
@@ -41,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         withCredentials: true,
       });
       if (response.data) {
-        const { id, email, profile_image, nickname, job } = response.data;
+        const { id, email, profile_image, nickname, job, role } = response.data;
 
         // profile_image를 profile로 매핑
         const user: User = {
@@ -50,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           profile: profile_image, // profile_image를 profile로 사용
           nickname,
           job,
+          role: role || "user",
         };
         setUser(user);
       }
@@ -61,11 +64,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // }
     }
   };
+  // 관리자 여부를 확인하는 함수
+  const isAdmin = (): boolean => {
+    return user?.role === "admin";
+  };
 
   const loginWithGoogle = async () => {
     const url = `${apiUrl}/auth/google`;
     console.log("Redirecting to:", url);
-    window.location.href = url;
+    if (isAdmin()) {
+      window.location.href = `${url}/admin`;
+    } else {
+      window.location.href = url;
+    }
   };
 
   const logout = async () => {
@@ -102,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         isLoggedIn: !!user,
+        isAdmin: isAdmin(), // isAdmin
         loginWithGoogle,
         logout,
         showLoginModal,

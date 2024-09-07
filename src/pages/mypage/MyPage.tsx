@@ -11,6 +11,17 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import axios from "axios";
+
+// 활동 내역 타입 정의
+interface Activity {
+  id: number;
+  title: string;
+  type: "베리톡" | "베리보드";
+  participants: number;
+  date: string;
+  entryTime: string;
+}
 
 const MyPage: React.FC = () => {
   const { user } = useAuth();
@@ -20,6 +31,11 @@ const MyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  //활동내역 데이터 저장
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [activities, setActivities] = useState<Activity[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [roomHistory, setRoomHistory] = useState<Activity[]>([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -40,6 +56,21 @@ const MyPage: React.FC = () => {
     setJob(user?.job ?? "");
     setProfile(user?.profile ?? null);
   }, [user]);
+
+  // 컴포넌트 마운트 시 활동 내역 데이터 가져오기
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await axios.get("/auth/room-history");
+        setActivities(response.data);
+        setRoomHistory(response.data); // roomHistory 상태도 업데이트
+      } catch (err) {
+        console.error("활동 내역을 불러오는데 실패했습니다:", err);
+      }
+    };
+
+    fetchActivities();
+  }, []);
 
   // 유효성 검사 함수
   const validateNickname = (value: string) => {
@@ -153,6 +184,7 @@ const MyPage: React.FC = () => {
 
   return (
     <Container className="py-5">
+      {/* 마이페이지 제목 */}
       <div className="flex items-center text-[40px] font-bold leading-[60px]">
         <img
           src="/images/mypage-pencil.png"
@@ -171,6 +203,7 @@ const MyPage: React.FC = () => {
         className="mb-4"
         style={{ paddingLeft: "50px" }}
       >
+        {/* 프로필 탭 */}
         <Tab eventKey="profile" title="프로필">
           <Row className="mb-4">
             <Col xs={12} md={6} className="text-center pt-[80px] pb-[80px]">
@@ -316,71 +349,59 @@ const MyPage: React.FC = () => {
             </button>
           </div>
         </Tab>
-        <Tab eventKey="history" title="참여 내역">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">활동 내역</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
+        {/* 활동 내역 탭 */}
+        <Tab eventKey="history" title="활동 내역">
+          <div className="bg-white h-[500px] shadow rounded-lg p-6">
+            <div className="overflow-x-auto ">
+              <table className="min-w-full border-collapse border border-gray-300 ">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-4 py-2 text-left">날짜</th>
-                    <th className="px-4 py-2 text-left">형태</th>
-                    <th className="px-4 py-2 text-left">방 제목</th>
-                    <th className="px-4 py-2 text-left">참여인원</th>
-                    <th className="px-4 py-2 text-left">시간 (분)</th>
+                  <tr className="bg-gray-100 ">
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      방제목
+                    </th>
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      종류
+                    </th>
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      참여인원
+                    </th>
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      날짜
+                    </th>
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      입장시간
+                    </th>
+                    <th className="px-4 py-2 text-center border border-gray-300">
+                      관리
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/*
-                  // 사용자 정보 타입 정의 필요하고
-                  // 활동내역 타입 정의 필요함
-                  //사용자 정보과 활동내역 가져오는 함수 
-                    interface UserInfo {
-                    email: string;
-                    profileImage: string;
-                  }
-
-                  // 활동 내역 타입 정의
-                  interface Activity {
-                    id: number;
-                    activityDate: string;
-                    activityType: '베리톡' | '베리보드';
-                    roomTitle: string;
-                    participants: number;
-                    durationMinutes: number;
-                  }
-
-                    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-                    const [activities, setActivities] = useState<Activity[]>([]);
-                    useEffect(() => {
-                    setUserInfo({
-                      email: 'user@example.com',
-                          profileImage: '/api/placeholder/100/100'
-                        });
-
-                        setActivities([
-                          { id: 1, activityDate: '2024-08-30 10:00', activityType: '베리톡', roomTitle: '아이디어 회의', participants: 5, durationMinutes: 60 },
-                          { id: 2, activityDate: '2024-08-30 14:30', activityType: '베리보드', roomTitle: '프로젝트 기획', participants: 3, durationMinutes: 90 },
-                          { id: 3, activityDate: '2024-08-31 09:15', activityType: '베리톡', roomTitle: '디자인 리뷰', participants: 4, durationMinutes: 45 },
-                        ]);
-                      }, []);
-                    {activities.map((activity) => (
-                    <tr key={activity.id} className="border-b">
-                      <td className="px-4 py-2">{activity.activityDate}</td>
-                      <td className="px-4 py-2">{activity.activityType}</td>
-                      <td className="px-4 py-2">{activity.roomTitle}</td>
-                      <td className="px-4 py-2">{activity.participants}</td>
-                      <td className="px-4 py-2">{activity.durationMinutes}</td>
+                  {/* 활동 내역 데이터 매핑 */}
+                  {roomHistory.map((room, index) => (
+                    <tr key={index} className="text-center">
+                      <td className="px-2 py-2 border border-gray-300">
+                        {room.title}
+                      </td>
+                      <td className="px-2 py-2 border border-gray-300">
+                        {room.type}
+                      </td>
+                      <td className="px-2 py-2 border border-gray-300">
+                        {room.participants}명
+                      </td>
+                      <td className="px-2 py-2 border border-gray-300">
+                        {room.date}
+                      </td>
+                      <td className="px-2 py-2 border border-gray-300">
+                        {room.entryTime}
+                      </td>
+                      <td className="px-2 py-2 border border-gray-300">
+                        <button className="bg-gray-500 hover:bg-gray-300 text-white font-bold py-1 px-2 rounded">
+                          삭제
+                        </button>
+                      </td>
                     </tr>
-                  ))} */}
-
-                  <tr>
-                    <td className="px-2">1</td>
-                    <td className="px-2">2</td>
-                    <td className="px-2">3</td>
-                    <td className="px-2">4</td>
-                    <td className="px-2">5</td>
-                  </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

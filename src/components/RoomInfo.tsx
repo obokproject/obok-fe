@@ -174,9 +174,9 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
               alt="logout"
               className="w-[16px] h-[16px]"
             />
-            <a className="text-[#FCF8FC]" style={{ textDecoration: "none" }}>
+            <span className="text-[#FCF8FC]" style={{ textDecoration: "none" }}>
               나가기
-            </a>
+            </span>
           </div>
         </button>
       </div>
