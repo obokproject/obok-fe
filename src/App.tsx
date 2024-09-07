@@ -17,6 +17,9 @@ import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
 import ScrolltoTop from "./components/ScrolltoTop";
 import AdminPage from "./pages/adminpage/AdminPage";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 // let API_URL;
 

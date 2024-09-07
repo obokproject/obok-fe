@@ -248,20 +248,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                             alt="User Profile"
                             className="w-10 h-full bg-gray-300 rounded-full"
                           />
-                          {(() => {
-                            // roomHostId와 msg.user_id를 콘솔에 출력
-                            console.log("roomHostId:", roomHostId);
-                            console.log("msg.user_id:", msg.user_id);
 
-                            // 두 값이 같을 때 이미지를 렌더링
-                            return roomHostId === msg.user_id ? (
-                              <img
-                                src="/images/crown.png"
-                                className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
-                                alt="Crown"
-                              />
-                            ) : null;
-                          })()}
                           {roomHostId === msg.user_id && (
                             <img
                               src="/images/crown.png"
