@@ -16,6 +16,7 @@ import MyPage from "./pages/mypage/MyPage";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
 import ScrolltoTop from "./components/ScrolltoTop";
+import AdminPage from "./pages/adminpage/AdminPage";
 
 // let API_URL;
 
@@ -62,6 +63,7 @@ const AppContent: React.FC = () => {
           <Route path="/kanban/:roomId" element={<KanbanBoardWrapper />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
       <Footer />

@@ -1,0 +1,268 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Container, Tab, Tabs, Form } from "react-bootstrap";
+import axios from "axios";
+import { useAuth } from "../../hooks/useAuth";
+import { Navigate } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+interface MonthlySignup {
+  month: number;
+  count: number;
+}
+
+interface User {
+  id: string;
+  social_id: string;
+  social_type: string;
+  job: string;
+  email: string;
+  nickname: string;
+  role: string;
+  last_login_at: string;
+  created_at: string;
+}
+const AdminPage: React.FC = () => {
+  const { isLoggedIn, isAdmin, user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("users");
+  const [users, setUsers] = useState<User[]>([]);
+  const [monthlySignups, setMonthlySignups] = useState<MonthlySignup[]>([]);
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/api/auth/users");
+      setUsers(response.data);
+    } catch (error) {
+      console.error("사용자 목록 조회 중 오류 발생:", error);
+    }
+  };
+  const fetchAvailableYears = async () => {
+    try {
+      const response = await axios.get("/api/auth/available-years");
+      setAvailableYears(response.data);
+    } catch (error) {
+      console.error("연도 목록 조회 중 오류 발생:", error);
+    }
+  };
+
+  const fetchMonthlySignups = useCallback(async (year: number) => {
+    try {
+      const response = await axios.get(`/api/auth/monthly-signups/${year}`);
+      setMonthlySignups(response.data);
+    } catch (error) {
+      console.error("월별 가입자 통계 조회 중 오류 발생:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const initializeAdminPage = async () => {
+      if (isLoggedIn && isAdmin) {
+        await Promise.all([
+          fetchUsers(),
+          fetchAvailableYears(),
+          fetchMonthlySignups(selectedYear),
+        ]);
+      }
+      setLoading(false);
+    };
+
+    initializeAdminPage();
+  }, [
+    isLoggedIn,
+    isAdmin,
+    fetchUsers,
+    fetchAvailableYears,
+    fetchMonthlySignups,
+    selectedYear,
+  ]);
+
+  useEffect(() => {
+    if (isLoggedIn && isAdmin) {
+      fetchMonthlySignups(selectedYear);
+    }
+  }, [selectedYear, isLoggedIn, isAdmin, fetchMonthlySignups]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/" />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+
+  // useEffect(() => {
+  //   fetchUsers();
+  //   fetchAvailableYears();
+  // }, []);
+
+  // useEffect(() => {
+  //   fetchMonthlySignups(selectedYear);
+  // }, [selectedYear, fetchMonthlySignups]);
+
+  const handleDeleteUser = async (id: string) => {
+    if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
+      try {
+        await axios.delete(`/api/auth/users/${id}`);
+        fetchUsers(); // 사용자 목록 새로고침
+      } catch (error) {
+        console.error("사용자 삭제 중 오류 발생:", error);
+      }
+    }
+  };
+
+  return (
+    <Container fluid className="p-0">
+      <div className="p-3 md:p-5">
+        <h1 className="text-[24px] font-bold mb-6">회원관리</h1>
+
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => k && setActiveTab(k)}
+          className="mb-4"
+        >
+          <Tab eventKey="users" title="사용자 관리">
+            <div className="bg-white shadow rounded-lg ">
+              <div className="p-3 md:p-6">
+                <h2 className="text-[16px] font-semibold mb-4">
+                  가입인원: {users.length}명
+                </h2>
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">ID</th>
+                      <th className="px-4 py-2 text-left">소셜ID</th>
+                      <th className="px-4 py-2 text-left">소셜타입</th>
+                      <th className="px-4 py-2 text-left">직업</th>
+                      <th className="px-4 py-2 text-left">이메일</th>
+                      <th className="px-4 py-2 text-left">닉네임</th>
+                      <th className="px-4 py-2 text-left">역할</th>
+                      <th className="px-4 py-2 text-left">마지막로그인</th>
+                      <th className="px-4 py-2 text-left">가입일자</th>
+                      <th className="px-4 py-2 text-left">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user: User) => (
+                      <tr key={user.id} className="border-b">
+                        <td className="px-4 py-2">{user.id}</td>
+                        <td className="px-4 py-2">{user.social_id}</td>
+                        <td className="px-4 py-2">{user.social_type}</td>
+                        <td className="px-4 py-2">{user.job}</td>
+                        <td className="px-4 py-2">{user.email}</td>
+                        <td className="px-4 py-2">{user.nickname}</td>
+                        <td className="px-4 py-2">{user.role}</td>
+                        <td className="px-4 py-2">
+                          {new Date(user.last_login_at).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-2">
+                          {new Date(user.created_at).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-2">
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </Tab>
+          <Tab eventKey="statistics" title="가입자 통계">
+            <div className="bg-white shadow-lg rounded-lg">
+              <div className="p-3 md:p-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                  <h2 className="text-[16px] font-bold text-gray-800 mb-4 sm:mb-0">
+                    월별 가입자 통계
+                  </h2>
+                  <div className="flex items-center">
+                    <span
+                      className="mr-1 text-gray-600 font-sm"
+                      style={{ width: "100px" }}
+                    >
+                      연도 :
+                    </span>
+                    <Form.Select
+                      id="year-select"
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(Number(e.target.value))}
+                      className="w-32 border-none bg-transparent focus:ring-2 focus:ring-blue-500 rounded-md text-gray-800 font-semibold"
+                    >
+                      {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}년
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </div>
+                </div>
+                <div style={{ width: "100%", height: "400px" }}>
+                  <ResponsiveContainer>
+                    <BarChart
+                      data={monthlySignups}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="month"
+                        tickFormatter={(value) => `${value}월`}
+                        type="number"
+                        domain={[0.5, 12.5]}
+                        ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+                        axisLine={{ stroke: "#e0e0e0" }}
+                        tick={{ fill: "#666", fontSize: 12 }}
+                      />
+                      <YAxis
+                        domain={[0, "auto"]}
+                        allowDataOverflow={false}
+                        axisLine={{ stroke: "#e0e0e0" }}
+                        tick={{ fill: "#666", fontSize: 12 }}
+                      />
+                      <Tooltip
+                        formatter={(value) => [`${value}명`, "가입자 수"]}
+                        contentStyle={{
+                          backgroundColor: "rgba(255, 255, 255, 0.8)",
+                          borderRadius: "8px",
+                          border: "1px solid #e0e0e0",
+                        }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: "20px" }} />
+                      <Bar
+                        dataKey="count"
+                        fill="#4f46e5"
+                        name="가입자 수"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </Tab>
+        </Tabs>
+      </div>
+    </Container>
+  );
+};
+
+export default AdminPage;
