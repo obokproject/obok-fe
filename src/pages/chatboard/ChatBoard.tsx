@@ -47,7 +47,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       fetchRoom(roomId); // 방 정보 로드
 
       // WebSocket 연결 초기화
-      socket.current = io(`${apiUrl}/api`, {
+      socket.current = io(`${apiUrl}`, {
         transports: ["websocket"], // WebSocket을 우선 사용
       });
 

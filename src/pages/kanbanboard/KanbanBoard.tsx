@@ -63,7 +63,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     if (roomId && user) {
       fetchRoom(roomId);
 
-      socket.current = io(`${apiUrl}/api`, {
+      socket.current = io(`${apiUrl}`, {
         transports: ["websocket"],
       });
 
