@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: "20"
       - name: Set Production API Endpoint
-        run: echo "REACT_APP_NODE_ENV=http://3.34.234.154:5000" > .env
+        run: echo "REACT_APP_API_URL=https://razvery.link" > .env
       - name: Check .env File Contents
         run: cat .env # .env 파일 내용 출력
       - run: npm ci
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set Production API Endpoint
-        run: echo "REACT_APP_NODE_ENV=http://3.34.234.154:5000" > .env
+        run: echo "REACT_APP_NODE_ENV=https://razvery.link" > .env
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -46,7 +46,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           npm ci
-          npm run build
+          npm run build --if-present
       # AWS S3 sync 명령
       - name: Deploy to S3
         run: aws s3 sync build/ s3://team05-razvery-bucket --delete
