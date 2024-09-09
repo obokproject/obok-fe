@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 interface MonthlySignup {
   month: number;
@@ -54,7 +54,7 @@ const AdminPage: React.FC = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/admin/users`);
+      const response = await axios.get(`${apiUrl}/api/admin/users`);
       setUsers(response.data);
     } catch (error) {
       console.error("사용자 목록 조회 중 오류 발생:", error);
@@ -62,7 +62,7 @@ const AdminPage: React.FC = () => {
   }, []);
   const fetchAvailableYears = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/admin/available-years`);
+      const response = await axios.get(`${apiUrl}/api/admin/available-years`);
       setAvailableYears(response.data);
     } catch (error) {
       console.error("연도 목록 조회 중 오류 발생:", error);
@@ -72,7 +72,7 @@ const AdminPage: React.FC = () => {
   const fetchMonthlySignups = useCallback(async (year: number) => {
     try {
       const response = await axios.get(
-        `${apiUrl}/admin/monthly-signups/${year}`
+        `${apiUrl}/api/admin/monthly-signups/${year}`
       );
       setMonthlySignups(response.data);
     } catch (error) {
@@ -123,7 +123,7 @@ const AdminPage: React.FC = () => {
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
       try {
-        await axios.delete(`/api/auth/users/${id}`);
+        await axios.delete(`${apiUrl}/api/admin/users/${id}`);
         fetchUsers(); // 사용자 목록 새로고침
       } catch (error) {
         console.error("사용자 삭제 중 오류 발생:", error);

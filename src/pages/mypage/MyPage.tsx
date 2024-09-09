@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 
-const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // 활동 내역 타입 정의
 interface Activity {
@@ -63,7 +63,7 @@ const MyPage: React.FC = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/auth/room-history`);
+        const response = await axios.get(`${apiUrl}/api/auth/room-history`);
         setActivities(response.data);
         setRoomHistory(response.data); // roomHistory 상태도 업데이트
       } catch (err) {
@@ -103,7 +103,7 @@ const MyPage: React.FC = () => {
   const handleImageDelete = async () => {
     try {
       // 서버에 이미지 삭제 요청
-      const response = await fetch("/api/delete-profile-image", {
+      const response = await fetch(`${apiUrl}/api/auth/profile-image`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +144,7 @@ const MyPage: React.FC = () => {
   const confirmSave = async () => {
     if (validateNickname(nickname) && validateJob(job)) {
       try {
-        const response = await fetch("/api/users/update", {
+        const response = await fetch(`${apiUrl}/api/auth/update`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
