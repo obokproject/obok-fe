@@ -35,6 +35,8 @@ jobs:
     # Job에서 실행될 각각의 step
     steps:
       - uses: actions/checkout@v4
+      - name: Set Production API Endpoint
+        run: echo "REACT_APP_NODE_ENV=http://3.34.234.154:5000" > .env
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
