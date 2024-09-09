@@ -373,9 +373,6 @@ const MyPage: React.FC = () => {
                     <th className="px-4 py-2 text-center border border-gray-300">
                       입장시간
                     </th>
-                    <th className="px-4 py-2 text-center border border-gray-300">
-                      관리
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -396,11 +393,6 @@ const MyPage: React.FC = () => {
                       </td>
                       <td className="px-2 py-2 border border-gray-300">
                         {room.entryTime}
-                      </td>
-                      <td className="px-2 py-2 border border-gray-300">
-                        <button className="bg-gray-500 hover:bg-gray-300 text-white font-bold py-1 px-2 rounded">
-                          삭제
-                        </button>
                       </td>
                     </tr>
                   ))}

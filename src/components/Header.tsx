@@ -4,22 +4,15 @@ import { Link } from "react-router-dom";
 
 interface HeaderProps {
   isLoggedIn: boolean;
-  onLogout: () => void;
   openLoginModal: () => void; // LoginModal을 열기 위한 함수
+  profile: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
   isLoggedIn,
-  onLogout,
   openLoginModal,
+  profile,
 }) => {
-  // const navigate = useNavigate();
-
-  // const handleLogout = () => {
-  //   onLogout();
-  //   navigate("/");
-  // };
-
   return (
     <Navbar className="h-100">
       <Container className="h-100 d-flex align-items-center">
@@ -40,7 +33,10 @@ const Header: React.FC<HeaderProps> = ({
             <>
               <Nav.Link as={Link} to="/mypage">
                 <img
-                  src={`${process.env.PUBLIC_URL}/images/user-profile.png`}
+                  src={
+                    profile ||
+                    `${process.env.PUBLIC_URL}/images/user-profile.png`
+                  }
                   alt="Profile"
                   style={{ width: "40px", height: "40px", borderRadius: "50%" }}
                 />

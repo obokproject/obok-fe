@@ -44,19 +44,19 @@ const KanbanBoardWrapper = () => {
 const AppContent: React.FC = () => {
   const {
     isLoggedIn,
-    logout,
     openLoginModal,
     showLoginModal,
     closeLoginModal,
     loginWithGoogle,
+    user,
   } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header
         isLoggedIn={isLoggedIn}
-        onLogout={logout}
         openLoginModal={openLoginModal}
+        profile={user?.profile || ""}
       />
       <main className="flex-grow">
         <Routes>

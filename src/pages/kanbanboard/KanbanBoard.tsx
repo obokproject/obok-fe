@@ -18,6 +18,7 @@ interface KanbanCard {
   id: string; // 카드의 고유 식별자
   content: string; // 카드의 내용
   profile: string; // 카드 작성자의 프로필 이미지 URL
+  userId: string; //
 }
 
 // 칸반 보드의 각 열(Section)을 나타내는 인터페이스
@@ -42,6 +43,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 칸반 보드의 상태를 관리하는 state
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userRole, setUserRole] = useState<string>("guest");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<any>(null);
   const { loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
   const [sections, setSections] = useState<KanbanSection[]>(SECTIONS);
@@ -59,11 +62,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   useEffect(() => {
     if (roomId && user) {
       fetchRoom(roomId);
-
-      // WebSocket 연결 초기화
-      // socket.current = io(SERVER_URL as string, {
-      //   transports: ["websocket"],
-      // });
 
       socket.current = io(`${apiUrl}`, {
         transports: ["websocket"],
@@ -129,10 +127,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = (result: DropResult) => {
+    console.log(result);
     const { source, destination } = result;
 
     // 유효하지 않은 목적지인 경우 (예: 보드 밖으로 드래그) 함수 종료
     if (!destination) return;
+
+    // 호스트만 카드 이동 가능
+    if (userRole !== "host") {
+      alert("호스트만 카드를 이동할 수 있습니다.");
+      return;
+    }
 
     const newSections = Array.from(sections);
     const sourceSection = newSections.find(
@@ -154,10 +159,29 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 새 카드 추가 함수
   const addCard = (content: string) => {
     if (content.trim() && user) {
+      const creationSection = sections.find((section) => section.id === "생성");
+      if (!creationSection) return;
+
+      // 1인당 2개 카드 제한 확인
+      const userCardCount = creationSection.cards.filter(
+        (card) => card.userId === user.id
+      ).length;
+      if (userCardCount >= 2) {
+        alert("생성 섹션에는 1인당 최대 2개의 카드만 추가할 수 있습니다.");
+        return;
+      }
+
+      // 생성 섹션 7개 카드 제한 확인
+      if (creationSection.cards.length >= 7) {
+        alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
+        return;
+      }
+
       const newCard: KanbanCard = {
         id: Date.now().toString(),
         content: content,
         profile: user.profile,
+        userId: user.id,
       };
 
       const newSections = sections.map((section) =>
@@ -187,7 +211,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 카드 내용 입력 핸들러
   const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewCardContent(e.target.value.slice(0, 80));
+    setNewCardContent(e.target.value.slice(0, 10));
   };
   // 카드 입력 키 이벤트 핸들러
   const handleCardInputKeyPress = (
@@ -227,6 +251,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                               key={card.id}
                               draggableId={card.id}
                               index={index}
+                              isDragDisabled={userRole !== "host"}
                             >
                               {(provided) => (
                                 <div
@@ -249,27 +274,27 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
                           {section.id === "생성" &&
                             (isAddingCard ? (
-                              <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2">
+                              <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2 h-[51px]">
                                 <input
                                   ref={inputRef}
                                   type="text"
-                                  placeholder="새 카드 내용 (80자 이내)"
+                                  placeholder="새 카드 내용 (10자 이내)"
                                   value={newCardContent}
                                   onChange={handleCardInputChange}
                                   onKeyDown={handleCardInputKeyPress}
                                   className="w-full bg-transparent border-none focus:outline-none"
                                 />
-                                <small className="text-gray-600 text-right block">
-                                  {newCardContent.length} / 7
-                                </small>
                               </div>
                             ) : (
                               <div className="flex justify-center">
                                 <button
                                   onClick={handleAddCardClick}
-                                  className="bg-white text-gray-800 font-bold py-2 px-4 rounded border border-gray-300 hover:bg-gray-100"
+                                  className="bg-white py-2 px-4 rounded border border-gray-300 hover:bg-gray-100 w-24"
                                 >
-                                  + 카드 추가
+                                  <img
+                                    src="/images/Vector-Stroke.png"
+                                    alt="addcard-button"
+                                  />
                                 </button>
                               </div>
                             ))}
