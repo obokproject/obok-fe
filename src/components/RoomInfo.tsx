@@ -134,8 +134,8 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
 
         {/* 두 번째 행: 주최자, 남은 시간 */}
         <div className="flex gap-[104px] items-center">
-          <div className="flex items-center ">
-            <div className="w-[83px] h-10 relative mr-2">
+          <div className="flex items-center w-[83px]">
+            <div className=" h-10 relative mr-2">
               <img
                 src={roomData.creator.profile_image || "/default-profile.png"}
                 alt={roomData.creator.name}

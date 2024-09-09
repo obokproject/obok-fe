@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Container, Tab, Tabs, Form } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../../hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
   BarChart,
   Bar,
@@ -30,7 +30,7 @@ interface User {
   nickname: string;
   role: string;
   last_login_at: string;
-  created_at: string;
+  createdAt: string;
 }
 const AdminPage: React.FC = () => {
   const { isLoggedIn, isAdmin } = useAuth();
@@ -41,6 +41,16 @@ const AdminPage: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
+
+  // 현재 페이지의 사용자 가져오기
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  // 페이지 변경 함수
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -102,22 +112,13 @@ const AdminPage: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  if (!isLoggedIn) {
-    return <Navigate to="/" />;
-  }
+  // if (!isLoggedIn) {
+  //   return <Navigate to="/" />;
+  // }
 
-  if (!isAdmin) {
-    return <Navigate to="/" />;
-  }
-
-  // useEffect(() => {
-  //   fetchUsers();
-  //   fetchAvailableYears();
-  // }, []);
-
-  // useEffect(() => {
-  //   fetchMonthlySignups(selectedYear);
-  // }, [selectedYear, fetchMonthlySignups]);
+  // if (!isAdmin) {
+  //   return <Navigate to="/" />;
+  // }
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
@@ -131,7 +132,7 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <Container fluid className="p-0">
+    <Container className="p-0 relative">
       <div className="p-3 md:p-5">
         <h1 className="text-[24px] font-bold mb-6">회원관리</h1>
 
@@ -141,43 +142,43 @@ const AdminPage: React.FC = () => {
           className="mb-4"
         >
           <Tab eventKey="users" title="사용자 관리">
-            <div className="bg-white shadow rounded-lg ">
-              <div className="p-3 md:p-6">
+            <div className="bg-white shadow rounded-lg min-w-[1200px]">
+              <div className="p-3 md:p-6 ">
                 <h2 className="text-[16px] font-semibold mb-4">
                   가입인원: {users.length}명
                 </h2>
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="px-4 py-2 text-left">ID</th>
-                      <th className="px-4 py-2 text-left">소셜ID</th>
-                      <th className="px-4 py-2 text-left">소셜타입</th>
-                      <th className="px-4 py-2 text-left">직업</th>
-                      <th className="px-4 py-2 text-left">이메일</th>
-                      <th className="px-4 py-2 text-left">닉네임</th>
-                      <th className="px-4 py-2 text-left">역할</th>
-                      <th className="px-4 py-2 text-left">마지막로그인</th>
-                      <th className="px-4 py-2 text-left">가입일자</th>
-                      <th className="px-4 py-2 text-left">관리</th>
+                      <th className="py-2 text-center">ID</th>
+                      <th className="  py-2 text-center">소셜ID</th>
+                      <th className="  py-2 text-center">소셜타입</th>
+                      <th className="  py-2 text-center">직업</th>
+                      <th className="  py-2 text-center">이메일</th>
+                      <th className="py-2 text-center">닉네임</th>
+                      <th className="  py-2 text-center">역할</th>
+                      <th className="  py-2 text-center">마지막로그인</th>
+                      <th className="  py-2 text-center">가입일자</th>
+                      <th className="  py-2 text-center">관리</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((user: User) => (
+                    {currentUsers.map((user: User) => (
                       <tr key={user.id} className="border-b">
-                        <td className="px-4 py-2">{user.id}</td>
-                        <td className="px-4 py-2">{user.social_id}</td>
-                        <td className="px-4 py-2">{user.social_type}</td>
-                        <td className="px-4 py-2">{user.job}</td>
-                        <td className="px-4 py-2">{user.email}</td>
-                        <td className="px-4 py-2">{user.nickname}</td>
-                        <td className="px-4 py-2">{user.role}</td>
-                        <td className="px-4 py-2">
+                        <td className="  py-2">{user.id}</td>
+                        <td className="  py-2">{user.social_id}</td>
+                        <td className="  py-2">{user.social_type}</td>
+                        <td className="  py-2">{user.job}</td>
+                        <td className="  py-2">{user.email}</td>
+                        <td className="  py-2">{user.nickname}</td>
+                        <td className="  py-2">{user.role}</td>
+                        <td className="  py-2">
                           {new Date(user.last_login_at).toLocaleString()}
                         </td>
-                        <td className="px-4 py-2">
-                          {new Date(user.created_at).toLocaleString()}
+                        <td className="  py-2">
+                          {new Date(user.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-4 py-2">
+                        <td className="  py-2">
                           <button
                             onClick={() => handleDeleteUser(user.id)}
                             className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
@@ -190,6 +191,58 @@ const AdminPage: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+            {/* 페이지네이션 */}
+            <div className="flex justify-center items-center my-4">
+              {/* 이전 버튼 */}
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full mx-2 ${
+                  currentPage === 1 ? "cursor-default" : "cursor-pointer"
+                }`}
+                style={{ pointerEvents: currentPage === 1 ? "none" : "auto" }}
+              >
+                <IoIosArrowBack />
+              </button>
+
+              {/* 페이지 번호 */}
+              {[...Array(Math.ceil(users.length / usersPerPage))].map(
+                (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => paginate(i + 1)}
+                    className={`w-10 h-10 mx-1 rounded-full ${
+                      currentPage === i + 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                )
+              )}
+
+              {/* 다음 버튼 */}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={
+                  currentPage === Math.ceil(users.length / usersPerPage)
+                }
+                className={`flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full mx-2 ${
+                  currentPage === Math.ceil(users.length / usersPerPage)
+                    ? "cursor-default"
+                    : "cursor-pointer"
+                }`}
+                style={{
+                  pointerEvents:
+                    currentPage === Math.ceil(users.length / usersPerPage)
+                      ? "none"
+                      : "auto",
+                }}
+              >
+                <IoIosArrowForward />
+              </button>
             </div>
           </Tab>
           <Tab eventKey="statistics" title="가입자 통계">
