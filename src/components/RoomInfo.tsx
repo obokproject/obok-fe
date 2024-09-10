@@ -105,26 +105,40 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
   }
 
   return (
-    <div className="flex max-h-[120px]">
-      <div className="flex-grow flex flex-col">
+    <div className="flex justify-between items-end gap-[40px] p-[10px]">
+      <div className="flex-grow flex flex-col gap-[5px]">
         {/* 첫 번째 행: 주제, 참여자, 키워드 */}
-        <div className="flex justify-between gap-[96px] mb-2">
-          <h2 className="flex items-center gap-3 text-[24px] font-bold text-[#323232]">
-            <img src="/images/Union.png" alt="union" className="w-6" />
-            주제: {roomData.title}
-          </h2>
-
-          <div className="flex items-center text-[16px] font-bold text-[#323232]">
-            <img src="/images/person.png" alt="person" className="mr-2" />
-            참여자: {roomData.member}/{roomData.maxMember}
+        <div className="h-[48px] flex justify-between items-center">
+          <div className="flex items-center gap-[12px]">
+            <img
+              src="/images/Union.png"
+              alt="union"
+              className="w-[18px] h-[24px] object-contain"
+            />
+            <h2 className="text-[#323232] text-[24px] font-bold leading-[36px] font-['Noto Sans KR']">
+              {roomData.title}
+            </h2>
           </div>
-
-          <div className="flex flex-wrap items-center">
-            <img src="/images/tags.png" alt="tags" className="mr-2" />
+          <div className="flex items-center gap-[8px]">
+            <img
+              src="/images/person.png"
+              alt="person"
+              className="w-[24px] h-[24px]"
+            />
+            <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
+              {roomData.member}/{roomData.maxMember}
+            </span>
+          </div>
+          <div className="flex items-center gap-[4px]">
+            <img
+              src="/images/tags.png"
+              alt="tags"
+              className="w-[24px] h-[24px]"
+            />
             {roomData.keywords.map((keyword, index) => (
               <span
                 key={index}
-                className=" text-[#323232] px-2 py-1 mr-2 mb-2 text-[16px] font-bold"
+                className="text-[#323232] text-[16px] font-medium leading-[22.4px] font-['Noto Sans KR']"
               >
                 #{keyword}
               </span>
@@ -133,51 +147,56 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
         </div>
 
         {/* 두 번째 행: 주최자, 남은 시간 */}
-        <div className="flex gap-[104px] items-center">
-          <div className="flex items-center w-[83px]">
-            <div className=" h-10 relative mr-2">
+        <div className="flex justify-start items-center gap-[104px]">
+          <div className="flex items-center gap-[8px]">
+            <div className="w-[40px] h-[40px] relative">
               <img
                 src={roomData.creator.profile_image || "/default-profile.png"}
-                alt={roomData.creator.name}
-                className="w-10 h-10 bg-gray-300 rounded-full"
+                alt="profile_image"
+                className="w-full h-full rounded-full object-cover"
               />
               <img
                 src="/images/crown.png"
-                className="w-[15px] h-[15px] absolute top-0 right-0"
+                className="w-[16px] h-[16px] absolute -top-1 -right-1"
                 alt="Crown"
               />
             </div>
-            <div>
-              <div className="text-lg font-bold">{roomData.creator.name}</div>
-              <div className="text-sm text-blue-500">
+            <div className="w-[160px]">
+              <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
+                {roomData.creator.name}
+              </div>
+              <div className="text-[16px] font-semibold text-[#AF7606] font-['Pretendard']">
                 {roomData.creator.job}
               </div>
             </div>
           </div>
-
-          <div className="flex items-center text-[16px] font-bold text-[#323232]">
-            <img src="/images/alarm.png" alt="alarm" className="mr-2" />
-            남은 시간: {formatTimeLeft(timeLeft)}
+          <div className="flex items-center gap-[8px]">
+            <img
+              src="/images/alarm.png"
+              alt="alarm"
+              className="w-[24px] h-[24px]"
+            />
+            <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
+              {formatTimeLeft(timeLeft)}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 나가기 버튼 열 */}
-      <div className="flex items-center ml-4">
+      {/* 나가기 버튼 */}
+      <div className="w-[100px] p-[8px]">
         <button
           onClick={handleLeaveRoom}
-          className="bg-[#FFC107] rounded-full hover:bg-gray-300 focus:outline-none w-[84px] h-[32px] text-[14px] flex items-center justify-center"
+          className="w-full h-[32px] bg-[#FFC107] rounded-[30px] flex items-center justify-center gap-[5px]"
         >
-          <div className="flex flex-row items-center">
-            <img
-              src="/images/logout.png"
-              alt="logout"
-              className="w-[16px] h-[16px]"
-            />
-            <span className="text-[#FCF8FC]" style={{ textDecoration: "none" }}>
-              나가기
-            </span>
-          </div>
+          <img
+            src="/images/logout.png"
+            alt="logout"
+            className="w-[16px] h-[16px]"
+          />
+          <span className="text-[#FCF8FC] text-[14px] font-bold font-['Pretendard']">
+            나가기
+          </span>
         </button>
       </div>
     </div>
