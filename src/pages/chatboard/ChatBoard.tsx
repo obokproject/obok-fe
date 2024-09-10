@@ -3,9 +3,10 @@ import { useRoom } from "../../hooks/useChat"; // 방 정보를 가져오는 cus
 import { useAuth } from "../../contexts/AuthContext"; // 사용자 인증 context
 import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴포넌트
 import RoomInfo from "../../components/RoomInfo"; // 방 정보 컴포넌트
+import MemberList from "../../components/MemberList"; // 멤버리스트 컴포넌트
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "";
 
 interface ChatBoardProps {
   roomId: string;
@@ -333,7 +334,12 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
             {/* 방 정보(4) */}
             <div className="w-full p-4 border-2 border-[#A6046D] rounded-[20px] bg-white">
-              <RoomInfo uuid={roomId} socket={socket.current} />
+              <RoomInfo
+                uuid={roomId}
+                socket={socket.current}
+                members={members}
+                isHost={isHost}
+              />
             </div>
           </div>
 
@@ -341,41 +347,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
           <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-pink-200">
             <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
               <div className="flex-1 overflow-y-auto p-2">
-                {members && members.length > 0 ? (
-                  members.map((member, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center mb-4 py-[1px]"
-                    >
-                      <div className="relative">
-                        <img
-                          src={member.profile || "default-profile.png"}
-                          alt={member.nickname}
-                          className="w-10 h-10 bg-gray-300 rounded-full mr-2"
-                        />
-                        {member.role === "host" && (
-                          <img
-                            src="/images/crown.png"
-                            className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-[8px]"
-                            alt="crown"
-                          />
-                        )}
-                      </div>
-                      <div className="">
-                        <div className="text-[16px] font-[700] text-[#323232]">
-                          {member.nickname}
-                        </div>
-                        <div className="text-[16px] text-[#A6046D]">
-                          {member.job}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-gray-500 text-center">
-                    멤버 로딩중...
-                  </div>
-                )}
+                <MemberList members={members} />
               </div>
             </div>
             <div className="h-1/2 overflow-y-auto py-4">

@@ -2,19 +2,22 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
+interface Member {
+  nickname: string;
+  job: string;
+  profile: string;
+  role: "host" | "guest";
+}
 interface RoomInfoProps {
   uuid: string; // room uuid를 prop으로 받습니다.
   socket: Socket | null;
+  members: Member[];
+  isHost: boolean;
 }
 
 interface RoomData {
   title: string;
   user_id: number;
-  creator: {
-    name: string;
-    job: string;
-    profile_image: string;
-  };
   member: number;
   maxMember: number;
   keywords: string[];
@@ -23,7 +26,12 @@ interface RoomData {
   type: string;
 }
 
-const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
+const RoomInfo: React.FC<RoomInfoProps> = ({
+  uuid,
+  socket,
+  members,
+  isHost,
+}) => {
   const navigate = useNavigate();
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -103,11 +111,14 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
   if (!roomData) {
     return <div>Loading...</div>;
   }
+  const currentMember = isHost
+    ? members.find((m) => m.role === "host")
+    : members[0];
 
   return (
     <div className="flex justify-between items-end gap-[40px] p-[10px]">
       <div className="flex-grow flex flex-col gap-[5px]">
-        {/* 첫 번째 행: 주제, 참여자, 키워드 */}
+        {/* 첫 번째 행: 주제, 참여자, 키워드 (변경 없음) */}
         <div className="h-[48px] flex justify-between items-center">
           <div className="flex items-center gap-[12px]">
             <img
@@ -145,31 +156,34 @@ const RoomInfo: React.FC<RoomInfoProps> = ({ uuid, socket }) => {
             ))}
           </div>
         </div>
-
-        {/* 두 번째 행: 주최자, 남은 시간 */}
+        {/* 두 번째 행: 현재 사용자 정보, 남은 시간 */}
         <div className="flex justify-start items-center gap-[104px]">
-          <div className="flex items-center gap-[8px]">
-            <div className="w-[40px] h-[40px] relative">
-              <img
-                src={roomData.creator.profile_image || "/default-profile.png"}
-                alt="profile_image"
-                className="w-full h-full rounded-full object-cover"
-              />
-              <img
-                src="/images/crown.png"
-                className="w-[16px] h-[16px] absolute -top-1 -right-1"
-                alt="Crown"
-              />
-            </div>
-            <div className="w-[160px]">
-              <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
-                {roomData.creator.name}
+          {currentMember && (
+            <div className="flex items-center gap-[8px]">
+              <div className="w-[40px] h-[40px] relative">
+                <img
+                  src={currentMember.profile || "/default-profile.png"}
+                  alt="profile"
+                  className="w-full h-full rounded-full object-cover"
+                />
+                {isHost && (
+                  <img
+                    src="/images/crown.png"
+                    className="w-[16px] h-[16px] absolute -top-1 -right-1"
+                    alt="Crown"
+                  />
+                )}
               </div>
-              <div className="text-[16px] font-semibold text-[#AF7606] font-['Pretendard']">
-                {roomData.creator.job}
+              <div className="w-[160px]">
+                <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
+                  {currentMember.nickname}
+                </div>
+                <div className="text-[16px] font-semibold text-[#AF7606] font-['Pretendard']">
+                  {currentMember.job}
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="flex items-center gap-[8px]">
             <img
               src="/images/alarm.png"

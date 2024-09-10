@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "";
 
 interface MonthlySignup {
   month: number;
@@ -182,9 +182,13 @@ const AdminPage: React.FC = () => {
                         <td className="  py-2">
                           <button
                             onClick={() => handleDeleteUser(user.id)}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                            className="hover:bg-gray-200 text-white font-bold py-1 px-2 rounded"
                           >
-                            삭제
+                            <img
+                              src="/images/trash.png"
+                              alt="trash"
+                              className="w-4 h-4"
+                            />
                           </button>
                         </td>
                       </tr>

@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "";
 
 // 활동 내역 타입 정의
 interface Activity {
@@ -100,14 +100,13 @@ const MyPage: React.FC = () => {
     }
   };
 
+  // 서버에 이미지 삭제 요청
   const handleImageDelete = async () => {
     try {
-      // 서버에 이미지 삭제 요청
       const response = await fetch(`${apiUrl}/api/auth/profile-image`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // 필요한 경우 인증 토큰 추가
         },
         body: JSON.stringify({ userId: user?.id }), // 현재 사용자 ID
       });

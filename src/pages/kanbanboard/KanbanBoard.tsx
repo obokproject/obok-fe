@@ -11,7 +11,7 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "";
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -43,16 +43,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 칸반 보드의 상태를 관리하는 state
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [userRole, setUserRole] = useState<string>("guest");
+  const [isHost, setIsHost] = useState<boolean>(false); // 호스트 여부 상태
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<any>(null);
+  // const [userRole, setUserRole] = useState<string>("guest");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
   const [sections, setSections] = useState<KanbanSection[]>(SECTIONS);
   const [newCardContent, setNewCardContent] = useState("");
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [creator, setCreator] = useState({ name: "", job: "" });
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -86,16 +86,25 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         });
         //멤버 수신
         socket.current?.on("memberUpdate", (updatedMembers) => {
-          console.log("Received member update:", updatedMembers);
-          setMembers(updatedMembers);
+          console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
+
+          // updatedMembers가 배열이 아닌 경우 예외 처리
+          const intervalId = setInterval(() => {
+            if (Array.isArray(updatedMembers)) {
+              setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
+              const currentUser = updatedMembers.find(
+                (member) => member.userId === user.id
+              );
+              setIsHost(currentUser?.role === "host");
+              clearInterval(intervalId); // 배열로 확인되면 더 이상 재시도하지 않음
+            } else {
+              console.log("Waiting for updatedMembers to become an array...");
+            }
+          }, 500); // 0.5초 간격으로 배열 여부를 계속 확인
         });
 
         socket.current?.on("roomInfo", (info) => {
-          console.log(">>>>>>>>>>>>>>>>");
-          console.log(info);
-          console.log("info : '" + info + "'");
           setRoom(info);
-          setCreator(info.creator || { name: "", job: "" });
         });
 
         // 에러 처리 로직
@@ -134,7 +143,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     if (!destination) return;
 
     // 호스트만 카드 이동 가능
-    if (userRole !== "host") {
+    if (!isHost) {
       alert("호스트만 카드를 이동할 수 있습니다.");
       return;
     }
@@ -166,7 +175,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       const userCardCount = creationSection.cards.filter(
         (card) => card.userId === user.id
       ).length;
-      if (userCardCount >= 2) {
+      if (userCardCount > 2) {
         alert("생성 섹션에는 1인당 최대 2개의 카드만 추가할 수 있습니다.");
         setIsAddingCard(false);
         setNewCardContent("");
@@ -174,7 +183,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       }
 
       // 생성 섹션 7개 카드 제한 확인
-      if (creationSection.cards.length >= 7) {
+      if (creationSection.cards.length > 7) {
         alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
         setIsAddingCard(false);
         setNewCardContent("");
@@ -252,10 +261,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                         >
                           {section.cards.map((card, index) => (
                             <Draggable
-                              key={card.id}
-                              draggableId={card.id}
+                              key={String(card.id)}
+                              draggableId={String(card.id)}
                               index={index}
-                              isDragDisabled={userRole !== "host"}
+                              isDragDisabled={!isHost}
                             >
                               {(provided) => (
                                 <div
@@ -316,7 +325,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         </div>
 
         <div className="w-full border-2 border-yellow-200 rounded-[20px] bg-white">
-          <RoomInfo uuid={roomId} socket={socket.current} />
+          <RoomInfo
+            uuid={roomId}
+            socket={socket.current}
+            members={members}
+            isHost={isHost}
+          />
         </div>
       </div>
       <div className="flex flex-col w-[280px] h-full ml-2 border-2 border-yellow-200 rounded-[20px] bg-white">
