@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 
-const apiUrl = process.env.REACT_APP_API_URL || "";
+// const apiUrl = process.env.REACT_APP_API_URL || "";
 
 interface User {
   id: string;
@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   //사용자 로그인 상태를 확인
   const checkUserLoggedIn = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/auth/user`, {
+      const response = await axios.get(`/api/auth/user`, {
         withCredentials: true,
       });
       if (response.data) {
@@ -70,14 +70,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loginWithGoogle = async () => {
-    const url = `${apiUrl}/api/auth/google`;
+    const url = `/api/auth/google`;
     console.log("Redirecting to:", url);
     window.location.href = url;
   };
 
   const logout = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/auth/logout`, {
+      const response = await axios.get(`/api/auth/logout`, {
         withCredentials: true, // 세션 쿠키 포함
       });
       if (response.status === 200) {
