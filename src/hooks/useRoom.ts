@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios"; // axios를 사용하여 API 호출
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_API_URL || "";
 
 interface Room {
   id: number;
