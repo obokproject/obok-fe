@@ -11,7 +11,7 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const apiUrl = process.env.REACT_APP_NODE_ENV || "http://localhost:5000";
 
 // 칸반 보드의 각 카드를 나타내는 인터페이스
 interface KanbanCard {
@@ -168,12 +168,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       ).length;
       if (userCardCount >= 2) {
         alert("생성 섹션에는 1인당 최대 2개의 카드만 추가할 수 있습니다.");
+        setIsAddingCard(false);
+        setNewCardContent("");
         return;
       }
 
       // 생성 섹션 7개 카드 제한 확인
       if (creationSection.cards.length >= 7) {
         alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
+        setIsAddingCard(false);
+        setNewCardContent("");
         return;
       }
 
@@ -311,7 +315,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           </DragDropContext>
         </div>
 
-        <div className="w-full p-4 border-2 border-yellow-200 rounded-[20px] bg-white">
+        <div className="w-full border-2 border-yellow-200 rounded-[20px] bg-white">
           <RoomInfo uuid={roomId} socket={socket.current} />
         </div>
       </div>
