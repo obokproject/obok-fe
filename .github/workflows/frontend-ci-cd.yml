@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set Production API Endpoint
-        run: echo "REACT_APP_NODE_ENV=https://razvery.link" > .env
+        run: echo "REACT_APP_API_URL=https://razvery.link" > .env
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
