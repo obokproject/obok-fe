@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
       - run: npm ci
       # - run: npm test
       - run: npm run build
@@ -38,6 +40,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
       - name: Install dependencies and build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
         run: |
           npm ci
           npm run build
