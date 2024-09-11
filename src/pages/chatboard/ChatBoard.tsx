@@ -24,6 +24,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   const [messages, setMessages] = useState<any[]>([]); // 메시지 상태
   const [newMessage, setNewMessage] = useState(""); // 새로운 메시지 상태
+  const [systemMessages, setSystemMessages] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [keywords, setKeywords] = useState<{ [key: string]: number }>({}); // 키워드 상태
   const [highlightedMessageIndex, setHighlightedMessageIndex] = useState<
@@ -56,8 +57,17 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       socket.current.on("connect", () => {
         console.log("Connected to the WebSocket server");
         socket.current?.emit("joinRoom", { roomId, userId: user.id }); // 방에 참여
-        console.log("Joined room:", roomId); // 추가된 콘솔 로그]
+        console.log("Joined room:", roomId); // 추가된 콘솔 로그
+
+        // 초기 시스템 메시지 추가
+        setSystemMessages([
+          {
+            content: "라즈베리는 건전한 채팅 문화를 지향합니다.",
+            position: "top",
+          },
+        ]);
       });
+
       // 서버로부터 realRoom 데이터를 수신
       socket.current?.on("realRoom", (realRoom) => {
         console.log("Received realRoom data from server:", realRoom);
@@ -65,9 +75,8 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         setroomHostId(realRoom.userId);
       });
       // 서버로부터 메시지 수신
-      socket.current.on("message", (message) => {
-        console.log("Received message:", message); // 메시지 수신 로그
-
+      socket.current?.on("message", (message) => {
+        console.log("Received message:", message);
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages, message];
 
@@ -76,13 +85,28 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
           setKeywords((prevKeywords) => {
             const newKeywords = { ...prevKeywords };
             keywordsInMessage.forEach((keyword: string) => {
-              newKeywords[keyword] = updatedMessages.length - 1; // 새로운 메시지의 인덱스
+              newKeywords[keyword] = updatedMessages.length;
             });
             return newKeywords;
           });
-
           return updatedMessages;
         });
+      });
+
+      // 남은 시간 알림을 위한 이벤트 리스너 추가
+      socket.current?.on("timeRemaining", (time: number) => {
+        let content = "";
+        if (time === 300) content = "종료까지 시간이 5분 남았습니다.";
+        else if (time === 180) content = "종료까지 시간이 3분 남았습니다.";
+        else if (time === 60) content = "종료까지 시간이 1분 남았습니다.";
+        else if (time === 30) content = "종료까지 시간이 30초 남았습니다.";
+
+        if (content) {
+          setSystemMessages((prevMessages) => [
+            ...prevMessages,
+            { content, position: "bottom" },
+          ]);
+        }
       });
 
       // 서버로부터 멤버 업데이트 수신
@@ -223,10 +247,36 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             <div className="flex flex-col flex-1 bg-white border-2 border-[#A6046D] overflow-hidden rounded-[20px]">
               {/* 채팅 영역 */}
               <div
-                className="flex-1 overflow-y-auto p-4"
+                className="flex-1 overflow-y-auto p-4 flex flex-col"
                 ref={chatContainerRef}
               >
+                <div className="w-full h-full flex justify-center items-center gap-1">
+                  <div className="w-[131px] py-1 flex flex-col justify-start items-start gap-2.5">
+                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F]"></div>
+                  </div>
+                  {systemMessages
+                    .filter((msg) => msg.position === "top")
+                    .map((msg, index) => (
+                      <div
+                        key={`system-top-${index}`}
+                        className="flex justify-center mb-4 top-0"
+                      >
+                        <span className="flex justify-center text-[#9F9F9F] text-lg font-bold break-words">
+                          {msg.content}
+                        </span>
+                      </div>
+                    ))}
+
+                  <div className="w-[131px] py-1 flex flex-col justify-start items-start gap-2.5">
+                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F]"></div>
+                  </div>
+                </div>
+
                 {messages.map((msg, index) => {
+                  if (msg.isSystem && msg.position === "bottom") {
+                    return null;
+                  }
+                  // 기존의 일반 메시지 렌더링 코드
                   const showProfile =
                     index === 0 || messages[index - 1].user_id !== msg.user_id;
 
@@ -285,6 +335,18 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                     </div>
                   );
                 })}
+                {systemMessages
+                  .filter((msg) => msg.position === "bottom")
+                  .map((msg, index) => (
+                    <div
+                      key={`system-bottom-${index}`}
+                      className="flex justify-center mt-auto sticky bottom-0 z-10"
+                    >
+                      <span className="bg-gray-200 text-[#9F9F9F] px-3 py-1 rounded-full text-sm">
+                        {msg.content}
+                      </span>
+                    </div>
+                  ))}
               </div>
               <div className="p-4">
                 <div className="flex items-center bg-white rounded-[30px] border-[1px] border-[#BD2130] p-[2px] h-fit">
