@@ -31,16 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [retryCount, setRetryCount] = useState<number>(0); // 재시도 횟수 상태 추가
-  const maxRetries = 3; // 최대 재시도 횟수
 
   useEffect(() => {
-    if (retryCount <= maxRetries) {
-      checkUserLoggedIn();
-    }
-  }, [retryCount]); // retryCount가 변경될 때마다 checkUserLoggedIn 호출
+    checkUserLoggedIn();
+  }, []);
 
-  // 사용자 로그인 상태를 확인
+  //사용자 로그인 상태를 확인
   const checkUserLoggedIn = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/auth/user`, {
@@ -59,18 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           role: role || "user",
         };
         setUser(user);
-        setRetryCount(0); // 성공 시 재시도 횟수 초기화
-      } else {
-        // 사용자 정보가 없으면 재시도
-        setRetryCount((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("Error fetching user:", error);
-      // 에러 발생 시 재시도
-      setRetryCount((prev) => prev + 1);
+      // if (axios.isAxiosError(error)) {
+      //   console.error("API Error:", error.response?.data);
+      // } else {
+      //   console.error("An unexpected error occurred:", error);
+      // }
     }
   };
-
   // 관리자 여부를 확인하는 함수
   const isAdmin = (): boolean => {
     return user?.role === "admin";
