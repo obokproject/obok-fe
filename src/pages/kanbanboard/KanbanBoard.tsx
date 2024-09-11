@@ -10,6 +10,7 @@ import {
 import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
+import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -135,7 +136,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   }, [roomId, user, fetchRoom]); // roomId와 user가 변경될 때마다 실행
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     console.log(result);
     const { source, destination } = result;
 
@@ -161,58 +162,90 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       destSection.cards.splice(destination.index, 0, movedCard);
       setSections(newSections);
 
-      socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+      try {
+        // 백엔드 API를 호출하여 카드 이동
+        await axios.put(`/api/rooms/${roomId}/card`, {
+          cardId: movedCard.id,
+          newSectionId: destination.droppableId,
+        });
+
+        // 프론트엔드의 상태 업데이트
+        setSections(newSections);
+
+        // 실시간 업데이트를 위해 소켓 이벤트 발생
+        socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+      } catch (error) {
+        console.error("Error moving card:", error);
+        alert("카드 이동에 실패했습니다.");
+        // 에러 발생 시 원래 상태로 되돌리기
+        const revertedSections = Array.from(sections);
+        setSections(revertedSections);
+      }
     }
   };
 
   // 새 카드 추가 함수
-  const addCard = (content: string) => {
+  const addCard = async (content: string) => {
     if (content.trim() && user) {
       const creationSection = sections.find((section) => section.id === "생성");
       if (!creationSection) return;
 
-      // 1인당 2개 카드 제한 확인
-      const userCardCount = creationSection.cards.filter(
-        (card) => card.userId === user.id
-      ).length;
-      if (userCardCount > 2) {
-        alert("생성 섹션에는 1인당 최대 2개의 카드만 추가할 수 있습니다.");
-        setIsAddingCard(false);
-        setNewCardContent("");
-        return;
-      }
-
       // 생성 섹션 7개 카드 제한 확인
-      if (creationSection.cards.length > 7) {
+      if (creationSection.cards.length >= 7) {
         alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
         setIsAddingCard(false);
         setNewCardContent("");
         return;
       }
 
-      const newCard: KanbanCard = {
-        id: Date.now().toString(),
-        content: content,
-        profile: user.profile,
-        userId: user.id,
-      };
-
-      const newSections = sections.map((section) =>
-        section.id === "생성"
-          ? { ...section, cards: [...section.cards, newCard] }
-          : section
+      // 1인당 2개 카드 제한 확인
+      const userCardCount = creationSection.cards.filter(
+        (card) => card.userId === user.id
+      ).length;
+      // 전체 섹션에서 현재 사용자의 카드 수 확인
+      const totalUserCardCount = sections.reduce(
+        (count, section) =>
+          count +
+          section.cards.filter((card) => card.userId === user.id).length,
+        0
       );
 
-      setSections(newSections);
-      setIsAddingCard(false);
-      setNewCardContent("");
+      // 사용자가 총 2개 이상의 카드를 가지고 있고, 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
+      if (totalUserCardCount >= 2 && userCardCount >= 2) {
+        alert(
+          "더 이상 카드를 추가할 수 없습니다. 다른 섹션으로 카드를 옮겨주세요."
+        );
+        setIsAddingCard(false);
+        setNewCardContent("");
+        return;
+      }
 
-      // 서버에 새 카드 추가 이벤트 전송
-      socket.current?.emit("addCard", {
-        roomId,
-        sectionId: "생성",
-        card: newCard,
-      });
+      try {
+        // 백엔드 API를 호출하여 새 카드 추가
+        const response = await axios.post(`/api/rooms/${roomId}/card`, {
+          sectionId: "생성",
+          content: content,
+        });
+
+        // 백엔드에서 반환한 새 카드 정보
+        const newCard: KanbanCard = response.data;
+
+        // 프론트엔드의 상태 업데이트
+        const newSections = sections.map((section) =>
+          section.id === "생성"
+            ? { ...section, cards: [...section.cards, newCard] }
+            : section
+        );
+        setSections(newSections);
+        setIsAddingCard(false);
+        setNewCardContent("");
+
+        // 실시간 업데이트를 위해 소켓 이벤트 발생
+        socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+      } catch (error) {
+        console.error("Error adding card:", error);
+        alert("카드 추가에 실패했습니다.");
+      }
     }
   };
 

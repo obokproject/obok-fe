@@ -147,7 +147,6 @@ const MyPage: React.FC = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({
             nickname,
@@ -376,25 +375,33 @@ const MyPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {/* 활동 내역 데이터 매핑 */}
-                  {roomHistory.map((room, index) => (
-                    <tr key={index} className="text-center">
-                      <td className="px-2 py-2 border border-gray-300">
-                        {room.title}
-                      </td>
-                      <td className="px-2 py-2 border border-gray-300">
-                        {room.type}
-                      </td>
-                      <td className="px-2 py-2 border border-gray-300">
-                        {room.participants}명
-                      </td>
-                      <td className="px-2 py-2 border border-gray-300">
-                        {room.date}
-                      </td>
-                      <td className="px-2 py-2 border border-gray-300">
-                        {room.entryTime}
+                  {roomHistory.length > 0 ? (
+                    roomHistory.map((room, index) => (
+                      <tr key={index} className="text-center">
+                        <td className="px-2 py-2 border border-gray-300">
+                          {room.title}
+                        </td>
+                        <td className="px-2 py-2 border border-gray-300">
+                          {room.type}
+                        </td>
+                        <td className="px-2 py-2 border border-gray-300">
+                          {room.participants}명
+                        </td>
+                        <td className="px-2 py-2 border border-gray-300">
+                          {room.date}
+                        </td>
+                        <td className="px-2 py-2 border border-gray-300">
+                          {room.entryTime}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="text-center py-4">
+                        활동 내역이 없습니다.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

@@ -82,8 +82,12 @@ const LandingPage: React.FC = () => {
         <main className="p-0">
           <section className="py-5 text-center">
             <Container fluid>
-              <h1 className="display-6 mb-3">실시간 아이디어 공유 플랫폼</h1>
-              <p className="lead mb-4">모두와 함께 하는 브레인스토밍</p>
+              <h1 className="display-6 mb-3 text-bold">
+                실시간 아이디어 공유 플랫폼
+              </h1>
+              <p className="lead mb-4 text-bold">
+                모두와 함께 하는 브레인스토밍
+              </p>
               <button
                 className="flex justify-center items-center col-4 mx-auto rounded-full text-5xl font-bold"
                 style={{
