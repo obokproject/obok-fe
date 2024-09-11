@@ -56,12 +56,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
         setUser(user);
       }
-    } catch (error) {
-      // if (axios.isAxiosError(error)) {
-      //   console.error("API Error:", error.response?.data);
-      // } else {
-      //   console.error("An unexpected error occurred:", error);
-      // }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        // 401 에러는 콘솔에 표시하지 않음
+        console.log("사용자가 인증되지 않았습니다.");
+      } else {
+        // 다른 에러는 콘솔에 표시
+        console.error("API Error:", error);
+      }
     }
   };
   // 관리자 여부를 확인하는 함수
