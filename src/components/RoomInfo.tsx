@@ -22,7 +22,7 @@ interface RoomData {
   maxMember: number;
   keywords: string[];
   duration: number; // 방 생성 시 설정한 제한 시간 (분)
-  createAt: Date;
+  createdAt: Date;
   type: string;
 }
 
@@ -46,36 +46,22 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
 
         // 방의 생성 시간과 남은 시간을 제대로 계산
         const now = new Date().getTime(); // 현재 시간 (밀리초)
-        const createdAtTime = new Date(data.createAt).getTime(); // 방 생성 시간 (밀리초)
-        const totalDurationInSeconds = data.duration * 60; // 제한 시간 (초)
+        const createdAtTime = data.createdAt
+          ? new Date(data.createdAt).getTime()
+          : now; // 방 생성 시간 (밀리초)
+        const totalDurationInSeconds = (data.duration || 0) * 60; // 제한 시간 (초)
         const elapsedTime = (now - createdAtTime) / 1000; // 방이 만들어진 후 경과된 시간 (초)
 
-        const remainingTime = totalDurationInSeconds - elapsedTime; // 남은 시간 (초)
-
-        if (remainingTime > 0) {
-          setTimeLeft(remainingTime); // 남은 시간 설정
-        } else {
-          setTimeLeft(0); // 시간이 다 지나면 0으로 설정
-        }
-      };
-
-      const handleRoomError = (error: any) => {
-        console.error("Error fetching room data:", error);
+        const remainingTime = Math.max(totalDurationInSeconds - elapsedTime, 0);
+        setTimeLeft(remainingTime); // 남은 시간 (초)
       };
 
       socket.on("roomInfo", handleRoomInfo);
-      socket.on("roomError", handleRoomError);
-
-      const refreshRoomInfo = () => {
-        socket.emit("getRoomInfo", uuid); // 방 정보 다시 요청
-      };
-
-      socket.on("roomUpdated", refreshRoomInfo); // 서버에서 roomUpdated 이벤트 수신
+      socket.on("roomUpdated", () => socket.emit("getRoomInfo", uuid));
 
       return () => {
         socket.off("roomInfo", handleRoomInfo);
-        socket.off("roomError", handleRoomError);
-        socket.off("roomUpdated", refreshRoomInfo); // 이벤트 클린업
+        socket.off("roomUpdated");
       };
     }
   }, [uuid, socket]);
@@ -204,7 +190,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
           className="w-full h-[32px] bg-[#FFC107] rounded-[30px] flex items-center justify-center gap-[5px]"
         >
           <img
-            src="/images/logout.png"
+            src="/images/Logout.png"
             alt="logout"
             className="w-[16px] h-[16px]"
           />
