@@ -29,7 +29,8 @@ const MyPage: React.FC = () => {
   const { user } = useAuth();
   const [nickname, setNickname] = useState("");
   const [job, setJob] = useState("");
-  const [profile, setProfile] = useState<string | null>(null);
+  const [profile, setProfile] = useState<string | null>(user?.profile ?? null);
+
   const [activeTab, setActiveTab] = useState("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -93,6 +94,7 @@ const MyPage: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfile(reader.result as string);
+        console.log("업로드된 이미지 (base64):", reader.result); // base64 데이터 확인
       };
       reader.readAsDataURL(file);
     } else {
@@ -101,36 +103,38 @@ const MyPage: React.FC = () => {
   };
 
   // 서버에 이미지 삭제 요청
-  const handleImageDelete = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/auth/profile-image`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: user?.id }), // 현재 사용자 ID
-      });
+  const handleImageDelete = () => {
+    // try {
+    //   const response = await fetch(`${apiUrl}/api/auth/profile-image`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ userId: user?.id }), // 현재 사용자 ID
+    //   });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete image");
-      }
+    //   if (!response.ok) {
+    //     throw new Error("Failed to delete image");
+    //   }
 
-      // 서버 응답 확인
-      const result = await response.json();
+    //   // 서버 응답 확인
+    //   const result = await response.json();
 
-      if (result.success) {
-        // 로컬 상태 업데이트
-        setProfile(null);
-        // 필요한 경우 사용자 정보 상태도 업데이트
-        // setUser(prevUser => ({ ...prevUser, profileImage: null }));
-      } else {
-        throw new Error(result.message || "Failed to delete image");
-      }
-    } catch (error) {
-      console.error("Error deleting image:", error);
-      // 사용자에게 에러 메시지 표시
-      alert("이미지 삭제에 실패했습니다. 다시 시도해주세요.");
-    }
+    //   if (result.success) {
+    //     // 로컬 상태 업데이트
+    //     setProfile(null);
+    //     // 필요한 경우 사용자 정보 상태도 업데이트
+    //     // setUser(prevUser => ({ ...prevUser, profileImage: null }));
+    //   } else {
+    //     throw new Error(result.message || "Failed to delete image");
+    //   }
+    // } catch (error) {
+    //   console.error("Error deleting image:", error);
+    //   // 사용자에게 에러 메시지 표시
+    //   alert("이미지 삭제에 실패했습니다. 다시 시도해주세요.");
+    // }
+    setProfile(null);
+    console.log("프로필상태 : ", profile);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -143,27 +147,77 @@ const MyPage: React.FC = () => {
   const confirmSave = async () => {
     if (validateNickname(nickname) && validateJob(job)) {
       try {
-        const response = await fetch(`${apiUrl}/api/auth/update`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        let base64Image = profile;
+
+        // 파일이 선택된 경우, FileReader로 base64 변환
+        if (fileInputRef.current?.files?.[0]) {
+          const file = fileInputRef.current.files[0];
+          const reader = new FileReader();
+
+          reader.onloadend = async () => {
+            base64Image = reader.result as string; // base64로 변환된 이미지
+
+            const payload = {
+              id: user?.id,
+              nickname,
+              job,
+              profile_image: base64Image, // base64로 변환된 이미지를 전송
+            };
+
+            console.log("전송할 데이터:", payload);
+
+            const response = await fetch(`${apiUrl}/api/auth/update`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              throw new Error("HTTP error!");
+            }
+
+            const data = await response.json();
+            if (isMounted) {
+              console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
+              setShowConfirmModal(false);
+              navigate("/main");
+              window.location.reload(); // 페이지 새로고침
+            }
+          };
+
+          reader.readAsDataURL(file); // 파일을 base64로 변환
+        } else {
+          // 프로필 이미지가 없을 경우, 기존 profile 상태값으로 전송
+          const payload = {
+            id: user?.id,
             nickname,
             job,
-            profile,
-          }),
-        });
+            profile_image: base64Image, // 기존 base64 이미지 또는 null
+          };
 
-        if (!response.ok) {
-          throw new Error("HTTP error!");
-        }
+          console.log("전송할 데이터:", payload);
 
-        const data = await response.json();
-        if (isMounted) {
-          console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
-          setShowConfirmModal(false);
-          navigate("/main");
+          const response = await fetch(`${apiUrl}/api/auth/update`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            throw new Error("HTTP error!");
+          }
+
+          const data = await response.json();
+          if (isMounted) {
+            console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
+            setShowConfirmModal(false);
+            navigate("/main");
+            window.location.reload(); // 페이지 새로고침
+          }
         }
       } catch (error) {
         if (isMounted) {
@@ -219,55 +273,70 @@ const MyPage: React.FC = () => {
                   margin: "0 auto 1rem",
                   position: "relative",
                 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  fileInputRef.current?.click(); // 클릭 시 파일 선택 창 열기
+                }}
               >
-                {user?.profile ? (
+                {profile ? (
                   <Image
-                    src={user?.profile}
+                    src={profile}
                     roundedCircle
                     className=""
                     style={{ width: "100%", height: "100%" }}
                   />
                 ) : (
-                  <button
-                    className="btn"
-                    onClick={() => fileInputRef.current?.click()}
+                  <span
                     style={{
                       fontSize: "42px",
                       fontWeight: "bold",
                       color: "#9F9F9F",
-                      cursor: "pointer",
-                      background: "none",
-                      border: "none",
                     }}
                   >
                     +
-                  </button>
+                  </span>
                 )}
-                <button
-                  onClick={handleImageDelete}
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <img
-                    src="/images/mypage-x-circle.png"
-                    alt="Delete"
-                    width="24"
-                    height="24"
-                  />
-                </button>
+
                 <input
                   type="file"
                   ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
+                  onChange={handleImageUpload} // 파일 선택 시 처리
+                  style={{
+                    opacity: 0, // 숨기기
+                    position: "absolute", // 부모 안에 위치
+                    width: "100%",
+                    height: "100%",
+                    cursor: "pointer",
+                  }}
                   accept="image/jpeg, image/png"
+                  onClick={(e) => e.stopPropagation()} // 중복 호출 방지
                 />
+
+                {profile && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleImageDelete(); // 삭제 버튼 클릭 시 이미지 삭제
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <img
+                      src="/images/mypage-x-circle.png"
+                      alt="Delete"
+                      width="24"
+                      height="24"
+                    />
+                  </button>
+                )}
               </div>
             </Col>
             <Col xs={12} md={6}>

@@ -123,7 +123,7 @@ const AdminPage: React.FC = () => {
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
       try {
-        await axios.delete(`${apiUrl}/api/admin/auth/users/${id}`);
+        await axios.delete(`${apiUrl}/api/admin/users/${id}`);
         fetchUsers(); // 사용자 목록 새로고침
       } catch (error) {
         console.error("사용자 삭제 중 오류 발생:", error);
