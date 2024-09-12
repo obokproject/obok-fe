@@ -10,7 +10,6 @@ import {
 import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
-import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -34,12 +33,6 @@ interface KanbanBoardProps {
   roomId: string; // 현재 방의 ID
 }
 
-const SECTIONS: KanbanSection[] = [
-  { id: "생성", title: "생성", cards: [] },
-  { id: "고민", title: "고민", cards: [] },
-  { id: "채택", title: "채택", cards: [] },
-];
-
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 칸반 보드의 상태를 관리하는 state
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
@@ -47,10 +40,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   const [isHost, setIsHost] = useState<boolean>(false); // 호스트 여부 상태
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<any>(null);
-  // const [userRole, setUserRole] = useState<string>("guest");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { loading, error, fetchRoom } = useRoom(roomId); // 방 정보 훅
-  const [sections, setSections] = useState<KanbanSection[]>(SECTIONS);
+  const { loading, error } = useRoom(roomId); // 방 정보 훅
+  const [sections, setSections] = useState<KanbanSection[]>([]);
   const [newCardContent, setNewCardContent] = useState("");
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
@@ -62,8 +54,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // useEffect hook: roomId, user가 변경될 때만 useEffect hook을 실행
   useEffect(() => {
     if (roomId && user) {
-      fetchRoom(roomId);
-
       socket.current = io(`${apiUrl}`, {
         transports: ["websocket"],
       });
@@ -133,7 +123,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         }
       };
     }
-  }, [roomId, user, fetchRoom]); // roomId와 user가 변경될 때마다 실행
+  }, [roomId, user]); // roomId와 user가 변경될 때마다 실행
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = async (result: DropResult) => {
@@ -163,17 +153,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       setSections(newSections);
 
       try {
-        // 백엔드 API를 호출하여 카드 이동
-        await axios.put(`/api/rooms/${roomId}/card`, {
-          cardId: movedCard.id,
-          newSectionId: destination.droppableId,
-        });
-
-        // 프론트엔드의 상태 업데이트
-        setSections(newSections);
-
         // 실시간 업데이트를 위해 소켓 이벤트 발생
-        socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+        socket.current?.emit("boardUpdate", {
+          roomId,
+          sections: newSections,
+          movedCard: {
+            id: movedCard.id,
+            newSectionId: destination.droppableId,
+          },
+        });
       } catch (error) {
         console.error("Error moving card:", error);
         alert("카드 이동에 실패했습니다.");
@@ -186,10 +174,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 새 카드 추가 함수
   const addCard = async (content: string) => {
-    if (content.trim() && user) {
-      const creationSection = sections.find((section) => section.id === "생성");
-      if (!creationSection) return;
+    console.log(content.trim() && user && socket.current != null);
 
+    if (content.trim() && user && socket.current != null) {
+      console.log("ok");
+      const creationSection = sections.find((section) => section.id === "생성");
+      console.log("creationSection:", creationSection);
+      console.log(!creationSection);
+      if (!creationSection) return;
+      console.log(creationSection.cards);
+      console.log(creationSection.cards.length);
+      console.log(creationSection.cards.length >= 7);
       // 생성 섹션 7개 카드 제한 확인
       if (creationSection.cards.length >= 7) {
         alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
@@ -203,6 +198,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         (card) => card.userId === user.id
       ).length;
 
+      console.log(userCardCountInCreation);
+      console.log(userCardCountInCreation >= 2);
+
       // 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
       if (userCardCountInCreation >= 2) {
         alert(
@@ -214,31 +212,21 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       }
 
       try {
-        // 백엔드 API를 호출하여 새 카드 추가
-        const response = await axios.post(`/api/rooms/${roomId}/card`, {
+        console.log("socket.current?.emit:");
+
+        //소켓 이벤트 사용
+        socket.current?.emit("addCard", {
+          roomId,
           sectionId: "생성",
-          content: content,
+          card: { content, userId: user.id },
         });
 
-        // 백엔드에서 반환한 새 카드 정보
-        const newCard: KanbanCard = response.data;
-
-        // 프론트엔드의 상태 업데이트
-        const newSections = sections.map((section) =>
-          section.id === "생성"
-            ? { ...section, cards: [...section.cards, newCard] }
-            : section
-        );
-        setSections(newSections);
-        setIsAddingCard(false);
-        setNewCardContent("");
-
-        // 실시간 업데이트를 위해 소켓 이벤트 발생
-        socket.current?.emit("boardUpdate", { roomId, sections: newSections });
+        setIsAddingCard(false); // 입력창 닫기
+        setNewCardContent(""); // 입력 내용 초기화
       } catch (error) {
         console.error("Error adding card:", error);
-
         alert("카드 추가에 실패했습니다.");
+
         setIsAddingCard(false); // 입력창 닫기
         setNewCardContent(""); // 입력 내용 초기화
       }
@@ -260,6 +248,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter" && newCardContent.trim()) {
+      console.log("add card ", newCardContent);
       addCard(newCardContent);
     } else if (e.key === "Escape") {
       setIsAddingCard(false);

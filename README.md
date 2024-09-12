@@ -24,27 +24,30 @@
 
 ## AWS 배포
 
-url:<br>
+url: razvery.link<br>
 
 ```mermaid
 graph LR
-    A[GitHub] --> B[Action/PM2]
-    C[My SQL] --> B
-    B --> D[Amazon S3 Bucket]
-    B --> E[EC2]
-    B --> F[Amazon RDS]
-    G[Amazon CloudWatch]
-
-    subgraph AWS Cloud
-        B
-        D
-        E
-        F
-        G
-    end
+    User((사용자)) --> Route53[Route 53]
+    Route53 --> CloudFront[CloudFront]
+    CloudFront --> ALB[ALB]
+    ALB --> EC2[EC2 Nginx+PM2]
+    EC2 --> S3[(S3 Bucket)]
+    ACM[ACM] --> CloudFront
+    ACM --> ALB
+    GitHub[GitHub] --> |Actions| S3
+    GitHub --> |Actions| EC2
+    GitHub --> |Actions| RDS[(Amazon RDS)]
+    MySQL[(MySQL)] --> |Migration| RDS
+    CloudWatch[Amazon CloudWatch] --> |Monitoring| CloudFront
+    CloudWatch --> |Monitoring| ALB
+    CloudWatch --> |Monitoring| EC2
+    CloudWatch --> |Monitoring| S3
+    CloudWatch --> |Monitoring| RDS
 ```
 
 GitHub에서 Action/PM2로 코드 푸시 및 배포<br>
+CloudFront는 ACM의 SSL 인증서를 사용해 HTTPS 연결을 제공<br>
 MySQL에서 Action/PM2를 통해 데이터 마이그레이션<br>
 Action/PM2에서 프론트엔드 파일을 S3 Bucket으로 배포<br>
 Action/PM2에서 백엔드 코드를 EC2로 배포<br>
