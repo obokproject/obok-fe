@@ -240,7 +240,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   return (
     <div className="  min-w-[1336px] flex justify-center overflow-x-scroll">
-      <div className="bg-pink-50 h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
+      <div className="bg-white h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
         <div className="flex-1 flex overflow-hidden">
           {/* 채팅 영역(1)과 방 정보(4) */}
           <div className="flex flex-col w-3/4 pr-4">
@@ -250,9 +250,9 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                 className="flex-1 overflow-y-auto p-4 flex flex-col"
                 ref={chatContainerRef}
               >
-                <div className="w-full h-full flex justify-center items-center gap-1">
+                <div className="w-full h-fit flex justify-center items-center gap-1">
                   <div className="w-[131px] py-1 flex flex-col justify-start items-start gap-2.5">
-                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F]"></div>
+                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F] mb-[20px]"></div>
                   </div>
                   {systemMessages
                     .filter((msg) => msg.position === "top")
@@ -266,9 +266,8 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                         </span>
                       </div>
                     ))}
-
                   <div className="w-[131px] py-1 flex flex-col justify-start items-start gap-2.5">
-                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F]"></div>
+                    <div className="self-stretch h-0 border-t border-solid border-[#9F9F9F] mb-[20px]"></div>
                   </div>
                 </div>
 
@@ -395,24 +394,32 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             </div>
 
             {/* 방 정보(4) */}
-            <div className="w-full p-4 border-2 border-[#A6046D] rounded-[20px] bg-white">
-              <RoomInfo
-                uuid={roomId}
-                socket={socket.current}
-                members={members}
-                isHost={isHost}
-              />
+            <div className="w-full p-4 border-2 border-[#A6046D] rounded-[20px] bg-white mt-2">
+              {members.length > 0 ? (
+                <RoomInfo
+                  uuid={roomId}
+                  socket={socket.current}
+                  members={members}
+                  isHost={isHost}
+                />
+              ) : (
+                <div>로딩 중...</div>
+              )}
             </div>
           </div>
 
           {/* 멤버 리스트(2)와 키워드 영역(3) */}
-          <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-pink-200">
+          <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-none">
             <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
               <div className="flex-1 overflow-y-auto p-2">
-                <MemberList members={members} />
+                {members.length > 0 ? (
+                  <MemberList members={members} />
+                ) : (
+                  <div>멤버 데이터를 로드 중입니다...</div>
+                )}
               </div>
             </div>
-            <div className="h-1/2 overflow-y-auto py-4">
+            <div className="h-1/2 overflow-y-auto pt-2">
               <ChatKeyword
                 roomId={roomId}
                 socket={socket.current}
