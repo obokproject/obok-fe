@@ -19,7 +19,7 @@ const MemberList: React.FC<MemberListProps> = ({ members = [] }) => {
           <div key={index} className="flex items-center overflow-y-auto">
             <div className="relative">
               <img
-                src={member.profile || "default-profile.png"}
+                src={member.profile || "/images/user-profile.png"}
                 alt={member.nickname}
                 className="w-10 h-10 bg-gray-300 rounded-full mr-2"
               />

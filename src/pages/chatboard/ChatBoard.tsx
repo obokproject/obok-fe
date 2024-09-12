@@ -295,9 +295,9 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                       {showProfile && (
                         <div className="flex items-center mr-4 pt-1 relative">
                           <img
-                            src={msg.profile || "default-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
+                            src={msg.profile || "/images/user-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
                             alt="User Profile"
-                            className="w-10 h-full bg-gray-300 rounded-full"
+                            className="w-10 h-10 bg-gray-300 rounded-full"
                           />
 
                           {roomHostId === msg.user_id && (
