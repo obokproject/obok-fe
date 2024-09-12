@@ -148,7 +148,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
             <div className="flex items-center gap-[8px]">
               <div className="w-[40px] h-[40px] relative">
                 <img
-                  src={currentMember.profile || "/default-profile.png"}
+                  src={currentMember.profile || "/images/user-profile.png"}
                   alt="profile"
                   className="w-full h-full rounded-full object-cover"
                 />

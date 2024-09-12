@@ -87,7 +87,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         });
         //멤버 수신
         socket.current?.on("memberUpdate", (updatedMembers) => {
-          console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
+          console.log("Updated members with roles:", updatedMembers);
 
           // updatedMembers가 배열이 아닌 경우 예외 처리
           const intervalId = setInterval(() => {
@@ -101,7 +101,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
             } else {
               console.log("Waiting for updatedMembers to become an array...");
             }
-          }, 500); // 0.5초 간격으로 배열 여부를 계속 확인
+          }, 1000); // 0.5초 간격으로 배열 여부를 계속 확인
         });
 
         socket.current?.on("roomInfo", (info) => {
@@ -198,22 +198,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         return;
       }
 
-      // 1인당 2개 카드 제한 확인
-      const userCardCount = creationSection.cards.filter(
+      // 1인당 생성 섹션에 2개 카드 제한 확인
+      const userCardCountInCreation = creationSection.cards.filter(
         (card) => card.userId === user.id
       ).length;
-      // 전체 섹션에서 현재 사용자의 카드 수 확인
-      const totalUserCardCount = sections.reduce(
-        (count, section) =>
-          count +
-          section.cards.filter((card) => card.userId === user.id).length,
-        0
-      );
 
-      // 사용자가 총 2개 이상의 카드를 가지고 있고, 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
-      if (totalUserCardCount >= 2 && userCardCount >= 2) {
+      // 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
+      if (userCardCountInCreation >= 2) {
         alert(
-          "더 이상 카드를 추가할 수 없습니다. 다른 섹션으로 카드를 옮겨주세요."
+          "생성 섹션에는 최대 2개의 카드만 추가할 수 있습니다. 다른 섹션으로 카드를 옮겨주세요."
         );
         setIsAddingCard(false);
         setNewCardContent("");
@@ -244,7 +237,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         socket.current?.emit("boardUpdate", { roomId, sections: newSections });
       } catch (error) {
         console.error("Error adding card:", error);
+
         alert("카드 추가에 실패했습니다.");
+        setIsAddingCard(false); // 입력창 닫기
+        setNewCardContent(""); // 입력 내용 초기화
       }
     }
   };
@@ -310,7 +306,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   <img
                                     src={card.profile}
                                     alt="User profile"
-                                    className="w-8 h-8 rounded-full ml-2"
+                                    className="w-6 h-6 rounded-full ml-2"
                                   />
                                 </div>
                               )}

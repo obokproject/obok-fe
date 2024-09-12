@@ -33,10 +33,7 @@ const Header: React.FC<HeaderProps> = ({
             <>
               <Nav.Link as={Link} to="/mypage">
                 <img
-                  src={
-                    profile ||
-                    `${process.env.PUBLIC_URL}/images/user-profile.png`
-                  }
+                  src={profile || "/images/user-profile.png"}
                   alt="Profile"
                   style={{ width: "40px", height: "40px", borderRadius: "50%" }}
                 />
