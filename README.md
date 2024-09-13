@@ -2,6 +2,8 @@
 
 "Razvery"는 실시간으로 아이디어를 공유하는 서비스입니다. 제한 시간이 있는 채팅과 포스트잇 보드 형태가 핵심 기능입니다.
 <br>
+관리자 백오피스 구축으로 직관적인 대시보드로 핵심 지표 실시간 모니터링이 가능하여 사용자 관리가 용이합니다.
+<br>
 
 ## 팀 소개
 
@@ -18,13 +20,13 @@
 
 ## 기술 스택 및 라이브러리
 
-- React
-- TailwindCSS
-- Bootstrap
+- React <img src="https://img.shields.io/badge/REACT-61DAFB?style=for-the-badge&logo=react&logoColor=black">
+- TailwindCSS <img src="https://img.shields.io/badge/TailwindCSS-1572B6?style=for-the-badge&logo=TailwindCSS&logoColor=white">
+- Bootstrap <img src="https://img.shields.io/badge/bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
 
 ## AWS 배포
 
-url: razvery.link<br>
+url: [Razvery 🍓](https://razvery.link/) <br>
 
 ```mermaid
 graph LR
@@ -286,83 +288,6 @@ classDiagram
 
 <br>
 
-## ERD
-
-```mermaid
-erDiagram
-    User ||--o{ Room : creates
-    User ||--o{ Member : participates
-    User ||--o{ Chat : sends
-    User ||--o{ Kanban : creates
-    User ||--o{ Content : creates
-    Room ||--o{ Keyword : has
-    Room ||--o{ Member : includes
-    Room ||--o{ Chat : contains
-    Room ||--o{ Kanban : contains
-    Room ||--o{ Content : contains
-    Room ||--o{ Chatkeyword : has
-    Kanban ||--o{ Content : contains
-
-    User {
-        int id PK
-        string social_id
-        enum social_type
-        string job
-        string email
-        string nickname
-        string profile_image
-        enum role
-        datetime last_login_at
-    }
-    Room {
-        int id PK
-        char uuid
-        int user_id FK
-        string title
-        enum type
-        int max_member
-        int duration
-        enum status
-    }
-    Chat {
-        int id PK
-        int room_id FK
-        int user_id FK
-        string content
-    }
-    Chatkeyword {
-        int id PK
-        int room_id FK
-        string keyword
-    }
-    Content {
-        int id PK
-        int room_id FK
-        int kanban_id FK
-        int user_id FK
-        string content
-    }
-    Kanban {
-        int id PK
-        int room_id FK
-        int user_id FK
-        string section
-    }
-    Keyword {
-        int id PK
-        int room_id FK
-        string keyword
-    }
-    Member {
-        int id PK
-        int room_id FK
-        int user_id FK
-        enum role
-    }
-```
-
-<br>
-
 ## 시퀀스 다이어그램
 
 ```mermaid
@@ -441,6 +366,10 @@ sequenceDiagram
 - 실시간 양방향 통신: Socket.io를 사용한 실시간 업데이트 구현
 - 포스트잇 기능: react-dnd 사용, <br>
   다수의 사용자가 이동할 시에 socket안정성 문제는 호스트만 이동하는 것으로 전환
+- React-beautiful-dnd가 적용되지 않는 문제: stricmode에서 적용되지 않아 제거 또는 주석처리함
+- 페이지 이동시 스크롤이 고정되는 이슈 (푸터에서 페이지라우팅하면 하단에 고정)
+  원인: React (SPA) Router의 기본 동작과 브라우저의 기본 동작의 충돌<br>
+  해결: scrollto(0,0) 컴포넌트 추가함 <br>
   <br>
 
 ## 회고
