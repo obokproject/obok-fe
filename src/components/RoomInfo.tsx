@@ -105,11 +105,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     : members[0];
 
   return (
-    <div
-      className={`flex justify-between gap-0 items-start p-[10px] pl-[10px] rounded-[20px] ${
-        roomData.type === "kanban" ? "bg-[#fffcef]" : "bg-white"
-      }`}
-    >
+    <div className="flex justify-between gap-0 items-start p-[10px] pl-[10px] rounded-[20px]">
       {/* 1행 1열: 방의 제목 섹션 */}
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-[12px] pl-[10px]">

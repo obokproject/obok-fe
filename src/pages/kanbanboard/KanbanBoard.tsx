@@ -41,6 +41,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [room, setRoom] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [cardHost, setCardHost] = useState<any>(null);
   const { loading, error } = useRoom(roomId); // 방 정보 훅
   const [sections, setSections] = useState<KanbanSection[]>([]);
   const [newCardContent, setNewCardContent] = useState("");
@@ -62,6 +63,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       socket.current.on("connect", () => {
         console.log("Connected to the WebSocket server");
         socket.current?.emit("joinRoom", { roomId, userId: user.id });
+      });
+
+      // 서버로부터 realRoom 데이터를 수신
+      socket.current?.on("realRoom", (realRoom) => {
+        console.log("Received realRoom data from server:", realRoom);
+        // roomHostId 상태 업데이트
+        setCardHost(realRoom.userId);
       });
 
       // 이벤트 리스너 설정
@@ -182,9 +190,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       console.log("creationSection:", creationSection);
       console.log(!creationSection);
       if (!creationSection) return;
-      console.log(creationSection.cards);
-      console.log(creationSection.cards.length);
-      console.log(creationSection.cards.length >= 7);
+
       // 생성 섹션 7개 카드 제한 확인
       if (creationSection.cards.length >= 7) {
         alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
@@ -218,7 +224,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         socket.current?.emit("addCard", {
           roomId,
           sectionId: "생성",
-          card: { content, userId: user.id },
+          card: {
+            content,
+            userId: user.id,
+            profile: user.profile,
+          },
         });
 
         setIsAddingCard(false); // 입력창 닫기
@@ -261,12 +271,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   return (
     <div className="container w-[1177px] h-[718px] mx-auto px-4  mt-5 mb-[120px] flex flex-grow">
       <div className="flex flex-col w-[100%]">
-        <div className="flex-grow border-2 border-yellow-200 bg-yellow-50 p-2 mb-2 rounded-[20px]">
+        <div className="flex-grow border-2 border-[#FFC107] bg-white p-2 mb-2 rounded-[20px]">
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex gap-10 relative">
               {sections.map((section, index) => (
                 <div key={section.id} className="flex-1 px-2">
-                  <div className="border-2 border-yellow-200 rounded-[20px] flex justify-center m-1 pt-3 bg-white">
+                  <div className="border-2 border-[#FFC107] rounded-[20px] flex justify-center m-1 pt-3 bg-[#FFf3cd] bg-opacity-20">
                     <h5 className="text-center mb-3">{section.title}</h5>
                   </div>
                   <div className="relative flex gap-10">
@@ -289,14 +299,23 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2 flex items-center"
+                                  className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2 flex items-center relative"
                                 >
                                   <p className="flex-grow">{card.content}</p>
-                                  <img
-                                    src={card.profile}
-                                    alt="User profile"
-                                    className="w-6 h-6 rounded-full ml-2"
-                                  />
+                                  <div className="relative">
+                                    <img
+                                      src={card.profile}
+                                      alt="User profile"
+                                      className="w-6 h-6 rounded-full ml-2"
+                                    />
+                                    {cardHost === card.userId && (
+                                      <img
+                                        src="/images/crown.png"
+                                        className="w-3 h-3 absolute -top-1 -right-1"
+                                        alt="Crown"
+                                      />
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </Draggable>
@@ -317,10 +336,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                 />
                               </div>
                             ) : (
-                              <div className="flex justify-center">
+                              <div className="flex justify-center items-center">
                                 <button
                                   onClick={handleAddCardClick}
-                                  className="bg-white py-2 px-4 rounded border border-gray-300 hover:bg-gray-100 w-24"
+                                  className=" py-2 px-4 rounded-[20px] border-[1px] border-dashed border-[#9f9f9f] hover:bg-gray-100 w-full flex justify-center items-center"
                                 >
                                   <img
                                     src="/images/Vector-Stroke.png"
@@ -342,18 +361,26 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           </DragDropContext>
         </div>
 
-        <div className="w-full border-2 border-yellow-200 rounded-[20px] bg-white">
-          <RoomInfo
-            uuid={roomId}
-            socket={socket.current}
-            members={members}
-            isHost={isHost}
-          />
+        <div className="w-full border-2 border-[#FFC107] rounded-[20px] bg-white">
+          {members.length > 0 ? (
+            <RoomInfo
+              uuid={roomId}
+              socket={socket.current}
+              members={members}
+              isHost={isHost}
+            />
+          ) : (
+            <div>로딩 중...</div>
+          )}
         </div>
       </div>
-      <div className="flex flex-col w-[280px] h-full ml-2 border-2 border-yellow-200 rounded-[20px] bg-white">
+      <div className="flex flex-col w-[280px] h-full ml-2 border-2 border-[#FFC107] rounded-[20px] bg-white">
         <div className="flex-1 overflow-y-auto p-4">
-          <MemberList members={members} />
+          {members.length > 0 ? (
+            <MemberList members={members} />
+          ) : (
+            <div>멤버 데이터를 로드 중입니다...</div>
+          )}
         </div>
       </div>
     </div>
