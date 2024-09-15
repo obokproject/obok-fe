@@ -1,0 +1,20 @@
+.kanban-card {
+  position: relative;
+  background-color: #ffd54f; /* 카드 배경색 */
+  border-radius: 10px; /* 카드 모서리 둥글게 */
+  padding: 10px 15px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.kanban-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, transparent 50%, #e6c046 50%);
+  border-bottom-right-radius: 10px;
+  box-shadow: -2px -2px 3px rgba(0, 0, 0, 0.1);
+}

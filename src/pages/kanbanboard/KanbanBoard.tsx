@@ -10,6 +10,7 @@ import {
 import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
+import "./KanbanCard.css";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -47,6 +48,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   const [newCardContent, setNewCardContent] = useState("");
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
+  const addCardContainerRef = useRef<HTMLDivElement>(null);
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -265,6 +267,23 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     }
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        addCardContainerRef.current &&
+        !addCardContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsAddingCard(false);
+        setNewCardContent("");
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -285,7 +304,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className="min-h-[500px] flex-1 overflow-auto"
+                          className="min-h-[500px] flex-1 overflow-y-auto pr-2"
                         >
                           {section.cards.map((card, index) => (
                             <Draggable
@@ -299,14 +318,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className="mb-2 bg-yellow-100 border border-yellow-300 rounded shadow-md p-2 flex items-center relative"
+                                  className="kanban-card mb-2 bg-yellow-100 rounded shadow-md p-2 flex items-center relative"
                                 >
-                                  <p className="flex-grow">{card.content}</p>
-                                  <div className="relative">
+                                  <p className="flex-grow text-left ml-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {card.content}
+                                  </p>
+                                  <div className="relative mr-2 flex-shrink-0">
                                     <img
                                       src={card.profile}
                                       alt="User profile"
-                                      className="w-6 h-6 rounded-full ml-2"
+                                      className="w-[30px] h-[30px] rounded-full ml-2"
                                     />
                                     {cardHost === card.userId && (
                                       <img
@@ -322,32 +343,35 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                           ))}
                           {provided.placeholder}
 
-                          {section.id === "생성" &&
-                            (isAddingCard ? (
-                              <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2 h-[51px]">
-                                <input
-                                  ref={inputRef}
-                                  type="text"
-                                  placeholder="새 카드 내용 (10자 이내)"
-                                  value={newCardContent}
-                                  onChange={handleCardInputChange}
-                                  onKeyDown={handleCardInputKeyPress}
-                                  className="w-full bg-transparent border-none focus:outline-none"
-                                />
-                              </div>
-                            ) : (
-                              <div className="flex justify-center items-center">
-                                <button
-                                  onClick={handleAddCardClick}
-                                  className=" py-2 px-4 rounded-[20px] border-[1px] border-dashed border-[#9f9f9f] hover:bg-gray-100 w-full flex justify-center items-center"
-                                >
-                                  <img
-                                    src="/images/Vector-Stroke.png"
-                                    alt="addcard-button"
+                          {section.id === "생성" && (
+                            <div ref={addCardContainerRef}>
+                              {isAddingCard ? (
+                                <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2 h-[51px]">
+                                  <input
+                                    ref={inputRef}
+                                    type="text"
+                                    placeholder="새 카드 내용 (10자 이내)"
+                                    value={newCardContent}
+                                    onChange={handleCardInputChange}
+                                    onKeyDown={handleCardInputKeyPress}
+                                    className="w-full bg-transparent border-none focus:outline-none"
                                   />
-                                </button>
-                              </div>
-                            ))}
+                                </div>
+                              ) : (
+                                <div className="flex justify-center items-center">
+                                  <button
+                                    onClick={handleAddCardClick}
+                                    className=" py-2 px-4 rounded-[20px] border-[1px] border-dashed border-[#9f9f9f] hover:bg-gray-100 w-full flex justify-center items-center"
+                                  >
+                                    <img
+                                      src="/images/Vector-Stroke.png"
+                                      alt="addcard-button"
+                                    />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </Droppable>

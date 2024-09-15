@@ -8,7 +8,8 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="p-[40px] mt-auto h-[300px] border-t-[1px] border-t-[#323232]">
+    // <footer className="p-[40px] mt-auto h-[300px] border-t-[1px] border-t-[#323232]">
+    <footer className="p-[40px] mt-auto h-[300px] bg-gray-100">
       <Container>
         <Row className="col-span-2">
           <Col md={8} className="mb-3 flex flex-column justify-between">

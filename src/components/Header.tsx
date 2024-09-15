@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({
             </>
           ) : (
             <>
-              <Nav.Link onClick={openLoginModal}>회원가입</Nav.Link>
+              <Nav.Link onClick={openLoginModal}>로그인</Nav.Link>
             </>
           )}
         </Nav>

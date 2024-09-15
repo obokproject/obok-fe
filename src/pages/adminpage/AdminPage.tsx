@@ -132,7 +132,7 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <Container className="p-0 relative">
+    <Container className="p-0 relative overflow-x-scroll">
       <div className="p-3 md:p-5">
         <h1 className="text-[24px] font-bold mb-6">회원관리</h1>
 
@@ -143,7 +143,7 @@ const AdminPage: React.FC = () => {
           style={{ paddingLeft: "50px" }}
         >
           <Tab eventKey="users" title="사용자 관리">
-            <div className="bg-white shadow rounded-lg min-w-[1200px]">
+            <div className="bg-white rounded-lg min-w-[1200px]">
               <div className="p-3 md:p-6 ">
                 <h2 className="text-[16px] font-semibold mb-4 ">
                   가입인원: {users.length}명
@@ -151,35 +151,35 @@ const AdminPage: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="py-2 text-center">ID</th>
-                      <th className="  py-2 text-center">소셜ID</th>
-                      <th className="  py-2 text-center">소셜타입</th>
-                      <th className="  py-2 text-center">직업</th>
-                      <th className="  py-2 text-center">이메일</th>
+                      <th className="p-2 text-center">ID</th>
+                      <th className="py-2 text-center">소셜ID</th>
+                      <th className="py-2 text-center">소셜타입</th>
+                      <th className="py-2 text-center">직업</th>
+                      <th className="py-2 text-center">이메일</th>
                       <th className="py-2 text-center">닉네임</th>
-                      <th className="  py-2 text-center">역할</th>
-                      <th className="  py-2 text-center">마지막로그인</th>
-                      <th className="  py-2 text-center">가입일자</th>
-                      <th className="  py-2 text-center">관리</th>
+                      <th className="py-2 text-center">역할</th>
+                      <th className="py-2 text-center">마지막로그인</th>
+                      <th className="py-2 text-center">가입일자</th>
+                      <th className="p-2 text-center">관리</th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentUsers.map((user: User) => (
                       <tr key={user.id} className="border-b">
-                        <td className="  py-2">{user.id}</td>
-                        <td className="  py-2">{user.social_id}</td>
-                        <td className="  py-2">{user.social_type}</td>
-                        <td className="  py-2">{user.job}</td>
-                        <td className="  py-2">{user.email}</td>
-                        <td className="  py-2">{user.nickname}</td>
-                        <td className="  py-2">{user.role}</td>
-                        <td className="  py-2">
+                        <td className="p-2">{user.id}</td>
+                        <td className="py-2">{user.social_id}</td>
+                        <td className="py-2">{user.social_type}</td>
+                        <td className="py-2">{user.job}</td>
+                        <td className="py-2">{user.email}</td>
+                        <td className="py-2">{user.nickname}</td>
+                        <td className="py-2">{user.role}</td>
+                        <td className="py-2">
                           {new Date(user.last_login_at).toLocaleString()}
                         </td>
-                        <td className="  py-2">
+                        <td className="py-2">
                           {new Date(user.createdAt).toLocaleString()}
                         </td>
-                        <td className="  py-2">
+                        <td className="p-2">
                           <button
                             onClick={() => handleDeleteUser(user.id)}
                             className="hover:bg-gray-200 text-white font-bold py-1 px-2 rounded"
@@ -262,7 +262,7 @@ const AdminPage: React.FC = () => {
             </div>
           </Tab>
           <Tab eventKey="statistics" title="가입자 통계">
-            <div className="bg-white shadow-lg rounded-lg">
+            <div className="bg-white  rounded-lg">
               <div className="p-3 md:p-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                   <h2 className="text-[16px] font-bold text-gray-800 mb-4 sm:mb-0">
