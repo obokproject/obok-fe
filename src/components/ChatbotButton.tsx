@@ -49,14 +49,14 @@ const ChatbotButton: React.FC = () => {
   };
 
   return (
-    <div className="fixed right-4 bottom-[15rem] z-50">
+    <div className="fixed right-[2rem] bottom-[15rem] z-50">
       {!isOpen && (
         <button
           onClick={toggleChat}
           className="hover:bg-gray-200 text-black rounded-full p-3 shadow-lg"
           style={{ backgroundColor: "#ffb561" }}
         >
-          <BotMessageSquare size={24} />
+          <BotMessageSquare size={22} />
         </button>
       )}
 

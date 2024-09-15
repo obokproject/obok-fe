@@ -77,13 +77,13 @@ const MyPage: React.FC = () => {
 
   // 유효성 검사 함수
   const validateNickname = (value: string) => {
-    const isValid = value.length >= 2 && value.length <= 10;
+    const isValid = /^[가-힣]{2,10}$/.test(value);
     setIsNicknameValid(isValid);
     return isValid;
   };
 
   const validateJob = (value: string) => {
-    const isValid = value.length <= 12;
+    const isValid = /^[가-힣a-zA-Z]{0,8}$/.test(value);
     setIsJobValid(isValid);
     return isValid;
   };
@@ -104,35 +104,6 @@ const MyPage: React.FC = () => {
 
   // 서버에 이미지 삭제 요청
   const handleImageDelete = () => {
-    // try {
-    //   const response = await fetch(`${apiUrl}/api/auth/profile-image`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ userId: user?.id }), // 현재 사용자 ID
-    //   });
-
-    //   if (!response.ok) {
-    //     throw new Error("Failed to delete image");
-    //   }
-
-    //   // 서버 응답 확인
-    //   const result = await response.json();
-
-    //   if (result.success) {
-    //     // 로컬 상태 업데이트
-    //     setProfile(null);
-    //     // 필요한 경우 사용자 정보 상태도 업데이트
-    //     // setUser(prevUser => ({ ...prevUser, profileImage: null }));
-    //   } else {
-    //     throw new Error(result.message || "Failed to delete image");
-    //   }
-    // } catch (error) {
-    //   console.error("Error deleting image:", error);
-    //   // 사용자에게 에러 메시지 표시
-    //   alert("이미지 삭제에 실패했습니다. 다시 시도해주세요.");
-    // }
     setProfile(null);
     console.log("프로필상태 : ", profile);
   };
@@ -237,13 +208,15 @@ const MyPage: React.FC = () => {
   };
 
   return (
-    <Container className="py-5">
+    <Container className="py-20">
       {/* 마이페이지 제목 */}
-      <div className="flex items-center text-[40px] font-bold leading-[60px]">
+
+      <div className="flex items-center text-[40px] font-[700] text-[#323232]">
         <img
           src="/images/mypage-pencil.png"
           alt="pencil"
-          style={{ height: "40px", width: "40px" }}
+          className="object-cover"
+          style={{ height: "63px" }}
         ></img>
         마이페이지
       </div>
@@ -254,7 +227,7 @@ const MyPage: React.FC = () => {
       <Tabs
         activeKey={activeTab}
         onSelect={(k) => k && setActiveTab(k)}
-        className="mb-4"
+        className="mb-4 text-[24px] font-bold"
         style={{ paddingLeft: "50px" }}
       >
         {/* 프로필 탭 */}
@@ -262,16 +235,9 @@ const MyPage: React.FC = () => {
           <Row className="mb-4">
             <Col xs={12} md={6} className="text-center pt-[80px] pb-[80px]">
               <div
+                className="w-60 h-60 bg-[#f0f0f0] rounded-[50%] d-flex justify-center items-center relative"
                 style={{
-                  width: "240px",
-                  height: "240px",
-                  backgroundColor: "#f0f0f0",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
                   margin: "0 auto 1rem",
-                  position: "relative",
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -342,43 +308,63 @@ const MyPage: React.FC = () => {
             <Col xs={12} md={6}>
               <Form>
                 <div className="mb-3">
-                  <Form.Label>
+                  <Form.Label className="text-[24px] font-bold">
                     닉네임<span className="text-danger">*</span>
                   </Form.Label>
                   <div className="">
                     <input
                       type="text"
-                      placeholder="닉네임"
+                      placeholder="랜덤부여 닉네임"
                       value={nickname}
                       onChange={(e) => {
-                        if (e.target.value.length < 10) {
-                          setNickname(e.target.value);
-                          validateNickname(e.target.value);
-                        }
+                        const newValue = e.target.value
+                          .replace(/[^가-힣]/g, "")
+                          .slice(0, 10);
+                        setNickname(newValue);
+                        validateNickname(newValue);
                       }}
-                      className={`form-control`}
+                      className={`form-control ${
+                        !isNicknameValid ? "is-invalid" : ""
+                      }`}
                     />
+                    {!isNicknameValid && (
+                      <Form.Text className="text-danger">
+                        닉네임은 2-10자의 한글만 사용 가능합니다.
+                      </Form.Text>
+                    )}
                   </div>
-                  <p>
-                    한글 최대 10글자까지 입력가능합니다. 띄어쓰기, 특수문자
-                    사용불가.
+                  <p className="text-[16px] break-words">
+                    한글,영어,숫자 섞어서 최대 10글자까지 입력가능합니다.
+                    띄어쓰기, 특수문자 사용불가.
                   </p>
                 </div>
 
                 <div className="mb-3">
-                  <Form.Label>직업</Form.Label>
+                  <Form.Label className="text-[24px] font-bold">
+                    직업
+                  </Form.Label>
                   <div className="">
                     <input
                       type="text"
                       placeholder="직업"
                       value={job}
                       onChange={(e) => {
-                        setJob(e.target.value);
-                        validateJob(e.target.value);
+                        const newValue = e.target.value
+                          .replace(/[^가-힣a-zA-Z]/g, "")
+                          .slice(0, 8);
+                        setJob(newValue);
+                        validateJob(newValue);
                       }}
-                      maxLength={12}
-                      className={`form-control`}
+                      maxLength={8}
+                      className={`form-control ${
+                        !isJobValid ? "is-invalid" : ""
+                      }`}
                     />
+                    {!isJobValid && (
+                      <Form.Text className="text-danger">
+                        직업은 8자 이하의 한글 또는 영문만 사용 가능합니다.
+                      </Form.Text>
+                    )}
                   </div>
                   <p>
                     한글, 영어 사용가능 최대 8글자. 숫자, 특수문자 사용불가.
@@ -386,13 +372,16 @@ const MyPage: React.FC = () => {
                 </div>
 
                 <div className="mb-3">
-                  <Form.Label>이메일</Form.Label>
+                  <Form.Label className="text-[24px] font-bold">
+                    이메일
+                  </Form.Label>
                   <div className="">
                     <Form.Control
                       type="email"
                       placeholder="example@email.com"
                       value={user?.email}
                       readOnly
+                      disabled
                     />
                   </div>
                 </div>
@@ -421,6 +410,7 @@ const MyPage: React.FC = () => {
         {/* 활동 내역 탭 */}
         <Tab eventKey="history" title="활동 내역">
           <div className="bg-white h-[500px] shadow rounded-lg p-6">
+            <h4 className="p-2">활동내역</h4>
             <div className="overflow-x-auto ">
               <table className="min-w-full border-collapse border border-gray-300 ">
                 <thead>

@@ -26,7 +26,7 @@ const MemberList: React.FC<MemberListProps> = ({ members = [] }) => {
               {member.role === "host" && (
                 <img
                   src="/images/crown.png"
-                  className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-[8px]"
+                  className="w-[15px] h-[15px] bg-opacity-100 absolute -top-1 right-1"
                   alt="crown"
                 />
               )}

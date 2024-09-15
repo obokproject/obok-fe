@@ -34,9 +34,9 @@ const AboutPage: React.FC = () => {
         </h1>
         <h1 className="text-3xl font-bold mb-12">About Razvery</h1>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-16 border-t-4">
+        <div className="grid md:grid-cols-2 gap-6 items-center mb-8 border-t-4">
           <div className=" space-y-6">
-            <p className=" text-lg text-gray-700 leading-relaxed">
+            <p className=" text-[20px] text-gray-700 leading-relaxed">
               라즈베리는 사람과 사람 사이의 의미 있는 연결을 추구하고 새로운
               아이디어, 다양한 관점의 교류를 통해 긍정적인 사회 변화를
               추구합니다.
@@ -61,8 +61,8 @@ const AboutPage: React.FC = () => {
             </div>
           </div>
 
-          <div className=" space-y-6">
-            <p className=" text-lg text-gray-700 leading-relaxed">
+          <div className="space-y-6">
+            <p className="text-[20px] text-gray-700 leading-relaxed">
               라즈베리의 목표는 단순한 기술 개발을 넘어, 사회적 가치를 창출하고
               인류의 지적, 정서적 성장에 기여하는 것입니다.
               <br />
@@ -88,7 +88,7 @@ const AboutPage: React.FC = () => {
         </div>
 
         <div className="mt-16 mb-20">
-          <h2 className="text-2xl font-semibold mb-[30px] ">Our Core Values</h2>
+          <h2 className="text-3xl font-semibold mb-[30px] ">Our Core Values</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {coreValues.map((value, index) => (
               <div
@@ -104,7 +104,7 @@ const AboutPage: React.FC = () => {
                   </h3>
                 </div>
                 <div className="p-4 space-y-4">
-                  <p className="text-gray-700">{value.description1}</p>
+                  <p className="text-gray-700 text-lg">{value.description1}</p>
                   <p className="text-gray-600">{value.description2}</p>
                 </div>
               </div>
