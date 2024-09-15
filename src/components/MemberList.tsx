@@ -13,10 +13,13 @@ interface MemberListProps {
 
 const MemberList: React.FC<MemberListProps> = ({ members = [] }) => {
   return (
-    <div className="flex-1 overflow-y-auto h-[100%] p-2 rounded-lg">
+    <div className="flex-1 overflow-y-auto h-[100%] px-2 rounded-lg">
       {members && members.length > 0 ? (
         members.map((member, index) => (
-          <div key={index} className="flex items-center overflow-y-auto">
+          <div
+            key={index}
+            className="flex items-center overflow-y-auto h-[50px]"
+          >
             <div className="relative">
               <img
                 src={member.profile || "/images/user-profile.png"}
