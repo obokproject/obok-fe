@@ -37,15 +37,12 @@ const MyPage: React.FC = () => {
   //활동내역 데이터 저장
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activities, setActivities] = useState<Activity[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [roomHistory, setRoomHistory] = useState<Activity[]>([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   // 유효성 검사를 위한 상태 추가
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNicknameValid, setIsNicknameValid] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isJobValid, setIsJobValid] = useState(true);
 
   const [isMounted, setIsMounted] = useState(true);
@@ -77,13 +74,16 @@ const MyPage: React.FC = () => {
 
   // 유효성 검사 함수
   const validateNickname = (value: string) => {
-    const isValid = /^[가-힣]{2,10}$/.test(value);
+    const isValid =
+      value.length >= 2 &&
+      value.length <= 10 &&
+      /^[가-힣a-zA-Z0-9]*$/.test(value);
     setIsNicknameValid(isValid);
     return isValid;
   };
 
   const validateJob = (value: string) => {
-    const isValid = /^[가-힣a-zA-Z]{0,8}$/.test(value);
+    const isValid = value.length <= 8 && /^[가-힣a-zA-Z]*$/.test(value);
     setIsJobValid(isValid);
     return isValid;
   };
@@ -317,9 +317,7 @@ const MyPage: React.FC = () => {
                       placeholder="랜덤부여 닉네임"
                       value={nickname}
                       onChange={(e) => {
-                        const newValue = e.target.value
-                          .replace(/[^가-힣]/g, "")
-                          .slice(0, 10);
+                        const newValue = e.target.value.slice(0, 10);
                         setNickname(newValue);
                         validateNickname(newValue);
                       }}
@@ -329,13 +327,13 @@ const MyPage: React.FC = () => {
                     />
                     {!isNicknameValid && (
                       <Form.Text className="text-danger">
-                        닉네임은 2-10자의 한글만 사용 가능합니다.
+                        닉네임은 2-10글자까지 한글,영어,숫자만 사용 가능합니다.
                       </Form.Text>
                     )}
                   </div>
                   <p className="text-[16px] break-words">
-                    한글,영어,숫자 섞어서 최대 10글자까지 입력가능합니다.
-                    띄어쓰기, 특수문자 사용불가.
+                    한글,영어,숫자 섞어서 2-10글자까지 입력가능합니다. 띄어쓰기,
+                    특수문자 사용불가.
                   </p>
                 </div>
 
@@ -349,9 +347,7 @@ const MyPage: React.FC = () => {
                       placeholder="직업"
                       value={job}
                       onChange={(e) => {
-                        const newValue = e.target.value
-                          .replace(/[^가-힣a-zA-Z]/g, "")
-                          .slice(0, 8);
+                        const newValue = e.target.value.slice(0, 8);
                         setJob(newValue);
                         validateJob(newValue);
                       }}
@@ -360,11 +356,6 @@ const MyPage: React.FC = () => {
                         !isJobValid ? "is-invalid" : ""
                       }`}
                     />
-                    {!isJobValid && (
-                      <Form.Text className="text-danger">
-                        직업은 8자 이하의 한글 또는 영문만 사용 가능합니다.
-                      </Form.Text>
-                    )}
                   </div>
                   <p>
                     한글, 영어 사용가능 최대 8글자. 숫자, 특수문자 사용불가.

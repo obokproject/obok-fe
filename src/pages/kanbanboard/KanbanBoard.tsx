@@ -288,23 +288,23 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container w-[1177px] h-[718px] mx-auto px-4  mt-5 mb-[120px] flex flex-grow">
-      <div className="flex flex-col w-[100%]">
-        <div className="flex-grow border-2 border-[#FFC107] bg-white p-2 mb-2 rounded-[20px]">
+    <div className="container w-[1177px] h-[718px] mx-auto px-4 mt-5 mb-[120px] flex">
+      <div className="flex flex-col flex-grow mr-2">
+        <div className="flex-grow border-2 border-[#FFC107] bg-white p-2 mb-2 rounded-[20px] overflow-y-auto">
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex gap-10 relative">
               {sections.map((section, index) => (
-                <div key={section.id} className="flex-1 px-2">
+                <div key={section.id} className="w-1/3 px-2">
                   <div className="border-2 border-[#FFC107] rounded-[20px] flex justify-center m-1 pt-3 bg-[#FFf3cd] bg-opacity-20">
                     <h5 className="text-center mb-3">{section.title}</h5>
                   </div>
-                  <div className="relative flex gap-10">
+                  <div className="relative flex gap-10 pt-3">
                     <Droppable droppableId={section.id}>
                       {(provided) => (
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className="min-h-[500px] flex-1 overflow-y-auto pr-2"
+                          className="h-[470px] flex-1 pr-2"
                         >
                           {section.cards.map((card, index) => (
                             <Draggable
@@ -318,9 +318,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className="kanban-card mb-2 bg-yellow-100 rounded shadow-md p-2 flex items-center relative"
+                                  className="kanban-card mb-2 bg-yellow-100 rounded shadow-md flex items-center relative mx-2.5 mr-1 h-[51px]"
                                 >
-                                  <p className="flex-grow text-left ml-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                                  <p className="flex-grow text-left ml-2 overflow-hidden text-ellipsis mt-2 whitespace-nowrap">
                                     {card.content}
                                   </p>
                                   <div className="relative mr-2 flex-shrink-0">
@@ -344,9 +344,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                           {provided.placeholder}
 
                           {section.id === "생성" && (
-                            <div ref={addCardContainerRef}>
+                            <div
+                              ref={addCardContainerRef}
+                              className="mx-2.5 mr-1"
+                            >
                               {isAddingCard ? (
-                                <div className="mb-2 bg-yellow-200 border border-yellow-300 rounded shadow-md p-2 h-[51px]">
+                                <div className="mb-2 bg-yellow-200 border border-yellow-300 h-[51px] rounded shadow-md p-2 flex items-center">
                                   <input
                                     ref={inputRef}
                                     type="text"
@@ -358,10 +361,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   />
                                 </div>
                               ) : (
-                                <div className="flex justify-center items-center">
+                                <div className="flex justify-center items-center mb-2">
                                   <button
                                     onClick={handleAddCardClick}
-                                    className=" py-2 px-4 rounded-[20px] border-[1px] border-dashed border-[#9f9f9f] hover:bg-gray-100 w-full flex justify-center items-center"
+                                    className="py-2 px-4 rounded-[20px] border-[1px] border-dashed border-[#9f9f9f] hover:bg-gray-100 w-full flex justify-center items-center h-[51px]"
                                   >
                                     <img
                                       src="/images/Vector-Stroke.png"
@@ -399,7 +402,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         </div>
       </div>
       <div className="flex flex-col w-[280px] h-full ml-2 border-2 border-[#FFC107] rounded-[20px] bg-white">
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4">
           {members.length > 0 ? (
             <MemberList members={members} />
           ) : (
