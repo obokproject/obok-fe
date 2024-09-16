@@ -12,11 +12,11 @@ interface ChatBoardProps {
   roomId: string;
 }
 
-// 키워드 추출 함수 정의
-const extractKeywords = (content: string): string[] => {
-  const regex = /#[^\s#]+/g;
-  return content.match(regex) || [];
-};
+// // 키워드 추출 함수 정의
+// const extractKeywords = (content: string): string[] => {
+//   const regex = /#[^\s#]+/g;
+//   return content.match(regex) || [];
+// };
 
 const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   const { user } = useAuth(); // 현재 로그인된 사용자 정보 가져오기
@@ -74,23 +74,11 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         // roomHostId 상태 업데이트
         setroomHostId(realRoom.userId);
       });
+
       // 서버로부터 메시지 수신
       socket.current?.on("message", (message) => {
         console.log("Received message:", message);
-        setMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages, message];
-
-          // 메시지에 포함된 키워드를 찾아서 인덱스 매핑
-          const keywordsInMessage = extractKeywords(message.content);
-          setKeywords((prevKeywords) => {
-            const newKeywords = { ...prevKeywords };
-            keywordsInMessage.forEach((keyword: string) => {
-              newKeywords[keyword] = updatedMessages.length;
-            });
-            return newKeywords;
-          });
-          return updatedMessages;
-        });
+        setMessages((prevMessages) => [...prevMessages, message]);
       });
 
       // 남은 시간 알림을 위한 이벤트 리스너 추가
@@ -132,20 +120,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       // 이전 메시지 및 키워드, 멤버 수신
       socket.current.on("previousMessages", (prevMessages) => {
         setMessages(prevMessages);
-
-        // 이전 키워드를 다시 매핑
-        socket.current?.on("previousKeywords", (keywords: string[]) => {
-          const keywordObject: { [key: string]: number } = {};
-          keywords.forEach((keyword) => {
-            const messageIndex = prevMessages.findIndex((msg: any) =>
-              msg.content.includes(keyword)
-            );
-            if (messageIndex !== -1) {
-              keywordObject[keyword] = messageIndex;
-            }
-          });
-          setKeywords(keywordObject); // 키워드를 올바른 형식으로 변환하여 상태에 저장
-        });
       });
 
       socket.current.on("previousMembers", (members) => {
@@ -165,46 +139,63 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     }
   }, [roomId, user, fetchRoom]); // roomId와 user가 변경될 때마다 실행
 
-  // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수
-  const scrollToMessage = (keyword: string) => {
-    // 모든 메시지 인덱스 찾기
-    const messageIndexes = messages
-      .map((msg, index) => (msg.content.includes(keyword) ? index : -1))
-      .filter((index) => index !== -1);
+  // 특정 키워드를 클릭했을 때 해당 메시지로 스크롤하는 함수 수정
+  const scrollToMessage = (keyword: string, retryCount = 0) => {
+    socket.current?.emit(
+      "keywordClick",
+      { roomId, keyword },
+      (response: any) => {
+        if (response.success) {
+          const message = response.message;
 
-    if (messageIndexes.length > 0) {
-      const messageIndex = messageIndexes[0]; // 첫 번째 인덱스 선택
+          // 메시지 인덱스를 찾아서 스크롤 이동
+          console.log("Received message ID from server:", message.id);
+          console.log("Messages in client:", messages);
 
-      if (messageRefs.current[messageIndex] && chatContainerRef.current) {
-        const messageElement = messageRefs.current[messageIndex]; // 해당 메시지 요소
-        const chatContainer = chatContainerRef.current; // 채팅 컨테이너 요소
+          const messageIndex = messages.findIndex(
+            (msg) => msg.id === message.id
+          );
 
-        if (messageElement && chatContainer) {
-          const messageRect = messageElement.getBoundingClientRect();
-          const containerRect = chatContainer.getBoundingClientRect();
+          if (messageIndex !== -1) {
+            const messageElement = messageRefs.current[messageIndex];
+            const chatContainer = chatContainerRef.current;
 
-          const offset =
-            messageRect.top - containerRect.top + chatContainer.scrollTop; // 스크롤 위치 계산
+            if (messageElement && chatContainer) {
+              const messageRect = messageElement.getBoundingClientRect();
+              const containerRect = chatContainer.getBoundingClientRect();
 
-          chatContainer.scrollTo({
-            top: offset,
-            behavior: "smooth", // 부드러운 스크롤
-          });
+              const offset =
+                messageRect.top - containerRect.top + chatContainer.scrollTop;
 
-          // 해당 메시지에 하이라이트 효과를 적용
-          setHighlightedMessageIndex(messageIndex);
+              chatContainer.scrollTo({
+                top: offset,
+                behavior: "smooth",
+              });
 
-          // 1초 후 하이라이트 해제
-          setTimeout(() => {
-            setHighlightedMessageIndex(null);
-          }, 1000);
+              // 해당 메시지에 하이라이트 효과를 적용
+              setHighlightedMessageIndex(messageIndex);
+
+              // 1초 후 하이라이트 해제
+              setTimeout(() => {
+                setHighlightedMessageIndex(null);
+              }, 1000);
+            }
+          }
+        } else {
+          console.error("Failed to find message:", response.error);
+
+          // 재시도 로직 (최대 재시도 횟수 설정)
+          if (retryCount < 3) {
+            console.log(`Retrying... Attempt ${retryCount + 1}`);
+            setTimeout(() => {
+              scrollToMessage(keyword, retryCount + 1); // 재시도
+            }, 2000); // 2초 후에 재시도
+          } else {
+            console.error("Max retry attempts reached.");
+          }
         }
-      } else {
-        console.error("Message element not found for keyword:", keyword);
       }
-    } else {
-      console.error("Message index not found for keyword:", keyword);
-    }
+    );
   };
 
   // 사용자가 메시지를 전송할 때 호출되는 함수
@@ -239,8 +230,8 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
   if (!room) return <div>Room not found</div>; // 방 정보가 없을 때 표시
 
   return (
-    <div className="  min-w-[1336px] flex justify-center overflow-x-scroll">
-      <div className="bg-white h-screen flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px] aspect-[1178/720]">
+    <div className="flex justify-center">
+      <div className="bg-white w-[1178px] h-[720px] flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px]">
         <div className="flex-1 flex overflow-hidden">
           {/* 채팅 영역(1)과 방 정보(4) */}
           <div className="flex flex-col w-3/4 pr-4">
@@ -281,7 +272,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
                   return (
                     <div
-                      key={index}
+                      key={msg.id} // key로 메시지 ID 사용
                       ref={(el) => {
                         messageRefs.current[index] = el;
                       }}
@@ -291,46 +282,67 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                           : "bg-white"
                       } ${showProfile ? "mt-4" : "mt-1"}`} // pt-4 또는 pt-1을 조건부로 적용
                     >
-                      {showProfile && (
-                        <div className="flex items-center mr-4 pt-1 relative">
-                          <img
-                            src={msg.profile || "/images/user-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
-                            alt="User Profile"
-                            className="w-10 h-10 bg-gray-300 rounded-full"
-                          />
-
-                          {roomHostId === msg.user_id && (
-                            <img
-                              src="/images/crown.png"
-                              className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
-                              alt="crown"
-                            />
-                          )}
-                        </div>
-                      )}
-                      <div className="flex flex-col h-fit">
-                        {showProfile && (
-                          <div className="flex items-center">
-                            <span className="font-bold text-lg mr-2">
-                              <span className="text-[#323232] mr-1 text-[16px] font-[700]">
-                                {msg.nickname}
-                              </span>
-                              {"     "}
-                              <span className="text-[#A6046D] text-[16px] font-500]">
-                                {msg.job}
-                              </span>{" "}
-                              {/* 닉네임과 직업에 다른 색상 적용 */}
-                            </span>
+                      {/* 시스템 메시지와 일반 메시지 구분 */}
+                      {msg.user_id === 99999 ? ( // 시스템 메시지 여부 확인
+                        <div className="flex items-center justify-center w-full py-2 bg-white">
+                          <div className="flex items-center justify-center w-full">
+                            <div className="border-t w-[131px] border-gray-400"></div>{" "}
+                            {/* 왼쪽 수평선 */}
+                            <div className="flex justify-center px-2 text-[#9F9F9F] font-semibold">
+                              {" "}
+                              {/* 텍스트 스타일 */}
+                              {msg.content}
+                            </div>
+                            <div className="border-t border-gray-400 w-[131px]"></div>{" "}
+                            {/* 오른쪽 수평선 */}
                           </div>
-                        )}
-                        <div
-                          className={`${
-                            showProfile ? "" : "ml-14"
-                          } mb-0 h-[25px]`}
-                        >
-                          <p className="text-gray-700 mb-0">{msg.content}</p>
                         </div>
-                      </div>
+                      ) : (
+                        <>
+                          {showProfile && (
+                            <div className="flex items-center mr-4 pt-1 relative">
+                              <img
+                                src={msg.profile || "/images/user-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
+                                alt="User Profile"
+                                className="w-10 h-10 bg-gray-300 rounded-full"
+                              />
+
+                              {roomHostId === msg.user_id && (
+                                <img
+                                  src="/images/crown.png"
+                                  className="w-[15px] h-[15px] bg-opacity-100 absolute top-0 right-0"
+                                  alt="crown"
+                                />
+                              )}
+                            </div>
+                          )}
+                          <div className="flex flex-col h-fit">
+                            {showProfile && (
+                              <div className="flex items-center">
+                                <span className="font-bold text-lg mr-2">
+                                  <span className="text-[#323232] mr-1 text-[16px] font-[700]">
+                                    {msg.nickname}
+                                  </span>
+                                  {"     "}
+                                  <span className="text-[#A6046D] text-[16px] font-500]">
+                                    {msg.job}
+                                  </span>{" "}
+                                  {/* 닉네임과 직업에 다른 색상 적용 */}
+                                </span>
+                              </div>
+                            )}
+                            <div
+                              className={`${
+                                showProfile ? "" : "ml-14"
+                              } mb-0 h-[25px]"`}
+                            >
+                              <p className="text-gray-700 mb-0">
+                                {msg.content}
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   );
                 })}
