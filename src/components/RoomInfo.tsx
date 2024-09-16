@@ -76,12 +76,38 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
         setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0)); // 1초마다 시간 감소
       }, 1000);
 
+      // 시스템 메시지를 보내는 로직 추가
+      if (socket) {
+        const roundedTimeLeft = Math.floor(timeLeft); // 소수점 제거
+        let content = "";
+
+        if (roundedTimeLeft === 300)
+          content = "종료까지 시간이 5분 남았습니다.";
+        else if (roundedTimeLeft === 180)
+          content = "종료까지 시간이 3분 남았습니다.";
+        else if (roundedTimeLeft === 60)
+          content = "종료까지 시간이 1분 남았습니다.";
+        else if (roundedTimeLeft === 30)
+          content = "종료까지 시간이 30초 남았습니다.";
+        else if (roundedTimeLeft === 0) content = "채팅이 종료되었습니다.";
+
+        if (content) {
+          socket.emit("message", { roomId: uuid, userId: 99999, content }); // 일반 메시지와 동일하게 전송
+          console.log(content);
+        }
+      }
+
       return () => clearInterval(timer); // 컴포넌트가 언마운트될 때 타이머 정리
     }
-  }, [timeLeft]);
+  }, [timeLeft, socket, uuid]);
 
   // 남은 시간을 분과 초로 변환하는 함수
   const formatTimeLeft = (seconds: number): string => {
+    // 만약 시간이 0보다 작으면 0으로 고정
+    if (seconds < 0) {
+      seconds = 0;
+    }
+
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}분 ${
