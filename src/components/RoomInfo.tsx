@@ -93,13 +93,49 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
 
         if (content) {
           socket.emit("message", { roomId: uuid, userId: 99999, content }); // 일반 메시지와 동일하게 전송
-          console.log(content);
+
+          // 1초 후 roomClosed 이벤트 전송
+          if (roundedTimeLeft === 0) {
+            setTimeout(() => {
+              socket.emit("roomClosed", { roomId: uuid });
+              console.log("Room closed event sent to the server.");
+            }, 1000);
+          }
         }
       }
 
       return () => clearInterval(timer); // 컴포넌트가 언마운트될 때 타이머 정리
     }
   }, [timeLeft, socket, uuid]);
+
+  // 서버에서 방이 닫혔다는 알림을 받았을 때 처리하는 useEffect 추가
+  useEffect(() => {
+    if (socket) {
+      socket.on("serverRoomClosed", (data) => {
+        alert(data.message); // 서버에서 받은 메시지 출력
+        navigate("/main"); // 메인 페이지로 리디렉션
+      });
+
+      return () => {
+        socket.off("serverRoomClosed");
+      };
+    }
+  }, [socket, navigate]);
+
+  useEffect(() => {
+    if (socket && isHost) {
+      // 현재 사용자가 호스트인 경우에만 해당 로직을 처리
+      socket.on("disconnect", () => {
+        // 호스트가 나가면 방 닫는 이벤트를 서버로 전송
+        socket.emit("roomClosed", { roomId: uuid });
+        console.log("Host disconnected. Room closed event sent to the server.");
+      });
+
+      return () => {
+        socket.off("disconnect");
+      };
+    }
+  }, [socket, isHost, uuid]);
 
   // 남은 시간을 분과 초로 변환하는 함수
   const formatTimeLeft = (seconds: number): string => {
