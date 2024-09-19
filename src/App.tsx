@@ -13,6 +13,7 @@ import ChatBoard from "./pages/chatboard/ChatBoard";
 import KanbanBoard from "./pages/kanbanboard/KanbanBoard";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import MyPage from "./pages/mypage/MyPage";
+import NotFound from "./pages/NotFound/NotFound";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
 import ScrolltoTop from "./components/ScrolltoTop";
@@ -20,16 +21,6 @@ import AdminPage from "./pages/adminpage/AdminPage";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
-
-// let API_URL;
-
-// if (process.env.NODE_ENV === "production") {
-//   API_URL = process.env.NODE_ENV_PROD;
-// } else if (process.env.NODE_ENV === "development") {
-//   API_URL = process.env.NODE_ENV_DEV;
-// } else {
-//   API_URL = process.env.NODE_ENV;
-// }
 
 const ChatBoardWrapper = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -67,6 +58,8 @@ const AppContent: React.FC = () => {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          {/* path="*" 추가하여 잘못된 경로 처리 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

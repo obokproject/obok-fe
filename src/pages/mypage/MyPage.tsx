@@ -92,9 +92,43 @@ const MyPage: React.FC = () => {
     const file = event.target.files?.[0];
     if (file && file.size <= 3 * 1024 * 1024) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile(reader.result as string);
-        console.log("업로드된 이미지 (base64):", reader.result); // base64 데이터 확인
+      const img = new window.Image(); // window 객체를 명시적으로 사용
+
+      reader.onloadend = (e) => {
+        img.src = e.target?.result as string;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxWidth = 800; // 최대 가로 크기
+          const maxHeight = 800; // 최대 세로 크기
+          let width = img.width;
+          let height = img.height;
+
+          // 이미지 비율을 유지하면서 크기 조정
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // canvas를 base64로 변환
+          const base64Image = canvas.toDataURL("image/png");
+
+          setProfile(base64Image);
+          console.log("업로드된 이미지 (base64):", base64Image); // 리사이즈된 base64 데이터 확인
+        };
       };
       reader.readAsDataURL(file);
     } else {

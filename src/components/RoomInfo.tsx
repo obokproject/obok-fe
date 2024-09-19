@@ -7,6 +7,7 @@ interface Member {
   job: string;
   profile: string;
   role: "host" | "guest";
+  deletedAt: string;
 }
 interface RoomInfoProps {
   uuid: string; // room uuid를 prop으로 받습니다.
@@ -24,6 +25,10 @@ interface RoomData {
   duration: number; // 방 생성 시 설정한 제한 시간 (분)
   createdAt: Date;
   type: string;
+  status: string;
+  hostNickname: string; // 추가
+  hostJob: string; // 추가
+  hostProfileImage: string; // 추가
 }
 
 const RoomInfo: React.FC<RoomInfoProps> = ({
@@ -108,6 +113,24 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     }
   }, [timeLeft, socket, uuid]);
 
+  useEffect(() => {
+    if (socket && roomData && roomData.status !== "open") {
+      // 현재 호스트가 존재하는지 확인
+      const hostExists = members.some(
+        (member) => member.role === "host" && !member.deletedAt
+      );
+
+      // 호스트가 존재하지 않고 방 상태가 open이 아닐 때
+      if (!hostExists) {
+        console.log("Host is no longer present. Sending roomClosed event.");
+        setTimeout(() => {
+          socket.emit("roomClosed", { roomId: uuid });
+          console.log("Room closed event sent to the server.");
+        }, 1000); // 1초 지연 후 전송
+      }
+    }
+  }, [members, roomData, socket, uuid]);
+
   // 서버에서 방이 닫혔다는 알림을 받았을 때 처리하는 useEffect 추가
   useEffect(() => {
     if (socket) {
@@ -121,21 +144,6 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
       };
     }
   }, [socket, navigate]);
-
-  useEffect(() => {
-    if (socket && isHost) {
-      // 현재 사용자가 호스트인 경우에만 해당 로직을 처리
-      socket.on("disconnect", () => {
-        // 호스트가 나가면 방 닫는 이벤트를 서버로 전송
-        socket.emit("roomClosed", { roomId: uuid });
-        console.log("Host disconnected. Room closed event sent to the server.");
-      });
-
-      return () => {
-        socket.off("disconnect");
-      };
-    }
-  }, [socket, isHost, uuid]);
 
   // 남은 시간을 분과 초로 변환하는 함수
   const formatTimeLeft = (seconds: number): string => {
@@ -186,21 +194,19 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
           <div className="flex items-center gap-[8px] mt-[10px]">
             <div className="w-[40px] h-[40px] relative">
               <img
-                src={currentMember.profile || "/images/user-profile.png"}
+                src={roomData.hostProfileImage || "/images/user-profile.png"}
                 alt="profile"
                 className="w-full h-full rounded-full object-cover"
               />
-              {isHost && (
-                <img
-                  src="/images/crown.png"
-                  className="w-[16px] h-[16px] absolute -top-1 -right-1"
-                  alt="Crown"
-                />
-              )}
+              <img
+                src="/images/crown.png"
+                className="w-[16px] h-[16px] absolute -top-1 -right-1"
+                alt="Crown"
+              />
             </div>
             <div className="w-[160px]">
               <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
-                {currentMember.nickname}
+                {roomData.hostNickname}
               </div>
               <div
                 className={`text-[16px] font-semibold font-['Pretendard'] ${
@@ -209,7 +215,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
                     : "text-[#A6046D]"
                 }`}
               >
-                {currentMember.job}
+                {roomData.hostJob}
               </div>
             </div>
           </div>
