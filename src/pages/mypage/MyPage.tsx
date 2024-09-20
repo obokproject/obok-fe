@@ -434,8 +434,7 @@ const MyPage: React.FC = () => {
         </Tab>
         {/* 활동 내역 탭 */}
         <Tab eventKey="history" title="활동 내역">
-          <div className="bg-white h-[500px] shadow rounded-lg p-6">
-            <h4 className="p-2">활동내역</h4>
+          <div className="bg-white h-[500px] rounded-lg p-6">
             <div className="overflow-x-auto ">
               <table className="min-w-full border-collapse border border-gray-300 ">
                 <thead>
