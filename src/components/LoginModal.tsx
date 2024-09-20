@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 interface LoginModalProps {
@@ -12,6 +12,27 @@ const LoginModal: React.FC<LoginModalProps> = ({
   closeModal,
   loginWithGoogle,
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        closeModal();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, closeModal]);
+
   const handleGoogleLogin = async () => {
     await loginWithGoogle();
     closeModal();
@@ -32,6 +53,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
         style={{ width: "640px", maxWidth: "640px" }}
       >
         <div
+          ref={modalRef}
           className="modal-content position-relative"
           style={{
             borderRadius: "50px",
@@ -72,14 +94,14 @@ const LoginModal: React.FC<LoginModalProps> = ({
             </p>
             <div>
               <Link
-                to="https://glitter-juniper-6f6.notion.site/8d4b93d50a164cb7a0e2533935c60a0b"
+                to="https://glitter-juniper-6f6.notion.site/1b776b68933f4879ad42d758f324950a"
                 className="text-xs mx-2 text-muted "
                 target="_blank"
               >
                 서비스 이용약관
               </Link>
               <Link
-                to="https://glitter-juniper-6f6.notion.site/32a79e282480462bb267b2cc51be71aa"
+                to="https://glitter-juniper-6f6.notion.site/c1627b068c3d4453abe5fc9f56f49eb9"
                 className="text-xs mx-2 text-muted "
                 target="_blank"
               >

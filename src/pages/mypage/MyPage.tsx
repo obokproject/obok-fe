@@ -54,7 +54,11 @@ const MyPage: React.FC = () => {
   useEffect(() => {
     setNickname(user?.nickname ?? "");
     setJob(user?.job ?? "");
-    setProfile(user?.profile ?? null);
+    if (user?.profile && !user.profile.startsWith("data:")) {
+      setProfile(`data:image/jpeg;base64,${user.profile}`);
+    } else {
+      setProfile(user?.profile ?? null);
+    }
   }, [user]);
 
   // 컴포넌트 마운트 시 활동 내역 데이터 가져오기
@@ -90,17 +94,27 @@ const MyPage: React.FC = () => {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.size <= 3 * 1024 * 1024) {
+    console.log("Selected file:", file);
+
+    if (file && file.size <= 10 * 1024 * 1024) {
+      console.log("File size OK:", file.size, "bytes");
       const reader = new FileReader();
-      const img = new window.Image(); // window 객체를 명시적으로 사용
+      const img = new window.Image();
 
       reader.onloadend = (e) => {
+        console.log("FileReader loadend");
         img.src = e.target?.result as string;
 
         img.onload = () => {
+          console.log(
+            "Image loaded, original size:",
+            img.width,
+            "x",
+            img.height
+          );
           const canvas = document.createElement("canvas");
-          const maxWidth = 800; // 최대 가로 크기
-          const maxHeight = 800; // 최대 세로 크기
+          const maxWidth = 1200; // 최대 가로 크기
+          const maxHeight = 1200; // 최대 세로 크기
           let width = img.width;
           let height = img.height;
 
@@ -124,7 +138,8 @@ const MyPage: React.FC = () => {
           ctx?.drawImage(img, 0, 0, width, height);
 
           // canvas를 base64로 변환
-          const base64Image = canvas.toDataURL("image/png");
+          const base64Image = canvas.toDataURL("image/webp", 0.8);
+          console.log("Base64 image length:", base64Image.length);
 
           setProfile(base64Image);
           console.log("업로드된 이미지 (base64):", base64Image); // 리사이즈된 base64 데이터 확인
@@ -132,6 +147,11 @@ const MyPage: React.FC = () => {
       };
       reader.readAsDataURL(file);
     } else {
+      console.log(
+        "File size exceeded or no file selected:",
+        file?.size,
+        "bytes"
+      );
       alert("이미지 크기는 3MB 이하여야 합니다.");
     }
   };
@@ -281,10 +301,13 @@ const MyPage: React.FC = () => {
               >
                 {profile ? (
                   <Image
-                    src={profile}
+                    src={
+                      profile.startsWith("data:")
+                        ? profile
+                        : `${apiUrl}${profile}`
+                    }
                     roundedCircle
-                    className=""
-                    style={{ width: "100%", height: "100%" }}
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <span
@@ -309,7 +332,7 @@ const MyPage: React.FC = () => {
                     height: "100%",
                     cursor: "pointer",
                   }}
-                  accept="image/jpeg, image/png"
+                  accept="image/*"
                   onClick={(e) => e.stopPropagation()} // 중복 호출 방지
                 />
 
