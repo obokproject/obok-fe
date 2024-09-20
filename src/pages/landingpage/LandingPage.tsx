@@ -210,7 +210,7 @@ const LandingPage: React.FC = () => {
 
                 <div className="py-24 text-center">
                   <div className="max-w-4xl mx-auto">
-                    <div className="text-center text-[#323232] text-[42px] font-bold font-['Inter'] leading-[63px] mb-12  break-words">
+                    <div className="text-center text-[#323232] text-[42px] font-bold leading-[63px] mb-12 break-words">
                       다양한 분야, 다양한 직업의 사람들의
                       <br />
                       생각을 모아보세요!
