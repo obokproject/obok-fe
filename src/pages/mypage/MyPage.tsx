@@ -391,7 +391,7 @@ const MyPage: React.FC = () => {
                       }`}
                     />
                   </div>
-                  <p>
+                  <p className="text-[16px] break-words">
                     한글, 영어 사용가능 최대 8글자. 숫자, 특수문자 사용불가.
                   </p>
                 </div>
@@ -414,7 +414,7 @@ const MyPage: React.FC = () => {
                 <div className="d-flex justify-content-end">
                   <button
                     onClick={handleSubmit}
-                    className="w-[210px] h-[44px] font-bold rounded-full"
+                    className="w-[210px] h-[44px] text-[28px] font-bold rounded-full"
                     style={{ backgroundColor: "#ffb561" }}
                   >
                     저장
@@ -425,7 +425,7 @@ const MyPage: React.FC = () => {
           </Row>
           <div className="text-center mt-5">
             <button
-              className="w-[160px] h-[56px] font-bold rounded-full bg-gray-200"
+              className="w-[160px] h-[56px] font-bold text-[24px] rounded-full bg-gray-200"
               onClick={handleLogout}
             >
               로그아웃
