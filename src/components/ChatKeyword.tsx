@@ -81,7 +81,7 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="flex flex-wrap p-2 h-auto w-full overflow-y-scroll max-h-[345px]">
+      <div className="flex flex-wrap p-2 h-auto w-full overflow-y-auto max-h-[345px]">
         {keywords.length === 0 ? (
           <p> </p>
         ) : (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
+import CustomModal from "./CustomModal";
 
 interface Member {
   nickname: string;
@@ -40,6 +41,9 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   const navigate = useNavigate();
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [showExitModal, setShowExitModal] = useState(false); // 나가기모달
+  const [showRoomClosedModal, setShowRoomClosedModal] = useState(false); // 방 종료 모달 상태
+  const [roomClosedMessage, setRoomClosedMessage] = useState(""); // 방 종료 메시지
 
   // 방 정보를 서버로부터 가져오는 useEffect
   useEffect(() => {
@@ -135,10 +139,8 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   useEffect(() => {
     if (socket) {
       socket.on("serverRoomClosed", (data) => {
-        console.log("Received serverRoomClosed event", data); // 서버로부터 받은 이벤트 로그
-
-        alert(data.message); // 서버에서 받은 메시지 출력
-        navigate("/main"); // 메인 페이지로 리디렉션
+        setRoomClosedMessage(data.message); // 서버에서 받은 메시지를 설정
+        setShowRoomClosedModal(true); // 방 종료 모달을 띄우기
       });
 
       return () => {
@@ -161,14 +163,24 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     }초`;
   };
 
+  // 나가기 버튼 클릭 핸들러
   const handleLeaveRoom = () => {
-    const confirmed = window.confirm("채팅방을 나가시겠습니까?");
-    if (confirmed) {
-      navigate("/main");
-      setTimeout(() => {
-        window.location.reload(); // 이동 후 새로고침
-      }, 100); // navigate 후 약간의 지연 후 새로고침
-    }
+    setShowExitModal(true); // 모달을 열기
+  };
+
+  // 모달에서 확인을 눌렀을 때 실행되는 핸들러
+  const handleConfirmLeave = () => {
+    setShowExitModal(false); // 모달을 닫고 나가기 처리
+    navigate("/main");
+    setTimeout(() => {
+      window.location.reload(); // 페이지 새로고침
+    }, 100);
+  };
+
+  // 모달에서 확인 버튼을 눌렀을 때 방 닫기 처리
+  const handleRoomClosedConfirm = () => {
+    setShowRoomClosedModal(false); // 모달을 닫고
+    navigate("/main"); // 메인 페이지로 리디렉션
   };
 
   // roomData가 null이면 로딩 상태를 표시
@@ -298,6 +310,27 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
           </button>
         </div>
       </div>
+
+      {/* 나가기 모달 */}
+      <CustomModal
+        show={showExitModal}
+        title="퇴장 하시겠습니까?"
+        body="인원이 가득차면 재입장이 불가능 할 수 있습니다."
+        onClose={() => setShowExitModal(false)} // 취소 버튼 클릭 시 모달 닫기
+        onConfirm={handleConfirmLeave} // 확인 버튼 클릭 시 방 나가기 처리
+        confirmText="나가기"
+        cancelText="취소"
+      />
+
+      {/* 방 종료 모달 - 취소 버튼 없이 확인 버튼만 */}
+      <CustomModal
+        show={showRoomClosedModal}
+        title="방이 종료되었습니다"
+        body={roomClosedMessage}
+        onClose={handleRoomClosedConfirm} // 확인을 누르면 무조건 navigate
+        onConfirm={handleRoomClosedConfirm} // 확인을 누르면 무조건 navigate
+        confirmText="확인"
+      />
     </div>
   );
 };

@@ -364,7 +364,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                 <div className="flex items-center bg-white rounded-[30px] border-[1px] border-[#BD2130] p-[2px] h-fit">
                   {/* 프로필 이미지 추가 */}
                   <img
-                    src={user?.profile} // 사용자 프로필 이미지 추가
+                    src={user?.profile || "/images/user-profile.png"} // 사용자 프로필 이미지 추가
                     alt="User Profile"
                     className="w-10 h-10 bg-gray-300 rounded-full mr-4"
                   />
