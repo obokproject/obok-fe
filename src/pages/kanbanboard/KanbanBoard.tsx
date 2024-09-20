@@ -194,8 +194,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       if (!creationSection) return;
 
       // 생성 섹션 7개 카드 제한 확인
-      if (creationSection.cards.length >= 7) {
-        alert("생성 섹션에는 최대 7개의 카드만 추가할 수 있습니다.");
+      if (creationSection.cards.length >= 20) {
+        alert("생성 섹션에는 최대 20개의 카드만 추가할 수 있습니다.");
         setIsAddingCard(false);
         setNewCardContent("");
         return;
@@ -207,12 +207,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       ).length;
 
       console.log(userCardCountInCreation);
-      console.log(userCardCountInCreation >= 2);
+      console.log(userCardCountInCreation >= 3);
 
       // 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
-      if (userCardCountInCreation >= 2) {
+      if (userCardCountInCreation >= 3) {
         alert(
-          "생성 섹션에는 최대 2개의 카드만 추가할 수 있습니다. 다른 섹션으로 카드를 옮겨주세요."
+          "생성 섹션에는 최대 3개의 카드만 추가할 수 있습니다. 다른 섹션으로 카드를 옮겨주세요."
         );
         setIsAddingCard(false);
         setNewCardContent("");

@@ -73,7 +73,7 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
 
   return (
     <div
-      className="w-full h-full border-2 border-[#A6046D] rounded-[20px]"
+      className="w-full h-full border-2 border-[#A6046D] rounded-[20px] overflow-hidden"
       style={{
         backgroundImage: `url('/images/logo_fix2.png')`,
         backgroundSize: "cover",
@@ -81,22 +81,28 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="flex flex-wrap p-2">
+      <div className="flex flex-wrap p-2 h-auto w-full overflow-y-scroll max-h-[345px]">
         {keywords.length === 0 ? (
           <p> </p>
         ) : (
           keywords.map((keyword, index) => (
-            <div key={index} className="flex items-center mr-2 mb-2">
+            <div
+              key={index}
+              className="flex items-center mr-2 mb-2 w-fit h-fit max-w-[220px]"
+            >
               <span
-                className="pl-2 pr-3 py-2 rounded-[30px] text-sm cursor-pointer bg-[#E4606D] text-[#FCF8FC] text-[16px]"
+                className="pl-2 pr-5 py-2 rounded-[30px] text-sm cursor-pointer bg-[#E4606D] text-[#FCF8FC] text-[16px] overflow-hidden max-w-full whitespace-nowrap text-ellipsis relative"
                 onClick={() => onKeywordClick(keyword)}
               >
                 {keyword}
 
                 {isHost && (
                   <button
-                    className="ml-2 text-[#FCF8FC] text-sm bg-[#E4606D]"
-                    onClick={() => handleDeleteKeyword(keyword)}
+                    className="absolute right-2 text-[#FCF8FC] text-sm bg-[#E4606D] ml-2"
+                    onClick={(e) => {
+                      e.stopPropagation(); // 클릭이 부모의 onClick 이벤트로 전파되지 않게
+                      handleDeleteKeyword(keyword);
+                    }}
                   >
                     x
                   </button>

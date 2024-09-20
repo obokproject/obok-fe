@@ -22,6 +22,7 @@ interface AuthContextType {
   openLoginModal: () => void;
   closeLoginModal: () => void;
   updateUserProfile: (nickname: string) => Promise<void>;
+  isLoading: boolean; // 로딩 상태
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoading, setisLoading] = useState(true); // 로딩 상태 추가
 
   useEffect(() => {
     checkUserLoggedIn();
@@ -64,11 +66,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // 다른 에러는 콘솔에 표시
         console.error("API Error:", error);
       }
+    } finally {
+      setisLoading(false); // 상태 확인 후 로딩 완료
     }
   };
   // 관리자 여부를 확인하는 함수
   const isAdmin = (): boolean => {
     return user?.role === "admin";
+  };
+  // 로그인 여부를 확인하는 함수
+  const isLoggedIn = (): boolean => {
+    return user?.role === "user" || user?.role === "admin";
   };
 
   const loginWithGoogle = async () => {
@@ -110,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{
         user,
-        isLoggedIn: !!user,
+        isLoggedIn: isLoggedIn(),
         isAdmin: isAdmin(), // isAdmin
         loginWithGoogle,
         logout,
@@ -118,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         openLoginModal,
         closeLoginModal,
         updateUserProfile,
+        isLoading,
       }}
     >
       {children}

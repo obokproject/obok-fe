@@ -60,6 +60,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
         console.log("Joined room:", roomId); // 추가된 콘솔 로그
 
         // 초기 시스템 메시지 추가
+
         setSystemMessages([
           {
             content: "라즈베리는 건전한 채팅 문화를 지향합니다.",
@@ -231,7 +232,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   return (
     <div className="flex justify-center">
-      <div className="bg-white w-[1178px] h-[720px] flex flex-col mt-[120px] mb-[120px] ml-[100px] mr-[100px]">
+      <div className="bg-white w-[1178px] h-[720px] flex flex-col mt-[40px] mb-[40px] ml-[100px] mr-[100px]">
         <div className="flex-1 flex overflow-hidden">
           {/* 채팅 영역(1)과 방 정보(4) */}
           <div className="flex flex-col w-3/4 pr-4">
@@ -304,7 +305,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                               <img
                                 src={msg.profile || "/images/user-profile.png"} // 프로필 이미지 추가 (기본 이미지 설정)
                                 alt="User Profile"
-                                className="w-10 h-10 bg-gray-300 rounded-full"
+                                className="min-w-10 min-h-10 w-10 h-10 bg-gray-300 rounded-full"
                               />
 
                               {roomHostId === msg.user_id && (
@@ -318,7 +319,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                           )}
                           <div className="flex flex-col h-fit">
                             {showProfile && (
-                              <div className="flex items-center">
+                              <div className="flex items-center min-w-fit min-h-fit">
                                 <span className="font-bold text-lg mr-2">
                                   <span className="text-[#323232] mr-1 text-[16px] font-[700]">
                                     {msg.nickname}
@@ -386,20 +387,17 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                     onClick={handleSendMessage}
                     className="ml-2 p-2 bg-transparent text-red-400 rounded-lg hover:bg-red-100 focus:outline-none"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <img
+                      src={"/images/arrow-return-left.png"}
+                      alt="arrow-return-left"
+                      className="w-full h-full bg-white"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </button>
                 </div>
               </div>
@@ -421,7 +419,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
           </div>
 
           {/* 멤버 리스트(2)와 키워드 영역(3) */}
-          <div className="flex flex-col w-1/4 bg-white rounded-tr-lg border-2 border-none">
+          <div className="flex flex-col w-[280px] bg-white rounded-tr-lg border-2 border-none">
             <div className="h-1/2 overflow-y-auto px-[9px] py-[17px] border-2 border-[#A6046D] rounded-[20px]">
               <div className="flex-1 overflow-y-auto p-2">
                 {members.length > 0 ? (
@@ -431,7 +429,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                 )}
               </div>
             </div>
-            <div className="h-1/2 overflow-y-auto pt-2">
+            <div className="h-[360px] overflow-y-auto pt-2">
               <ChatKeyword
                 roomId={roomId}
                 socket={socket.current}

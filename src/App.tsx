@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
   useParams,
 } from "react-router-dom";
 import Header from "./components/Header";
@@ -40,7 +41,13 @@ const AppContent: React.FC = () => {
     closeLoginModal,
     loginWithGoogle,
     user,
+    isAdmin,
+    isLoading,
   } = useAuth();
+
+  if (isLoading) {
+    return <div></div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -52,12 +59,30 @@ const AppContent: React.FC = () => {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/main" element={<MainPage />} />
-          <Route path="/chat/:roomId" element={<ChatBoardWrapper />} />
-          <Route path="/kanban/:roomId" element={<KanbanBoardWrapper />} />
-          <Route path="/mypage" element={<MyPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          {/* 로그인 했을 때만 접근 가능한 경로 */}
+          {isLoggedIn ? (
+            <>
+              <Route path="/main" element={<MainPage />} />
+              <Route path="/chat/:roomId" element={<ChatBoardWrapper />} />
+              <Route path="/kanban/:roomId" element={<KanbanBoardWrapper />} />
+              <Route path="/mypage" element={<MyPage />} />
+              {isAdmin ? (
+                <>
+                  <Route path="/admin" element={<AdminPage />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/admin" element={<Navigate to="/" />} />
+                </>
+              )}
+            </>
+          ) : (
+            // 로그인 안 했을 때 로그인 페이지로 리다이렉트
+            <>
+              <Route path="*" element={<Navigate to="/" />} />
+            </>
+          )}
           {/* path="*" 추가하여 잘못된 경로 처리 */}
           <Route path="*" element={<NotFound />} />
         </Routes>

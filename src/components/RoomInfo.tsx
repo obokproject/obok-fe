@@ -135,6 +135,8 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   useEffect(() => {
     if (socket) {
       socket.on("serverRoomClosed", (data) => {
+        console.log("Received serverRoomClosed event", data); // 서버로부터 받은 이벤트 로그
+
         alert(data.message); // 서버에서 받은 메시지 출력
         navigate("/main"); // 메인 페이지로 리디렉션
       });
@@ -163,6 +165,9 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     const confirmed = window.confirm("채팅방을 나가시겠습니까?");
     if (confirmed) {
       navigate("/main");
+      setTimeout(() => {
+        window.location.reload(); // 이동 후 새로고침
+      }, 100); // navigate 후 약간의 지연 후 새로고침
     }
   };
 
