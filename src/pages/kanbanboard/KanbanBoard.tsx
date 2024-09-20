@@ -325,7 +325,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   </p>
                                   <div className="relative mr-2 flex-shrink-0">
                                     <img
-                                      src={card.profile}
+                                      src={
+                                        card.profile ||
+                                        "/images/user-profile.png"
+                                      }
                                       alt="User profile"
                                       className="w-[30px] h-[30px] rounded-full ml-2"
                                     />
