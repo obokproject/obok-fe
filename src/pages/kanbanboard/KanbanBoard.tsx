@@ -49,6 +49,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
   const addCardContainerRef = useRef<HTMLDivElement>(null);
+  const [imageError, setImageError] = useState(false);
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   // socket.io 연결 설정
   const socket = useRef<ReturnType<typeof io> | null>(null); // socket.io 연결을 관리하는 ref
@@ -326,11 +330,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                                   <div className="relative mr-2 flex-shrink-0">
                                     <img
                                       src={
-                                        card.profile ||
+                                        (!imageError && card.profile) ||
                                         "/images/user-profile.png"
                                       }
                                       alt="User profile"
                                       className="w-[30px] h-[30px] rounded-full ml-2"
+                                      onError={handleImageError}
                                     />
                                     {cardHost === card.userId && (
                                       <img

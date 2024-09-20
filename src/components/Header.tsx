@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -13,6 +13,11 @@ const Header: React.FC<HeaderProps> = ({
   openLoginModal,
   profile,
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Navbar className="h-100">
       <Container className="h-100 d-flex align-items-center">
@@ -33,9 +38,10 @@ const Header: React.FC<HeaderProps> = ({
             <>
               <Nav.Link as={Link} to="/mypage">
                 <img
-                  src={profile || "/images/user-profile.png"}
+                  src={(!imageError && profile) || "/images/user-profile.png"}
                   alt="Profile"
-                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                  className="w-[40px] h-[40px] rounded-full object-cover"
+                  onError={handleImageError}
                 />
               </Nav.Link>
             </>
