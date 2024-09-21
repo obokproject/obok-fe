@@ -168,15 +168,15 @@ const LandingPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-20">
                   {slides.map((_, index) => (
                     <button
                       key={index}
-                      className={`w-3 h-3 rounded-full mx-2 transition-all duration-300 ${
-                        index === current ? "bg-blue-500" : "bg-gray-300"
+                      className={`w-4 h-4 rounded-full mx-2 transition-all duration-300 ${
+                        index === current ? "bg-gray-500" : "bg-gray-300"
                       }`}
                       onClick={() => setCurrent(index)}
-                    ></button>
+                    ></button> // 캐러셀
                   ))}
                 </div>
               </div>
@@ -193,7 +193,7 @@ const LandingPage: React.FC = () => {
                   alt="lightimage"
                 />
                 <div className="p-2 text-center">
-                  <p className="text-2xl font-bold mb-4 break-words">
+                  <p className="text-2xl font-bold mb-8 break-words">
                     아이디어가 필요한데 떠오르지 않아 막막했던 경험.
                     <br />
                     한번씩 있지 않나요?
@@ -202,7 +202,7 @@ const LandingPage: React.FC = () => {
                     <br />
                     혼자여서는 아니었을까요?
                   </p>
-                  <p className="text-3xl font-bold mb-4">집단 지성,</p>
+                  <p className="text-3xl font-bold ">집단 지성,</p>
                   <p className="text-2xl font-bold">
                     다양한 사람들과 함께 할 때입니다.
                   </p>

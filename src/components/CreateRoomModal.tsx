@@ -246,6 +246,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 className="flex-grow w-[50px] bg-[#E9ECEF] text-[#323232] rounded-md outline-none appearance-none"
                 onKeyDown={(e) => e.preventDefault()} // 입력 차단
               />
+              분
             </div>
           </div>
 
