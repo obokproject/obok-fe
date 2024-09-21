@@ -14,7 +14,7 @@ import ChatBoard from "./pages/chatboard/ChatBoard";
 import KanbanBoard from "./pages/kanbanboard/KanbanBoard";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import MyPage from "./pages/mypage/MyPage";
-import NotFound from "./pages/NotFound/NotFound";
+import NotFound from "./pages/notfound/NotFound";
 import LoginModal from "./components/LoginModal";
 import AboutPage from "./pages/about/AboutPage";
 import ScrolltoTop from "./components/ScrolltoTop";
