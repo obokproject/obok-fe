@@ -8,13 +8,14 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    // <footer className="p-[40px] mt-auto h-[300px] border-t-[1px] border-t-[#323232]">
     <footer className="p-[40px] mt-auto h-[300px] bg-gray-100">
       <Container>
         <Row className="col-span-2">
           <Col md={8} className="mb-3 flex flex-column justify-between">
             <h5 className="mt-2 mb-4 text-xl">라즈베리</h5>
-            <p className="mb-4 text-base">주소:서울시 강남구 역삼로 160 9층</p>
+            <p className="mb-4 text-base font-medium">
+              주소 : 서울시 강남구 역삼로 160 9층
+            </p>
           </Col>
           <Col md={2} className="mb-3">
             <h6 className="mb-4">▼ 바로가기</h6>
@@ -72,36 +73,6 @@ const Footer: React.FC = () => {
             RazVery &copy; {currentYear} All rights reserved.
           </p>
           <div className="relative">
-            {/* 
-            <button
-              onClick={toggleDropdown}
-              className="flex items-center space-x-2 hover:text-gray-300
-               "
-            >
-              <div
-                className="p-2 flex items-center bg-[#ffb561] rounded-full"
-                style={{ width: "136px" }}
-              >
-                Family Sites <Plus />
-              </div>
-            </button>
-            
-            {isOpen && (
-              <div className="absolute bottom-full left-0 mb-2 w-48 rounded-md bg-white">
-                {familySites.map((site, index) => (
-                  <a
-                    key={index}
-                    href={site.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-4 py-2 text-sm text-gray-700 "
-                    style={{ cursor: "pointer", textDecoration: "none" }}
-                  >
-                    {site.name}
-                  </a>
-                ))}
-              </div>
-            )} */}
             <Link
               to="http://tmdedu.com/"
               className="flex items-center p-2 hover:text-gray-300 text-dark
