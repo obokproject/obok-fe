@@ -149,49 +149,21 @@ section 마무리
 
 ```bash
 client/
-├── public/
-│   ├── images/
-│   └── index.html
+├── github/  # GitHub 관련 설정. CI/CD 워크플로우
+├── public/     # 정적 파일 (HTML, 이미지 등)
 ├── src/
-│   ├── components/
-│   │   ├── CreateRoomModal.tsx
-│   │   ├── ChatKeyword.tsx
-│   │   ├── ChatbotButton.tsx
-│   │   ├── MemberList.tsx
-│   │   ├── RoomInfo.tsx
-│   │   ├── Footer.tsx
-│   │   ├── Header.tsx
-│   │   └── LoginModal.tsx
-│   ├── contexts/
-│   │   └── AuthContext.tsx
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useRoom.ts
-│   │   └── useForm.ts
+│   ├── components/ # 재사용 가능한 React 컴포넌트
+│   ├── contexts/   # AuthContext
+│   ├── hooks/      # 커스텀 React Hooks
 │   ├── pages/
-│   │   ├── chatboard/
-│   │   │   ├── ChatBoard.tsx
-│   │   │   └── index.tsx
-│   │   ├── about/
-│   │   │   ├── AboutPage.tsx
-│   │   │   └── index.tsx
-│   │   ├── mypage/
-│   │   │   ├── MyPage.tsx
-│   │   │   └── index.tsx
-│   │   ├── kanbanboard/
-│   │   │   ├── KanbanBoard.tsx
-│   │   │   └── index.tsx
-│   │   ├── landingpage/
-│   │   │   ├── LandingPage.tsx
-│   │   │   └── index.tsx
-│   │   └── mainpage/
-│   │       ├── MainPage.tsx
-│   │       └── index.tsx
-│   ├── styles/
-│   │   └── tailwind.css
-│   ├── App.tsx
-│   ├── index.css
-│   └── index.tsx
+│   │   ├── chatboard/  # 베리톡(채팅페이지)
+│   │   ├── about/      # 소개페이지
+│   │   ├── mypage/     # 마이페이지
+│   │   ├── notfound/   # 404 Not Found 페이지
+│   │   ├── kanbanboard/    # 베리보드(드래그앤드롭 페이지)
+│   │   ├── landingpage/    # 랜딩페이지
+│   │   └── mainpage/   # 메인페이지(보드, 톡 방들 만들거나 참여)
+│   └── styles/     # 전역스타일 및 스타일 관련 파일
 ├── package.json
 └── tsconfig.json
 ```
@@ -200,14 +172,15 @@ client/
 
 ## 페이지 및 URL 구조
 
-| 페이지      | URL             | 설명                                       | 주요 기능                                 |
-| ----------- | --------------- | ------------------------------------------ | ----------------------------------------- |
-| LandingPage | /               | 웹사이트의 메인 페이지, 로그인 및 입장하기 | - 서비스 소개<br>- 시작하기 버튼<br>- FAQ |
-| MainPage    | /main           | 로그인 후 메인 대시보드                    | - 사용자의 방 목록<br>- 새 방 만들기      |
-| ChatBoard   | /chat/:roomId   | 베리 톡(채팅방) 페이지                     | - 실시간 채팅<br>- 키워드 표시            |
-| KanbanBoard | /kanban/:roomId | 베리 보드(포스트잇) 페이지                 | - 작업 항목 관리<br>- 드래그 앤 드롭      |
-| MyPage      | /mypage         | 사용자 개인 정보 및 설정 페이지            | - 프로필 수정<br>- 활동 내역 확인         |
-| AboutPage   | /about          | 서비스 소개 및 정보 페이지                 | - 서비스 소개                             |
+| 페이지      | URL             | 설명                                       | 주요 기능                                              |
+| ----------- | --------------- | ------------------------------------------ | ------------------------------------------------------ |
+| LandingPage | /               | 웹사이트의 메인 페이지, 로그인 및 입장하기 | - 서비스 소개<br>- 시작하기 버튼<br>- FAQ              |
+| MainPage    | /main           | 로그인 후 메인 대시보드                    | - 사용자의 방 목록<br>- 새 방 만들기                   |
+| ChatBoard   | /chat/:roomId   | 베리 톡(채팅방) 페이지                     | - 실시간 채팅<br>- 키워드 표시                         |
+| KanbanBoard | /kanban/:roomId | 베리 보드(포스트잇) 페이지                 | - 섹션 별 카드<br>- 드래그 앤 드롭                     |
+| MyPage      | /mypage         | 사용자 개인 정보 및 설정 페이지            | - 프로필 수정<br>- 활동 내역 확인                      |
+| AboutPage   | /about          | 서비스 소개 및 정보 페이지                 | - 서비스 소개                                          |
+| AdminPage   | /admin          | 관리자 페이지                              | - 유저 조회 및 소프트 삭제 <br>- 월별 사용자 유입 통계 |
 
 <br>
 
@@ -299,7 +272,7 @@ sequenceDiagram
     participant ChatController
     participant KanbanController
     participant Database
-    participant WebSocket
+    participant Socket.IO
 
     User->>Frontend: 로그인 요청
     Frontend->>AuthController: 소셜 로그인 요청
@@ -323,39 +296,48 @@ sequenceDiagram
     Frontend-->>User: 방 생성 결과 표시
 
     User->>Frontend: 방 입장
-    Frontend->>WebSocket: 방 입장 이벤트 발생
-    WebSocket->>ChatController: 사용자 입장 처리
+    Frontend->>Socket.IO: 방 입장 이벤트 발생
+    Socket.IO->>ChatController: 사용자 입장 처리
     ChatController->>Database: 멤버 정보 저장
     Database-->>ChatController: 저장 결과 반환
-    ChatController-->>WebSocket: 입장 알림 브로드캐스트
-    WebSocket-->>Frontend: 입장 알림 수신
-    Frontend-->>User: 채팅방 UI 표시
+    ChatController-->>Socket.IO: 입장 알림 브로드캐스트
+    Socket.IO-->>Frontend: 입장 알림 수신
+    Frontend-->>User: 채팅방/칸반보드 UI 표시
 
     User->>Frontend: 채팅 메시지 전송
-    Frontend->>WebSocket: 메시지 전송 이벤트 발생
-    WebSocket->>ChatController: 메시지 처리
+    Frontend->>Socket.IO: 메시지 전송 이벤트 발생
+    Socket.IO->>ChatController: 메시지 처리
     ChatController->>Database: 메시지 저장
     Database-->>ChatController: 저장 결과 반환
-    ChatController-->>WebSocket: 메시지 브로드캐스트
-    WebSocket-->>Frontend: 새 메시지 수신
+    ChatController-->>Socket.IO: 메시지 브로드캐스트
+    Socket.IO-->>Frontend: 새 메시지 수신
     Frontend-->>User: 새 메시지 표시
 
-    User->>Frontend: 칸반 보드 카드 이동
-    Frontend->>WebSocket: 카드 이동 이벤트 발생
-    WebSocket->>KanbanController: 카드 이동 처리
+    User->>Frontend: 칸반 보드 카드 이동 (호스트만)
+    Frontend->>Socket.IO: 카드 이동 이벤트 발생
+    Socket.IO->>KanbanController: 카드 이동 처리
     KanbanController->>Database: 카드 위치 업데이트
     Database-->>KanbanController: 업데이트 결과 반환
-    KanbanController-->>WebSocket: 카드 이동 브로드캐스트
-    WebSocket-->>Frontend: 카드 이동 정보 수신
+    KanbanController-->>Socket.IO: 카드 이동 브로드캐스트
+    Socket.IO-->>Frontend: 카드 이동 정보 수신
     Frontend-->>User: 칸반 보드 UI 업데이트
 
+    User->>Frontend: 키워드 관리 (추가/삭제/클릭)
+    Frontend->>Socket.IO: 키워드 이벤트 발생
+    Socket.IO->>ChatController: 키워드 처리
+    ChatController->>Database: 키워드 정보 업데이트
+    Database-->>ChatController: 업데이트 결과 반환
+    ChatController-->>Socket.IO: 키워드 변경 브로드캐스트
+    Socket.IO-->>Frontend: 키워드 변경 정보 수신
+    Frontend-->>User: 키워드 UI 업데이트
+
     User->>Frontend: 방 나가기
-    Frontend->>WebSocket: 방 나가기 이벤트 발생
-    WebSocket->>ChatController: 사용자 퇴장 처리
+    Frontend->>Socket.IO: 방 나가기 이벤트 발생
+    Socket.IO->>ChatController: 사용자 퇴장 처리
     ChatController->>Database: 멤버 정보 업데이트
     Database-->>ChatController: 업데이트 결과 반환
-    ChatController-->>WebSocket: 퇴장 알림 브로드캐스트
-    WebSocket-->>Frontend: 퇴장 알림 수신
+    ChatController-->>Socket.IO: 퇴장 알림 브로드캐스트
+    Socket.IO-->>Frontend: 퇴장 알림 수신
     Frontend-->>User: 메인 페이지로 리다이렉트
 ```
 

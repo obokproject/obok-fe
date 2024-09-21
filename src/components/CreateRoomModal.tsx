@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface CreateRoomModalProps {
   show: boolean;
@@ -21,6 +21,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   // 유효성 검사 상태
   const [titleError, setTitleError] = useState(false);
   const [keywordError, setKeywordError] = useState(false);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (show && titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [show]);
 
   // 방 생성 핸들러 함수
   const handleCreate = () => {
@@ -169,11 +176,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* 주제 입력 필드 */}
           <div
             className={`flex items-center bg-[#E9ECEF] w-full h-[52px] pt-2 pb-2 rounded-[30px] text-[24px] font-[500] ${
-              titleError && title !== "" ? "border-2 border-red-500" : ""
+              titleError ? "border-2 border-red-500" : ""
             }`}
           >
             <div className="w-[142px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D]">
-              주제
+              주제 <span className="text-danger">*</span>
             </div>
             <div className="w-full pt-2 pb-2 pr-6 pl-6">
               <input
@@ -183,21 +190,22 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 onChange={(e) => {
                   const newTitle = e.target.value;
                   setTitle(newTitle);
-
-                  // 제목이 비어 있으면 에러를 제거
-                  if (newTitle === "") {
-                    setTitleError(false);
-                  }
-                  // 제목이 2자 이상 20자 이하일 경우 에러를 제거
-                  else if (newTitle.length >= 2 && newTitle.length <= 20) {
-                    setTitleError(false);
-                  }
-                  // 유효성 조건을 만족하지 않으면 에러 설정
-                  else {
-                    setTitleError(true);
-                  }
+                  setTitleError(newTitle.length < 2 || newTitle.length > 20);
+                  // // 제목이 비어 있으면 에러를 제거
+                  // if (newTitle === "") {
+                  //   setTitleError(false);
+                  // }
+                  // // 제목이 2자 이상 20자 이하일 경우 에러를 제거
+                  // else if (newTitle.length >= 2 && newTitle.length <= 20) {
+                  //   setTitleError(false);
+                  // }
+                  // // 유효성 조건을 만족하지 않으면 에러 설정
+                  // else {
+                  //   setTitleError(true);
+                  // }
                 }}
                 className="flex-grow bg-[#E9ECEF] text-[#323232] rounded-md outline-none w-full"
+                ref={titleInputRef}
               />
             </div>
           </div>
@@ -205,7 +213,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           {/* 인원 및 제한시간 설정 */}
           <div className="flex items-center w-full h-[52px] pt-2 pb-2 text-[24px] font-[500]">
             <div className="w-[123px] pt-2 pb-2 pr-6 pl-6 text-[#323232] text-center border-r-[3px] border-[#6C757D] bg-[#E9ECEF] rounded-l-[30px]">
-              인원
+              인원 <span className="text-danger">*</span>
             </div>
             <div className="w-[120px] pt-2 pb-2 pl-6 text-[#323232] text-center rounded-r-[30px] bg-[#E9ECEF] border-[#6C757D]">
               <input
@@ -225,8 +233,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               />
             </div>
 
-            <div className="w-[123px] pt-2 pb-2 pr-3 pl-3 text-[#323232] text-center border-r-[3px] border-[#6C757D] bg-[#E9ECEF] ml-[80px] rounded-l-[30px]">
-              제한시간
+            <div className="w-[123px] pt-2 pb-2 pr-0 pl-2 text-[#323232] text-center border-r-[3px] border-[#6C757D] bg-[#E9ECEF] ml-[80px] rounded-l-[30px]">
+              제한시간 <span className="text-danger">*</span>
             </div>
             <div className="w-[120px] pt-2 pb-2 pl-6 text-[#323232] text-center rounded-r-[30px] bg-[#E9ECEF] border-[#6C757D]">
               <input

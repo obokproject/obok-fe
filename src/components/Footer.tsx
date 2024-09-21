@@ -24,6 +24,7 @@ const Footer: React.FC = () => {
                   to="https://www.instagram.com/razvery_/"
                   className="text-muted"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Instagram />
                 </Link>
@@ -48,6 +49,7 @@ const Footer: React.FC = () => {
                   className="text-muted"
                   style={{ textDecoration: "none" }}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   이용약관
                 </Link>
@@ -57,6 +59,7 @@ const Footer: React.FC = () => {
                   to="https://glitter-juniper-6f6.notion.site/c1627b068c3d4453abe5fc9f56f49eb9"
                   className="text-muted"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   개인정보처리방침
                 </Link>
