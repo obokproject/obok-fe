@@ -267,7 +267,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 onChange={(e) => {
                   const inputValue = e.target.value;
                   const filteredValue = inputValue.replace(
-                    /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ0-9]/g,
+                    /[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ]/g,
                     ""
                   );
 

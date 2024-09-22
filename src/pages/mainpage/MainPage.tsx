@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import CustomModal from "../../components/CustomModal";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const MainPage: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false); // 방 생성 모달 표시 상태
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
   const [roomsPerPage] = useState(9); // 페이지 당 방 개수 설정
+  const [showFullModal, setShowFullModal] = useState<boolean>(false);
 
   // 컴포넌트가 마운트될 때 방 목록을 가져옴
   useEffect(() => {
@@ -68,6 +70,19 @@ const MainPage: React.FC = () => {
     } catch (error) {
       console.error("Failed to create room:", error);
       // 추가적인 오류 메시지를 사용자에게 표시할 수 있음
+    }
+  };
+
+  const handleJoinRoom = (room: {
+    participants: number;
+    max_member: number;
+    type: any;
+    uuid: any;
+  }) => {
+    if (room.participants >= room.max_member) {
+      setShowFullModal(true); // 모달을 띄움
+    } else {
+      navigate(`/${room.type}/${room.uuid}`); // 방으로 이동
     }
   };
 
@@ -268,8 +283,7 @@ const MainPage: React.FC = () => {
                           ? "bg-[#FF8A8A] text-[#323232]"
                           : "bg-[#FFE27C] text-[#323232]"
                       }`}
-                      onClick={() => navigate(`/${room.type}/${room.uuid}`)}
-                      disabled={room.participants >= room.max_member}
+                      onClick={() => handleJoinRoom(room)}
                     >
                       참여하기
                     </button>
@@ -361,6 +375,17 @@ const MainPage: React.FC = () => {
         show={showCreateModal}
         onHide={() => setShowCreateModal(false)}
         onCreate={handleCreateRoom}
+      />
+      <CustomModal
+        show={showFullModal}
+        title="참가 불가"
+        body="해당 방은 이미 최대 인원입니다."
+        onClose={() => setShowFullModal(false)} // 모달 닫기
+        onConfirm={() => {
+          setShowFullModal(false); // 모달 닫기
+          window.location.reload(); // 새로고침
+        }}
+        confirmText="확인"
       />
     </Container>
   );
