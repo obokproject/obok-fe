@@ -239,7 +239,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             <div className="flex flex-col flex-1 bg-white border-2 border-[#A6046D] overflow-hidden rounded-[20px]">
               {/* 채팅 영역 */}
               <div
-                className="flex-1 overflow-y-auto p-4 flex flex-col"
+                className="flex-1 overflow-y-auto m-4 flex flex-col max-w-full"
                 ref={chatContainerRef}
               >
                 <div className="w-full h-fit flex justify-center items-center gap-1">
@@ -277,7 +277,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                       ref={(el) => {
                         messageRefs.current[index] = el;
                       }}
-                      className={`flex items-start h-fit rounded-[20px] ${
+                      className={`flex items-start h-fit rounded-[20px] max-w-full break-words ${
                         highlightedMessageIndex === index
                           ? "bg-yellow-100 border border-yellow-300"
                           : "bg-white"
@@ -317,9 +317,9 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                               )}
                             </div>
                           )}
-                          <div className="flex flex-col h-fit">
+                          <div className="flex flex-col h-fit max-w-full">
                             {showProfile && (
-                              <div className="flex items-center min-w-fit min-h-fit">
+                              <div className="flex items-center min-w-fit min-h-fit max-w-full">
                                 <span className="font-bold text-lg mr-2">
                                   <span className="text-[#323232] mr-1 text-[16px] font-[700]">
                                     {msg.nickname}
@@ -337,7 +337,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
                                 showProfile ? "" : "ml-14"
                               } mb-0 h-[25px]"`}
                             >
-                              <p className="text-gray-700 mb-0">
+                              <p className="text-gray-700 mb-0 max-w-[680px] break-words">
                                 {msg.content}
                               </p>
                             </div>
