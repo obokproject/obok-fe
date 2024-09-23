@@ -228,7 +228,7 @@ const LandingPage: React.FC = () => {
             </div>
           </section>
 
-          <section className="pb-40">
+          {/* <section className="pb-40">
             <div className="relative mb-10 z-10 w-full max-w-4xl mx-auto">
               <div className="w-[800px] h-[440px] bg-[#DEE2E6] rounded-2xl overflow-hidden mx-auto">
                 <iframe
@@ -240,7 +240,7 @@ const LandingPage: React.FC = () => {
                 ></iframe>
               </div>
             </div>
-          </section>
+          </section> */}
         </main>
 
         {/* 스크롤버튼 */}

@@ -109,20 +109,8 @@ const AdminPage: React.FC = () => {
   }, [selectedYear, isLoggedIn, isAdmin, fetchMonthlySignups]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center">
-        <img src="https://a.top4top.net/p_1990j031.gif" alt="loading"></img>
-      </div>
-    );
+    return <div className="flex justify-center items-center">loading</div>;
   }
-
-  // if (!isLoggedIn) {
-  //   return <Navigate to="/" />;
-  // }
-
-  // if (!isAdmin) {
-  //   return <Navigate to="/" />;
-  // }
 
   const handleDeleteUser = async (id: string) => {
     if (window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) {

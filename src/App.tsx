@@ -46,11 +46,7 @@ const AppContent: React.FC = () => {
   } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center">
-        <img src="https://a.top4top.net/p_1990j031.gif" alt="loading"></img>
-      </div>
-    );
+    return <div className="flex justify-center items-center">loading</div>;
   }
 
   return (
