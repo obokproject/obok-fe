@@ -111,7 +111,7 @@ const AdminPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center">
-        <img src="http://a.top4top.net/p_1990j031.gif" alt="loading"></img>
+        <img src="https://a.top4top.net/p_1990j031.gif" alt="loading"></img>
       </div>
     );
   }
