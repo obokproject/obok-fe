@@ -1,10 +1,22 @@
 .kanban-card {
   position: relative;
-  background-color: #ffd54f; /* 카드 배경색 */
-  border-radius: 10px; /* 카드 모서리 둥글게 */
+  border-radius: 10px;
   padding: 10px 15px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+}
+
+.kanban-card {
+  background-color: #ffd54f; /* 카드 배경색 */
+}
+/* 두 번째 색상 */
+.kanban-card:nth-child(3n-1) {
+  background-color: #81c784;
+}
+
+/* 세 번째 색상 */
+.kanban-card:nth-child(3n) {
+  background-color: #64b5f6;
 }
 
 .kanban-card::after {
@@ -14,7 +26,7 @@
   right: 0;
   width: 20px;
   height: 20px;
-  background: linear-gradient(135deg, transparent 50%, #e6c046 50%);
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.1) 50%);
   border-bottom-right-radius: 10px;
   box-shadow: -2px -2px 3px rgba(0, 0, 0, 0.1);
 }

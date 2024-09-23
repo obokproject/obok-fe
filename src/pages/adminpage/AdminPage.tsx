@@ -109,7 +109,11 @@ const AdminPage: React.FC = () => {
   }, [selectedYear, isLoggedIn, isAdmin, fetchMonthlySignups]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <img src="http://a.top4top.net/p_1990j031.gif" alt="loading"></img>
+      </div>
+    );
   }
 
   // if (!isLoggedIn) {
