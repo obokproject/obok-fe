@@ -308,7 +308,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className="h-[470px] flex-1 pr-2"
+                          className="h-[430px] flex-1 pr-2"
                         >
                           {section.cards.map((card, index) => (
                             <Draggable
@@ -396,7 +396,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           </DragDropContext>
         </div>
 
-        <div className="w-full border-2 border-[#FFC107] rounded-[20px] bg-white">
+        <div className="w-full p-4 border-2 border-[#FFC107] rounded-[20px] bg-white">
           {members.length > 0 ? (
             <RoomInfo
               uuid={roomId}
