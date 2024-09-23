@@ -89,7 +89,7 @@ const MainPage: React.FC = () => {
   if (loading)
     return (
       <div className="flex justify-center items-center">
-        <img src="http://a.top4top.net/p_1990j031.gif" alt="loading"></img>
+        <img src="https://a.top4top.net/p_1990j031.gif" alt="loading"></img>
       </div>
     ); // 로딩 중 표시
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
@@ -383,8 +383,8 @@ const MainPage: React.FC = () => {
       />
       <CustomModal
         show={showFullModal}
-        title="참가 불가"
-        body="해당 방은 이미 최대 인원입니다."
+        title="현재 방은 만석입니다."
+        body=""
         onClose={() => setShowFullModal(false)} // 모달 닫기
         onConfirm={() => {
           setShowFullModal(false); // 모달 닫기
