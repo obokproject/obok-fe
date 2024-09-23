@@ -44,6 +44,8 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   const [showExitModal, setShowExitModal] = useState(false); // 나가기모달
   const [showRoomClosedModal, setShowRoomClosedModal] = useState(false); // 방 종료 모달 상태
   const [roomClosedMessage, setRoomClosedMessage] = useState(""); // 방 종료 메시지
+  const [showExplainChatModal, setShowExplainChatModal] = useState(false);
+  const [showExplainKanbanModal, setShowExplainKanbanModal] = useState(false);
 
   // 방 정보를 서버로부터 가져오는 useEffect
   useEffect(() => {
@@ -118,7 +120,12 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   }, [timeLeft, socket, uuid]);
 
   useEffect(() => {
-    if (socket && roomData && roomData.status !== "open") {
+    if (
+      socket &&
+      roomData &&
+      roomData.status !== "open" &&
+      members.length > 0
+    ) {
       // 현재 호스트가 존재하는지 확인
       const hostExists = members.some(
         (member) => member.role === "host" && !member.deletedAt
@@ -183,6 +190,15 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     navigate("/main"); // 메인 페이지로 리디렉션
   };
 
+  // 도움말버튼눌렀을때 칸반보드와 챗보드 따로 처리
+  const handleHelpClick = () => {
+    if (roomData?.type === "kanban") {
+      setShowExplainKanbanModal(true);
+    } else {
+      setShowExplainChatModal(true);
+    }
+  };
+
   // roomData가 null이면 로딩 상태를 표시
   if (!roomData) {
     return <div>Loading...</div>;
@@ -192,110 +208,127 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     : members[0];
 
   return (
-    <div className="flex justify-between gap-0 items-start p-[10px] pl-[10px] rounded-[20px]">
-      {/* 1행 1열: 방의 제목 섹션 */}
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-[12px] pl-[10px]">
-          <img
-            src="/images/Union.png"
-            alt="union"
-            className="w-[24px] h-[24px] object-contain scale-125"
-          />
-          <h2 className="text-[#323232] text-[24px] font-bold leading-[36px] mt-1 font-['Noto Sans KR']">
-            {roomData.title}
-          </h2>
-        </div>
-
-        {/* 1행 2열: 현재 사용자 프로필, 닉네임, 직업 정보 */}
-        {currentMember && (
-          <div className="flex items-center gap-[8px] mt-[10px]">
-            <div className="w-[40px] h-[40px] relative">
-              <img
-                src={roomData.hostProfileImage || "/images/user-profile.png"}
-                alt="profile"
-                className="w-full h-full rounded-full object-cover"
-              />
-              <img
-                src="/images/crown.png"
-                className="w-[16px] h-[16px] absolute -top-1 -right-1"
-                alt="Crown"
-              />
-            </div>
-            <div className="w-[160px]">
-              <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
-                {roomData.hostNickname}
-              </div>
-              <div
-                className={`text-[16px] font-semibold font-['Pretendard'] ${
-                  roomData.type === "kanban"
-                    ? "text-[#AF7606]"
-                    : "text-[#A6046D]"
-                }`}
-              >
-                {roomData.hostJob}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 1행 2열 */}
-      <div className="flex flex-col items-start h-full gap-[25px] pt-2">
-        {/* 1행 2열 1행: 참여자 수 */}
-        <div className="flex items-center gap-[8px]">
-          <img
-            src="/images/person.png"
-            alt="person"
-            className="w-[24px] h-[24px]"
-          />
-          <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
-            {roomData.member}/{roomData.maxMember}
-          </span>
-        </div>
-
-        {/* 1행 2열 2행: 남은 시간 */}
-        <div className="flex items-center gap-[8px] mt-[10px]">
-          <img
-            src="/images/alarm.png"
-            alt="alarm"
-            className="w-[24px] h-[24px]"
-          />
-          <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
-            {formatTimeLeft(timeLeft)}
-          </span>
-        </div>
-      </div>
-
-      {/* 1행 3열: 방의 키워드 섹션 */}
-      <div className="flex items-start gap-[10px] h-full pt-2">
-        {/* 아이콘 */}
-        <div className="flex-shrink-0">
-          <img
-            src="/images/tags.png"
-            alt="tags"
-            className="w-[24px] h-[24px]"
-          />
-        </div>
-
-        {/* 키워드 리스트 */}
+    <>
+      <div className="flex justify-between items-start p-[10px] rounded-[20px]">
+        {/* 왼쪽 섹션: 방 제목, 호스트 정보 */}
         <div className="flex flex-col">
-          {roomData.keywords.map((keyword, index) => (
-            <span
-              key={index}
-              className="block text-[#323232] text-[16px] font-medium leading-[22.4px] font-['Noto Sans KR']"
-            >
-              #{keyword}
-            </span>
-          ))}
-        </div>
-      </div>
+          <div className="flex items-center gap-[12px] pl-[10px]">
+            <img
+              src="/images/Union.png"
+              alt="union"
+              className="w-[24px] h-[24px] object-contain scale-125"
+            />
+            <h2 className="text-[#323232] text-[24px] font-bold leading-[36px] mt-1 font-['Noto Sans KR']">
+              {roomData.title}
+            </h2>
+          </div>
 
-      {/* 1행 4열: 나가기 버튼 */}
-      <div className="flex flex-col justify-end h-full mr-[10px]">
-        <div className="w-[100px] p-[8px] mt-[50px]">
+          {/* 현재 사용자 프로필, 닉네임, 직업 정보 */}
+          {currentMember && (
+            <div className="flex items-center gap-[8px] mt-[10px]">
+              <div className="w-[40px] h-[40px] relative">
+                <img
+                  src={roomData.hostProfileImage || "/images/user-profile.png"}
+                  alt="profile"
+                  className="w-full h-full rounded-full object-cover"
+                />
+                <img
+                  src="/images/crown.png"
+                  className="w-[16px] h-[16px] absolute -top-1 -right-1"
+                  alt="Crown"
+                />
+              </div>
+              <div className="w-[160px]">
+                <div className="text-[16px] font-semibold text-[#323232] font-['Pretendard']">
+                  {roomData.hostNickname}
+                </div>
+                <div
+                  className={`text-[16px] font-semibold font-['Pretendard'] ${
+                    roomData.type === "kanban"
+                      ? "text-[#AF7606]"
+                      : "text-[#A6046D]"
+                  }`}
+                >
+                  {roomData.hostJob}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 중앙 섹션: 참여자 수, 남은 시간 */}
+        <div className="flex flex-col items-start gap-[25px] pt-2">
+          {/*  참여자 수 */}
+          <div className="flex items-center gap-[8px]">
+            <img
+              src="/images/person.png"
+              alt="person"
+              className="w-[24px] h-[24px]"
+            />
+            <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
+              {roomData.member}/{roomData.maxMember}
+            </span>
+          </div>
+
+          {/* 남은 시간 */}
+          <div className="flex items-center gap-[8px] ">
+            <img
+              src="/images/alarm.png"
+              alt="alarm"
+              className="w-[24px] h-[24px]"
+            />
+            <span className="text-[16px] font-bold text-[#323232] font-['Noto Sans KR']">
+              {formatTimeLeft(timeLeft)}
+            </span>
+          </div>
+        </div>
+
+        {/* 방의 키워드 섹션 */}
+        <div className="flex items-start gap-[10px] pt-2">
+          {/* 아이콘 */}
+          <div className="flex-shrink-0">
+            <img
+              src="/images/tags.png"
+              alt="tags"
+              className="w-[24px] h-[24px]"
+            />
+          </div>
+
+          {/* 키워드 리스트 */}
+          <div className="flex flex-col">
+            {roomData.keywords.map((keyword, index) => (
+              <span
+                key={index}
+                className="block text-[#323232] text-[16px] font-medium leading-[22.4px] font-['Noto Sans KR']"
+              >
+                #{keyword}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* 오른쪽 섹션: 도움말, 나가기 버튼 */}
+        <div className="flex flex-col gap-[10px] ">
+          {/* 도움말 버튼 */}
+          <button
+            onClick={handleHelpClick}
+            className={`w-full h-[32px] rounded-[30px] flex items-center justify-center m-2 ${
+              roomData.type === "kanban" ? "bg-[#FFC107]" : "bg-[#E4606D]"
+            }`}
+          >
+            <img
+              src="/images/info-circle.png"
+              alt="info"
+              className="w-[16px] h-[16px]"
+            />
+            <span className="text-[#FCF8FC] text-[14px] font-bold font-['Pretendard'] m-1">
+              도움말
+            </span>
+          </button>
+          {/* 나가기 버튼 */}
           <button
             onClick={handleLeaveRoom}
-            className={`w-full h-[32px] rounded-[30px] flex items-center justify-center gap-[5px] ${
+            className={`w-full h-[32px] rounded-[30px] flex items-center justify-center m-2  ${
               roomData.type === "kanban" ? "bg-[#FFC107]" : "bg-[#E4606D]"
             }`}
           >
@@ -304,12 +337,63 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
               alt="logout"
               className="w-[16px] h-[16px]"
             />
-            <span className="text-[#FCF8FC] text-[14px] font-bold font-['Pretendard']">
+            <span className="text-[#FCF8FC] text-[14px] font-bold font-['Pretendard'] m-1">
               나가기
             </span>
           </button>
         </div>
       </div>
+
+      {/* 칸반 도움말 모달 */}
+      {showExplainKanbanModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-[50px] p-10 min-w-md w-[600px]">
+            <div className="mb-4 whitespace-pre-wrap">
+              {`방장은 아이디어 카드를 드래그 앤 드랍해서 원하는 섹션으로 옮길 수 있습니다.
+
+아이디어 카드는 한번에 3개까지만 만들 수 있어요!
+4개넘게 만들기 위해선 방장이 카드를 옮겨줘야 합니다.
+
+한 섹션에는 최대 20개까지의 카드만 있을 수 있습니다.`}
+            </div>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowExplainKanbanModal(false)}
+                className="w-[100px] rounded-full py-2 text-lg bg-[#ffb662] text-[#323232]"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 채팅 도움말 모달 */}
+      {showExplainChatModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-[50px] p-10 min-w-md w-[600px]">
+            <div className="mb-4 whitespace-pre-wrap">
+              {`# 를 써서 키워드를 생성 할 수 있습니다.
+(예시: #키워드)
+
+생성된 키워드는 키워드 색인창에 등록되고
+등록된 키워드를 클릭해서 해당 키워드가 포함된 본문으로 이동 할 수 있습니다.
+(중복 키워드 등록은 안돼요!)
+
+생성된 키워드는 방장이 임의로 삭제 할 수 있습니다.
+복구는 되지 않으니 신중하게!`}
+            </div>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowExplainChatModal(false)}
+                className="w-[100px] rounded-full py-2 text-lg bg-[#ffb662] text-[#323232]"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 나가기 모달 */}
       <CustomModal
@@ -318,7 +402,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
         body="인원이 가득차면 재입장이 불가능 할 수 있습니다."
         onClose={() => setShowExitModal(false)} // 취소 버튼 클릭 시 모달 닫기
         onConfirm={handleConfirmLeave} // 확인 버튼 클릭 시 방 나가기 처리
-        confirmText="나가기"
+        confirmText="확인"
         cancelText="취소"
       />
 
@@ -331,7 +415,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
         onConfirm={handleRoomClosedConfirm} // 확인을 누르면 무조건 navigate
         confirmText="확인"
       />
-    </div>
+    </>
   );
 };
 
