@@ -87,11 +87,7 @@ const MainPage: React.FC = () => {
   };
 
   if (loading)
-    return (
-      <div className="flex justify-center items-center">
-        <img src="https://a.top4top.net/p_1990j031.gif" alt="loading"></img>
-      </div>
-    ); // 로딩 중 표시
+    return <div className="flex justify-center items-center">loading</div>; // 로딩 중 표시
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
 
   return (
