@@ -122,39 +122,6 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
     }
   }, [timeLeft, socket, uuid, user?.id, roomData?.user_id]);
 
-  useEffect(() => {
-    if (
-      socket &&
-      roomData &&
-      roomData.status !== "open" &&
-      members.length > 0
-    ) {
-      // 1. 현재 호스트가 존재하는지 확인 (실시간으로 members 배열을 체크)
-      const hostPresent = members.some(
-        (member) => member.role === "host" && !member.deletedAt
-      );
-
-      // 2. 실시간 호스트 상태를 로컬 스토리지에 저장
-      localStorage.setItem("hostExists", hostPresent.toString());
-
-      // 3. 호스트가 없으면 2초 후 다시 확인
-      if (!hostPresent) {
-        setTimeout(() => {
-          // 2초 후에 다시 호스트가 존재하는지 확인
-          const hostStillAbsent = members.some(
-            (member) => member.role === "host" && !member.deletedAt
-          );
-
-          // 여전히 호스트가 없다면 roomClosed 이벤트 전송
-          if (!hostStillAbsent) {
-            console.log("Host is still absent. Sending roomClosed event.");
-            socket.emit("roomClosed", { roomId: uuid });
-          }
-        }, 2000); // 2초 후 재확인
-      }
-    }
-  }, [members, roomData, socket, uuid]);
-
   // 서버에서 방이 닫혔다는 알림을 받았을 때 처리하는 useEffect 추가
   useEffect(() => {
     if (socket) {
