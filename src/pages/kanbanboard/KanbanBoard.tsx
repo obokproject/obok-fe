@@ -143,6 +143,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = async (result: DropResult) => {
     console.log(result);
+
     const { source, destination } = result;
 
     // 유효하지 않은 목적지인 경우 (예: 보드 밖으로 드래그) 함수 종료
@@ -167,23 +168,39 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       destSection.cards.splice(destination.index, 0, movedCard);
 
       try {
-        // 실시간 업데이트를 위해 소켓 이벤트 발생
-        socket.current?.emit("boardUpdate", {
-          roomId,
-          sections: newSections,
-          movedCard: {
-            id: movedCard.id,
-            newSectionId: destination.droppableId,
-            newIndex: destination.index,
-          },
-        });
         setSections(newSections);
+        // 소켓 연결 확인
+        if (!socket.current?.connected) {
+          throw new Error("Socket is not connected");
+        }
+
+        // 소켓 이벤트를 Promise로 감싸서 비동기 처리
+        await new Promise<void>((resolve, reject) => {
+          socket.current?.emit(
+            "boardUpdate",
+            {
+              roomId,
+              sections: newSections,
+              movedCard: {
+                id: movedCard.id,
+                newSectionId: destination.droppableId,
+                newIndex: destination.index,
+              },
+            },
+            (response: any) => {
+              if (response.success) {
+                resolve();
+              } else {
+                reject(new Error("Server update failed"));
+              }
+            }
+          );
+        });
       } catch (error) {
         console.error("Error moving card:", error);
         alert("카드 이동에 실패했습니다.");
         // 에러 발생 시 원래 상태로 되돌리기
-        const revertedSections = Array.from(sections);
-        setSections(revertedSections);
+        setSections(Array.from(sections));
       }
     }
   };
