@@ -116,12 +116,13 @@ const MainPage: React.FC = () => {
                 setFilter("all");
                 setCurrentPage(1);
               }}
-              className="me-3 text-[20px] font-[500] w-[60px] h-[41.334px] p-0"
+              className="me-3 font-[500] w-[60px] h-[41.334px] p-0"
               style={{
                 backgroundColor: filter === "all" ? "#323232" : "#E9ECEF",
                 borderColor: filter === "all" ? "#323232" : "#E9ECEF",
                 color: filter === "all" ? "white" : "#323232",
                 borderRadius: "30px",
+                fontSize: "20px",
               }}
             >
               전체
@@ -144,13 +145,13 @@ const MainPage: React.FC = () => {
               title="브레인스토밍 채팅"
               data-bs-content="채팅"
             >
-              <div className="w-[130px] p-3 h-[40px] flex gap-2 justify-center items-center">
+              <div className="w-[130px] p-3 h-[40px] flex gap-2 justify-center items-center text-[20px]">
                 <img
                   src="/images/Vector.png"
                   alt="Vector"
                   className="w-[24px] h-[24px]"
                 />
-                베리 톡
+                베리톡
               </div>
             </Button>{" "}
             <Button
@@ -171,13 +172,13 @@ const MainPage: React.FC = () => {
               title="포스트잇 보드"
               data-bs-content="칸반보드 형태"
             >
-              <div className="w-[130px] p-3 h-[40px] flex gap-2 justify-center items-center">
+              <div className="w-[130px] p-2 h-[40px] flex gap-2 justify-center items-center text-[20px]">
                 <img
                   src="/images/layout-kanban.png"
                   alt="layout-kanban"
                   className="w-[24px] h-[24px]"
                 />
-                베리 보드
+                베리보드
               </div>
             </Button>
           </div>
@@ -298,7 +299,7 @@ const MainPage: React.FC = () => {
             </div>
           ) : (
             <div className="w-full flex justify-center mt-0">
-              <p className="font-[30px] mt-[150px]">
+              <p className="text-[30px] mt-[150px]">
                 다들 생각중인가봐요...함께 새로운 주제로 대화해 볼까요?
               </p>
             </div>
