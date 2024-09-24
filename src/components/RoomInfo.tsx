@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import CustomModal from "./CustomModal";
@@ -40,6 +41,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   isHost,
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showExitModal, setShowExitModal] = useState(false); // 나가기모달
@@ -103,7 +105,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
           content = "종료까지 시간이 30초 남았습니다.";
         else if (roundedTimeLeft === 0) content = "채팅이 종료되었습니다.";
 
-        if (content) {
+        if (content && user?.id === roomData?.user_id) {
           socket.emit("message", { roomId: uuid, userId: 99999, content }); // 일반 메시지와 동일하게 전송
 
           // 1초 후 roomClosed 이벤트 전송
@@ -118,7 +120,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
 
       return () => clearInterval(timer); // 컴포넌트가 언마운트될 때 타이머 정리
     }
-  }, [timeLeft, socket, uuid]);
+  }, [timeLeft, socket, uuid, user?.id, roomData?.user_id]);
 
   useEffect(() => {
     if (
@@ -127,18 +129,28 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
       roomData.status !== "open" &&
       members.length > 0
     ) {
-      // 현재 호스트가 존재하는지 확인
-      const hostExists = members.some(
+      // 1. 현재 호스트가 존재하는지 확인 (실시간으로 members 배열을 체크)
+      const hostPresent = members.some(
         (member) => member.role === "host" && !member.deletedAt
       );
 
-      // 호스트가 존재하지 않고 방 상태가 open이 아닐 때
-      if (!hostExists) {
-        console.log("Host is no longer present. Sending roomClosed event.");
+      // 2. 실시간 호스트 상태를 로컬 스토리지에 저장
+      localStorage.setItem("hostExists", hostPresent.toString());
+
+      // 3. 호스트가 없으면 2초 후 다시 확인
+      if (!hostPresent) {
         setTimeout(() => {
-          socket.emit("roomClosed", { roomId: uuid });
-          console.log("Room closed event sent to the server.");
-        }, 1000); // 1초 지연 후 전송
+          // 2초 후에 다시 호스트가 존재하는지 확인
+          const hostStillAbsent = members.some(
+            (member) => member.role === "host" && !member.deletedAt
+          );
+
+          // 여전히 호스트가 없다면 roomClosed 이벤트 전송
+          if (!hostStillAbsent) {
+            console.log("Host is still absent. Sending roomClosed event.");
+            socket.emit("roomClosed", { roomId: uuid });
+          }
+        }, 2000); // 2초 후 재확인
       }
     }
   }, [members, roomData, socket, uuid]);
@@ -357,7 +369,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
               {`방장은 아이디어 카드를 드래그 앤 드랍해서 원하는 섹션으로 옮길 수 있습니다.
 
 아이디어 카드는 한번에 3개까지만 만들 수 있어요!
-4개넘게 만들기 위해선 방장이 카드를 옮겨줘야 합니다.
+4개 이상 만들기 위해선 방장이 카드를 옮겨줘야 합니다.
 
 한 섹션에는 최대 20개까지의 카드만 있을 수 있습니다.`}
             </div>
