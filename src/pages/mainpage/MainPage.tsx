@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import CustomModal from "../../components/CustomModal";
+import { Loader } from "lucide-react";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
