@@ -20,6 +20,7 @@ import AboutPage from "./pages/about/AboutPage";
 import ScrolltoTop from "./components/ScrolltoTop";
 import AdminPage from "./pages/adminpage/AdminPage";
 import axios from "axios";
+import { Loader } from "lucide-react";
 
 axios.defaults.withCredentials = true;
 
@@ -46,7 +47,11 @@ const AppContent: React.FC = () => {
   } = useAuth();
 
   if (isLoading) {
-    return <div className="flex justify-center items-center">loading</div>;
+    return (
+      <div className="flex justify-center items-center ">
+        <Loader /> Loading...
+      </div>
+    );
   }
 
   return (

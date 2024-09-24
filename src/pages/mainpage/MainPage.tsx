@@ -5,6 +5,7 @@ import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import CustomModal from "../../components/CustomModal";
+import { Loader } from "lucide-react";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -87,7 +88,11 @@ const MainPage: React.FC = () => {
   };
 
   if (loading)
-    return <div className="flex justify-center items-center">loading</div>; // 로딩 중 표시
+    return (
+      <div className="flex justify-center items-center">
+        <Loader /> Loading...
+      </div>
+    ); // 로딩 중 표시
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
 
   return (

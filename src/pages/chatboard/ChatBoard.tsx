@@ -5,6 +5,7 @@ import ChatKeyword from "../../components/ChatKeyword"; // 채팅 키워드 컴�
 import RoomInfo from "../../components/RoomInfo"; // 방 정보 컴포넌트
 import MemberList from "../../components/MemberList"; // 멤버리스트 컴포넌트
 import io from "socket.io-client"; // socket.io-client 라이브러리
+import { Loader } from "lucide-react";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -226,7 +227,12 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
     }
   }, [messages]); // messages가 변경될 때마다 실행
 
-  if (loading) return <div>Loading...</div>; // 로딩 중 표시
+  if (loading)
+    return (
+      <div className="flex justify-center items-center">
+        <Loader /> Loading...
+      </div>
+    ); // 로딩 중 표시
   if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
   if (!room) return <div>Room not found</div>; // 방 정보가 없을 때 표시
 

@@ -13,6 +13,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Loader } from "lucide-react";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -109,7 +110,11 @@ const AdminPage: React.FC = () => {
   }, [selectedYear, isLoggedIn, isAdmin, fetchMonthlySignups]);
 
   if (loading) {
-    return <div className="flex justify-center items-center">loading</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <Loader /> Loading...
+      </div>
+    );
   }
 
   const handleDeleteUser = async (id: string) => {

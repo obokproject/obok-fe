@@ -4,19 +4,7 @@
   padding: 10px 15px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-}
-
-.kanban-card {
   background-color: #ffd54f; /* 카드 배경색 */
-}
-/* 두 번째 색상 */
-.kanban-card:nth-child(3n-1) {
-  background-color: #81c784;
-}
-
-/* 세 번째 색상 */
-.kanban-card:nth-child(3n) {
-  background-color: #64b5f6;
 }
 
 .kanban-card::after {

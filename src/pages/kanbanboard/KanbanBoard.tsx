@@ -11,6 +11,7 @@ import RoomInfo from "../../components/RoomInfo";
 import MemberList from "../../components/MemberList";
 import io from "socket.io-client"; // socket.io-client 라이브러리
 import "./KanbanCard.css";
+import { Loader } from "lucide-react";
 
 const apiUrl = process.env.REACT_APP_API_URL || "";
 
@@ -164,7 +165,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     if (sourceSection && destSection) {
       const [movedCard] = sourceSection.cards.splice(source.index, 1);
       destSection.cards.splice(destination.index, 0, movedCard);
-      setSections(newSections);
 
       try {
         // 실시간 업데이트를 위해 소켓 이벤트 발생
@@ -174,8 +174,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
           movedCard: {
             id: movedCard.id,
             newSectionId: destination.droppableId,
+            newIndex: destination.index,
           },
         });
+        setSections(newSections);
       } catch (error) {
         console.error("Error moving card:", error);
         alert("카드 이동에 실패했습니다.");
@@ -288,7 +290,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     };
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center">
+        <Loader /> Loading...
+      </div>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (

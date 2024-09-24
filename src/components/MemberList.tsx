@@ -1,3 +1,4 @@
+import { Loader } from "lucide-react";
 import React from "react";
 
 interface Member {
@@ -44,7 +45,9 @@ const MemberList: React.FC<MemberListProps> = ({ members = [] }) => {
           </div>
         ))
       ) : (
-        <div className="text-gray-500 text-center">멤버 로딩중...</div>
+        <div className="flex justify-center items-center">
+          <Loader /> Loading...
+        </div>
       )}
     </div>
   );

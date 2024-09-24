@@ -7,7 +7,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { BsCaretLeft, BsCaretRight } from "react-icons/bs";
 import ChatbotButton from "../../components/ChatbotButton";
 
-// 슬라이드 이미지 데이터 (실제 이미지 URL로 교체 필요)
+// 슬라이드 이미지 데이터
 const slides = [
   {
     url: "/images/landing-veryfind.png",

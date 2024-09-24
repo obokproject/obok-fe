@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import CustomModal from "./CustomModal";
+import { Loader } from "lucide-react";
 
 interface Member {
   nickname: string;
@@ -201,7 +202,11 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
 
   // roomData가 null이면 로딩 상태를 표시
   if (!roomData) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <Loader /> Loading...
+      </div>
+    );
   }
   const currentMember = isHost
     ? members.find((m) => m.role === "host")
