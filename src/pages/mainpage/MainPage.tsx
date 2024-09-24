@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Row } from "react-bootstrap";
+import { Container, Button, Row, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useRoom } from "../../hooks/useRoom";
 import CreateRoomModal from "../../components/CreateRoomModal";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import CustomModal from "../../components/CustomModal";
-import { Loader } from "lucide-react";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -382,17 +381,34 @@ const MainPage: React.FC = () => {
         onHide={() => setShowCreateModal(false)}
         onCreate={handleCreateRoom}
       />
-      <CustomModal
+
+      <Modal
+        className="rounded-[50px] border-none"
         show={showFullModal}
-        title="현재 방은 만석입니다."
-        body=""
-        onClose={() => setShowFullModal(false)} // 모달 닫기
-        onConfirm={() => {
-          setShowFullModal(false); // 모달 닫기
-          window.location.reload(); // 새로고침
-        }}
-        confirmText="확인"
-      />
+        onHide={() => setShowFullModal(false)} // 모달 닫기
+        keyboard={false}
+        dialogClassName="rounded-[30px] overflow-hidden border-none"
+        backdropClassName="" // Tailwind 클래스로 배경 설정
+        style={{ border: 100 }}
+      >
+        <div className="overflow-hidden bg-white flex flex-col items-center px-[98px] py-[25px] gap-4">
+          {/* Header와 Body를 합친 부분 */}
+          <div className="flex justify-center items-center">
+            <div className="font-bold text-[26px]">현재 방은 만석입니다.</div>
+          </div>
+
+          <button
+            className="w-[64px] rounded-full px-2 text-[20px] font-medium"
+            onClick={() => {
+              setShowFullModal(false); // 모달 닫기
+              window.location.reload(); // 새로고침
+            }}
+            style={{ backgroundColor: "#ffb561" }}
+          >
+            확인
+          </button>
+        </div>
+      </Modal>
     </Container>
   );
 };
