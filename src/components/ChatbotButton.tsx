@@ -91,8 +91,10 @@ const ChatbotButton: React.FC = () => {
                 }`}
               >
                 <span
-                  className={`inline-block p-2 px-3 rounded-[20px]  ${
-                    msg.sender === "user" ? "bg-blue-100 " : "bg-gray-200 mr-10"
+                  className={`inline-block p-2 px-3 rounded-[20px]   ${
+                    msg.sender === "user"
+                      ? "bg-blue-100 font-bold"
+                      : "bg-gray-200 mr-10 font-bold"
                   }`}
                 >
                   {msg.text}
@@ -106,25 +108,25 @@ const ChatbotButton: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleOptionClick("라즈베리란?")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
+                  className="bg-gray-200 hover:bg-gray-300 rounded-[30px] p-2 text-lg"
                 >
                   라즈베리란?
                 </button>
                 <button
                   onClick={() => handleOptionClick("이용문의")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
+                  className="bg-gray-200 hover:bg-gray-300 rounded-[30px] p-2 text-lg"
                 >
                   이용문의
                 </button>
                 <button
                   onClick={() => handleOptionClick("상담문의")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2 text-lg"
+                  className="bg-gray-200 hover:bg-gray-300 rounded-[30px] p-2 text-lg"
                 >
                   상담문의
                 </button>
                 <button
                   onClick={() => handleOptionClick("탈퇴문의")}
-                  className="bg-gray-200 hover:bg-gray-300 rounded p-2"
+                  className="bg-gray-200 hover:bg-gray-300 rounded-[30px] p-2"
                 >
                   탈퇴문의
                 </button>
@@ -132,7 +134,7 @@ const ChatbotButton: React.FC = () => {
             ) : (
               <button
                 onClick={handleReset}
-                className="w-full bg-gray-200 hover:bg-gray-300 rounded p-2 text-[18px] flex items-center justify-center"
+                className="w-full bg-gray-200 hover:bg-gray-300 rounded-[30px] p-2 text-[18px] flex items-center justify-center"
               >
                 <ArrowLeft size={20} className="mr-2" />
                 처음으로 돌아가기

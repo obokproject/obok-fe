@@ -81,7 +81,7 @@ const Footer: React.FC = () => {
               style={{ textDecoration: "none" }}
             >
               <div
-                className="p-2 flex items-center bg-[#ffb561] rounded-full  "
+                className="pr-2 flex pl-3 pt-2 pb-2 items-center bg-[#ffb561] rounded-full  "
                 style={{ width: "136px" }}
               >
                 Family Sites <Plus />
