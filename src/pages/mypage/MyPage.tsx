@@ -94,24 +94,15 @@ const MyPage: React.FC = () => {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log("Selected file:", file);
 
     if (file && file.size <= 10 * 1024 * 1024) {
-      console.log("File size OK:", file.size, "bytes");
       const reader = new FileReader();
       const img = new window.Image();
 
       reader.onloadend = (e) => {
-        console.log("FileReader loadend");
         img.src = e.target?.result as string;
 
         img.onload = () => {
-          console.log(
-            "Image loaded, original size:",
-            img.width,
-            "x",
-            img.height
-          );
           const canvas = document.createElement("canvas");
           const maxWidth = 1200; // 최대 가로 크기
           const maxHeight = 1200; // 최대 세로 크기
@@ -139,19 +130,12 @@ const MyPage: React.FC = () => {
 
           // canvas를 base64로 변환
           const base64Image = canvas.toDataURL("image/webp", 0.8);
-          console.log("Base64 image length:", base64Image.length);
 
           setProfile(base64Image);
-          console.log("업로드된 이미지 (base64):", base64Image); // 리사이즈된 base64 데이터 확인
         };
       };
       reader.readAsDataURL(file);
     } else {
-      console.log(
-        "File size exceeded or no file selected:",
-        file?.size,
-        "bytes"
-      );
       alert("이미지 크기는 3MB 이하여야 합니다.");
     }
   };
@@ -159,7 +143,6 @@ const MyPage: React.FC = () => {
   // 서버에 이미지 삭제 요청
   const handleImageDelete = () => {
     setProfile(null);
-    console.log("프로필상태 : ", profile);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -189,8 +172,6 @@ const MyPage: React.FC = () => {
               profile_image: base64Image, // base64로 변환된 이미지를 전송
             };
 
-            console.log("전송할 데이터:", payload);
-
             const response = await fetch(`${apiUrl}/api/auth/update`, {
               method: "PUT",
               headers: {
@@ -202,10 +183,9 @@ const MyPage: React.FC = () => {
             if (!response.ok) {
               throw new Error("HTTP error!");
             }
-
+            // eslint-disable-next-line
             const data = await response.json();
             if (isMounted) {
-              console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
               setShowConfirmModal(false);
               navigate("/main");
               window.location.reload(); // 페이지 새로고침
@@ -222,8 +202,6 @@ const MyPage: React.FC = () => {
             profile_image: base64Image, // 기존 base64 이미지 또는 null
           };
 
-          console.log("전송할 데이터:", payload);
-
           const response = await fetch(`${apiUrl}/api/auth/update`, {
             method: "PUT",
             headers: {
@@ -235,10 +213,9 @@ const MyPage: React.FC = () => {
           if (!response.ok) {
             throw new Error("HTTP error!");
           }
-
+          // eslint-disable-next-line
           const data = await response.json();
           if (isMounted) {
-            console.log("사용자 정보가 성공적으로 저장되었습니다:", data);
             setShowConfirmModal(false);
             navigate("/main");
             window.location.reload(); // 페이지 새로고침

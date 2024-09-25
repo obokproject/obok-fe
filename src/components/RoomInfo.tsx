@@ -112,7 +112,6 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
           if (roundedTimeLeft === 0) {
             setTimeout(() => {
               socket.emit("roomClosed", { roomId: uuid });
-              console.log("Room closed event sent to the server.");
             }, 1000);
           }
         }

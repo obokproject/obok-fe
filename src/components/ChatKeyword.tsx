@@ -21,8 +21,6 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
     if (socket) {
       // 서버로부터 키워드 업데이트 이벤트를 수신
       socket.on("keywordUpdate", (updatedKeywords: string[]) => {
-        console.log("Received updated keywords:", updatedKeywords);
-
         setKeywords((prevKeywords) => {
           // 새로운 키워드를 기존 키워드에 병합하고 중복 제거
           const newKeywords = [...prevKeywords, ...updatedKeywords];
@@ -32,8 +30,6 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
 
       // 방에 처음 입장할 때 서버로부터 이전 키워드를 수신하는 이벤트
       socket.on("previousKeywords", (previousKeywords: string[]) => {
-        console.log("Received previous keywords:", previousKeywords);
-
         setKeywords((prevKeywords) => {
           // 이전 키워드를 기존 키워드에 병합하고 중복 제거
           const newKeywords = [...prevKeywords, ...previousKeywords];
@@ -65,7 +61,6 @@ const ChatKeyword: React.FC<ChatKeywordProps> = ({
             prevKeywords.filter((kw) => kw !== keyword)
           );
         } else {
-          console.error("Failed to delete keyword:", response.error);
         }
       }
     );

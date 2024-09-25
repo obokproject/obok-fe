@@ -54,7 +54,6 @@ const MainPage: React.FC = () => {
 
   // 방 생성 핸들러 함수
   const handleCreateRoom = async (roomData: any) => {
-    console.log("Creating room with data:", roomData);
     try {
       const newRoomId = await createRoom(
         roomData.title, // 방 제목
