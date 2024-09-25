@@ -19,30 +19,44 @@ const Footer: React.FC = () => {
               서울시 강남구 역삼로 160 9층
             </p>
           </Col>
-          <Col md={2} className="mb-3">
+          <Col md={2} className="mb-3 ">
             <h6 className="mb-4 font-bold">바로가기</h6>
-            <ul className="space-y-4">
-              <li>
+            <div className="space-y-4 ml-2">
+              <div>
                 <Link
                   to="https://www.instagram.com/razvery_/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={linkClasses}
                 >
-                  <Instagram className="hover:scale-125" />
+                  <Instagram className="hover:scale-125 w-6 h-6" />
                 </Link>
-              </li>
-              <li>
+              </div>
+              <div>
+                <Link
+                  to="http://www.jsoftware.co.kr/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClasses}
+                >
+                  <img
+                    src="https://lh3.googleusercontent.com/a/ACg8ocJko5IpaCBEgAOi76IVaBbN5VWPi5Xg4c47kq9vwZk0Tc3c5Q=s96-c"
+                    className="rounded-full hover:scale-125 w-6 h-6"
+                    alt="jsoftware"
+                  />
+                </Link>
+              </div>
+              <div>
                 <Link to="/about" className={linkClasses}>
                   소개
                 </Link>
-              </li>
-            </ul>
+              </div>
+            </div>
           </Col>
           <Col md={2} className="mb-3">
             <h6 className="mb-4 font-bold"> 법적 고지</h6>
-            <ul className="space-y-4">
-              <li>
+            <div className="space-y-4 ml-2">
+              <div>
                 <Link
                   to="https://glitter-juniper-6f6.notion.site/1b776b68933f4879ad42d758f324950a"
                   className={linkClasses}
@@ -51,18 +65,18 @@ const Footer: React.FC = () => {
                 >
                   이용약관
                 </Link>
-              </li>
-              <li>
+              </div>
+              <div>
                 <Link
                   to="https://glitter-juniper-6f6.notion.site/c1627b068c3d4453abe5fc9f56f49eb9"
-                  className="text-[#323232] hover:text-blue-600 transition-colors duration-200"
+                  className="text-[#323232] hover:text-blue-600 hover:scale-120 transform transition-all duration-200"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   개인정보처리방침
                 </Link>
-              </li>
-            </ul>
+              </div>
+            </div>
           </Col>
         </Row>
         <div className="flex justify-between items-center mt-8">
