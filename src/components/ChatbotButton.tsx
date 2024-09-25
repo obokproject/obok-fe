@@ -63,8 +63,8 @@ const ChatbotButton: React.FC = () => {
 
       {isOpen && (
         <div className="bg-white rounded-[16px] shadow-xl w-96 h-[28rem] flex flex-col overflow-hidden">
-          <div className="bg-[#ffb561] p-4 flex justify-between items-center  h-[64px]">
-            <h3 className="font-bold">문의하기</h3>
+          <div className="bg-[#ffb561] p-4 flex justify-between items-center h-[64px]">
+            <h3 className="font-bold mt-2">문의하기</h3>
 
             <button
               onClick={toggleChat}
@@ -91,10 +91,8 @@ const ChatbotButton: React.FC = () => {
                 }`}
               >
                 <span
-                  className={`inline-block p-2 px-3 rounded-[20px]   ${
-                    msg.sender === "user"
-                      ? "bg-blue-100 font-bold"
-                      : "bg-gray-200 mr-10 font-bold"
+                  className={`inline-block p-2 px-3 rounded-[20px] text-[#323232] ${
+                    msg.sender === "user" ? "bg-blue-100" : "bg-gray-200 mr-10"
                   }`}
                 >
                   {msg.text}
