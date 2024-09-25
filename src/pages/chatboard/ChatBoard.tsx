@@ -56,9 +56,7 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
       // WebSocket 서버에 연결 성공시
       socket.current.on("connect", () => {
-        console.log("Connected to the WebSocket server");
         socket.current?.emit("joinRoom", { roomId, userId: user.id }); // 방에 참여
-        console.log("Joined room:", roomId); // 추가된 콘솔 로그
 
         // 초기 시스템 메시지 추가
 
@@ -72,14 +70,12 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
       // 서버로부터 realRoom 데이터를 수신
       socket.current?.on("realRoom", (realRoom) => {
-        console.log("Received realRoom data from server:", realRoom);
         // roomHostId 상태 업데이트
         setroomHostId(realRoom.userId);
       });
 
       // 서버로부터 메시지 수신
       socket.current?.on("message", (message) => {
-        console.log("Received message:", message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
 
@@ -101,7 +97,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
       // 서버로부터 멤버 업데이트 수신
       socket.current.on("memberUpdate", (updatedMembers) => {
-        console.log("Received member update:", updatedMembers); // 로그로 데이터 확인
         setMembers(updatedMembers); // 멤버 리스트를 상태에 저장
 
         // updatedMembers가 배열이 아닌 경우 예외 처리
@@ -114,7 +109,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
             setIsHost(currentUser?.role === "host");
             clearInterval(intervalId); // 배열로 확인되면 더 이상 재시도하지 않음
           } else {
-            console.log("Waiting for updatedMembers to become an array...");
           }
         }, 500); // 0.5초 간격으로 배열 여부를 계속 확인
       });
@@ -125,10 +119,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       });
 
       socket.current.on("previousMembers", (members) => {
-        console.log(
-          "Received previous members:",
-          JSON.stringify(members, null, 2)
-        );
         setMembers(members); // 이전 멤버 리스트 상태에 저장
       });
 
@@ -149,10 +139,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       (response: any) => {
         if (response.success) {
           const message = response.message;
-
-          // 메시지 인덱스를 찾아서 스크롤 이동
-          console.log("Received message ID from server:", message.id);
-          console.log("Messages in client:", messages);
 
           const messageIndex = messages.findIndex(
             (msg) => msg.id === message.id
@@ -188,7 +174,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
           // 재시도 로직 (최대 재시도 횟수 설정)
           if (retryCount < 3) {
-            console.log(`Retrying... Attempt ${retryCount + 1}`);
             setTimeout(() => {
               scrollToMessage(keyword, retryCount + 1); // 재시도
             }, 2000); // 2초 후에 재시도
@@ -214,7 +199,6 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
       userId: user.id, // 현재 사용자의 ID
       content: newMessage, // 입력한 메시지 내용
     };
-    console.log("Sending message:", message); // 추가된 콘솔 로그
     socket.current.emit("message", message); // 메시지를 서버로 전송
     setNewMessage(""); // 입력창 초기화
   };

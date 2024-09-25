@@ -60,8 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        // 401 에러는 콘솔에 표시하지 않음
-        console.log("사용자가 인증되지 않았습니다.");
       } else {
         // 다른 에러는 콘솔에 표시
         console.error("API Error:", error);
@@ -81,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loginWithGoogle = async () => {
     const url = `${apiUrl}/api/auth/google`;
-    console.log("Redirecting to:", url);
     window.location.href = url;
   };
 

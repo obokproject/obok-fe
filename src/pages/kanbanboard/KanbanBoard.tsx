@@ -68,13 +68,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
       // WebSocket 서버에 연결 성공시
       socket.current.on("connect", () => {
-        console.log("Connected to the WebSocket server");
         socket.current?.emit("joinRoom", { roomId, userId: user.id });
       });
 
       // 서버로부터 realRoom 데이터를 수신
       socket.current?.on("realRoom", (realRoom) => {
-        console.log("Received realRoom data from server:", realRoom);
         // roomHostId 상태 업데이트
         setCardHost(realRoom.userId);
       });
@@ -82,18 +80,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       // 이벤트 리스너 설정
       const setupSocketListeners = () => {
         socket.current?.on("boardUpdate", (updatedSections) => {
-          console.log("Received board update:", updatedSections);
           setSections(updatedSections);
         });
         //이전 보드 불러오기
         socket.current?.on("previousBoardData", (prevSections) => {
-          console.log("Received previous board data:", prevSections);
           setSections(prevSections);
         });
         //멤버 수신
         socket.current?.on("memberUpdate", (updatedMembers) => {
-          console.log("Updated members with roles:", updatedMembers);
-
           // updatedMembers가 배열이 아닌 경우 예외 처리
           const intervalId = setInterval(() => {
             if (Array.isArray(updatedMembers)) {
@@ -104,7 +98,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
               setIsHost(currentUser?.role === "host");
               clearInterval(intervalId); // 배열로 확인되면 더 이상 재시도하지 않음
             } else {
-              console.log("Waiting for updatedMembers to become an array...");
             }
           }, 1000); // 0.5초 간격으로 배열 여부를 계속 확인
         });
@@ -119,9 +112,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         });
 
         // 재연결 성공 시 로직
-        socket.current?.on("reconnect", (attemptNumber) => {
-          console.log("Reconnected on attempt: ", attemptNumber);
-        });
+        socket.current?.on("reconnect", (attemptNumber) => {});
       };
 
       setupSocketListeners();
@@ -142,8 +133,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 드래그 앤 드롭이 끝났을 때 실행되는 함수
   const onDragEnd = async (result: DropResult) => {
-    console.log(result);
-
     const { source, destination } = result;
 
     // 유효하지 않은 목적지인 경우 (예: 보드 밖으로 드래그) 함수 종료
@@ -207,13 +196,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   // 새 카드 추가 함수
   const addCard = async (content: string) => {
-    console.log(content.trim() && user && socket.current != null);
-
     if (content.trim() && user && socket.current != null) {
-      console.log("ok");
       const creationSection = sections.find((section) => section.id === "생성");
-      console.log("creationSection:", creationSection);
-      console.log(!creationSection);
       if (!creationSection) return;
 
       // 생성 섹션 7개 카드 제한 확인
@@ -229,9 +213,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
         (card) => card.userId === user.id
       ).length;
 
-      console.log(userCardCountInCreation);
-      console.log(userCardCountInCreation >= 3);
-
       // 생성 섹션에 2개 이상의 카드가 있으면 추가 불가
       if (userCardCountInCreation >= 3) {
         alert(
@@ -243,8 +224,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
       }
 
       try {
-        console.log("socket.current?.emit:");
-
         //소켓 이벤트 사용
         socket.current?.emit("addCard", {
           roomId,
@@ -283,7 +262,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter" && newCardContent.trim()) {
-      console.log("add card ", newCardContent);
       addCard(newCardContent);
     } else if (e.key === "Escape") {
       setIsAddingCard(false);
