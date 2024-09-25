@@ -5,57 +5,55 @@
 관리자 백오피스 구축으로 직관적인 대시보드로 핵심 지표 실시간 모니터링이 가능하여 사용자 관리가 용이합니다.
 <br>
 
+### 목차
+
+1. 프로젝트 소개
+2. 팀 소개 및 링크
+3. 프로젝트 기획(FE)
+4. 기술 스택 및 라이브러리
+5. 시현 영상(FE)
+6. WBS(FE)
+7. 폴더 구조
+8. 페이지 및 URL 구조(FE)
+9. 시퀀스 다이어그램(BE)
+10. 클래스 다이어그램(BE)
+11. ERD(BE)
+12. AWS배포(BE)
+13. 트러블 슈팅
+14. 회고(BE)
+
 ## 팀 소개
 
 - 기획팀: 김상윤, 윤상수
 - 개발팀: 박초롱, 변윤석
   <br>
+  링크 <br>
+- url: [Razvery 🍓](https://razvery.link/) <br>
+- Frontend: https://github.com/obokproject/razvery-fe <br>
+- Backend: https://github.com/obokproject/be-test <br>
 
 ## 프로젝트 기획
 
+- 경쟁사 분석<br>
 - 기능정의서<br>
 - 유저저니맵, 페르소나<br>
 - 화면흐름도<br>
-  <br>
+- [코딩 컨벤션/ 폴더구조/ GitHub 전략](https://mathdev-park.notion.site/GitHub-Flow-32f89991bd0442eca822662076da1a9c?pvs=4)
+
+<br>
 
 ## 기술 스택 및 라이브러리
 
-- React <img src="https://img.shields.io/badge/REACT-61DAFB?style=for-the-badge&logo=react&logoColor=black">
-- TailwindCSS <img src="https://img.shields.io/badge/TailwindCSS-1572B6?style=for-the-badge&logo=TailwindCSS&logoColor=white">
-- Bootstrap <img src="https://img.shields.io/badge/bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
+- <img src="https://img.shields.io/badge/REACT-61DAFB?style=for-the-badge&logo=react&logoColor=black">
+- <img src="https://img.shields.io/badge/TailwindCSS-1572B6?style=for-the-badge&logo=TailwindCSS&logoColor=white">
+- <img src="https://img.shields.io/badge/bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
 
-## AWS 배포
+## 시현영상
 
-url: [Razvery 🍓](https://razvery.link/) <br>
+![video1](https://github.com/user-attachments/assets/da4bc760-0bbd-498a-9e8f-1a6e36ac02c7)
+<br>
 
-```mermaid
-graph LR
-    User((사용자)) --> Route53[Route 53]
-    Route53 --> CloudFront[CloudFront]
-    CloudFront --> ALB[ALB]
-    ALB --> EC2[EC2 Nginx+PM2]
-    EC2 --> S3[(S3 Bucket)]
-    ACM[ACM] --> CloudFront
-    ACM --> ALB
-    GitHub[GitHub] --> |Actions| S3
-    GitHub --> |Actions| EC2
-    GitHub --> |Actions| RDS[(Amazon RDS)]
-    MySQL[(MySQL)] --> |Migration| RDS
-    CloudWatch[Amazon CloudWatch] --> |Monitoring| CloudFront
-    CloudWatch --> |Monitoring| ALB
-    CloudWatch --> |Monitoring| EC2
-    CloudWatch --> |Monitoring| S3
-    CloudWatch --> |Monitoring| RDS
-```
-
-GitHub에서 Action/PM2로 코드 푸시 및 배포<br>
-CloudFront는 ACM의 SSL 인증서를 사용해 HTTPS 연결을 제공<br>
-MySQL에서 Action/PM2를 통해 데이터 마이그레이션<br>
-Action/PM2에서 프론트엔드 파일을 S3 Bucket으로 배포<br>
-Action/PM2에서 백엔드 코드를 EC2로 배포<br>
-Action/PM2에서 데이터베이스 스키마 및 데이터를 Amazon RDS로 마이그레이션<br>
-Amazon CloudWatch를 사용하여 전체 시스템 모니터링<br>
-
+![video2](https://github.com/user-attachments/assets/5c08e161-8ed9-470b-89ad-38c8372d08b7)
 <br>
 
 ## WBS
@@ -184,165 +182,6 @@ client/
 
 <br>
 
-## 클래스 다이어그램
-
-```mermaid
-classDiagram
-    class User {
-        +int id
-        +string social_id
-        +enum social_type
-        +string job
-        +string email
-        +string nickname
-        +string profile_image
-        +enum role
-        +datetime last_login_at
-    }
-    class Room {
-        +int id
-        +char uuid
-        +int user_id
-        +string title
-        +enum type
-        +int max_member
-        +int duration
-        +enum status
-    }
-    class Chat {
-        +int id
-        +int room_id
-        +int user_id
-        +string content
-    }
-    class Chatkeyword {
-        +int id
-        +int room_id
-        +string keyword
-    }
-    class Content {
-        +int id
-        +int room_id
-        +int kanban_id
-        +int user_id
-        +string content
-    }
-    class Kanban {
-        +int id
-        +int room_id
-        +int user_id
-        +string section
-    }
-    class Keyword {
-        +int id
-        +int room_id
-        +string keyword
-    }
-    class Member {
-        +int id
-        +int room_id
-        +int user_id
-        +enum role
-    }
-
-    User "1" -- "*" Room : creates
-    User "1" -- "*" Member : participates
-    User "1" -- "*" Chat : sends
-    User "1" -- "*" Kanban : creates
-    User "1" -- "*" Content : creates
-    Room "1" -- "*" Keyword : has
-    Room "1" -- "*" Member : includes
-    Room "1" -- "*" Chat : contains
-    Room "1" -- "*" Kanban : contains
-    Room "1" -- "*" Content : contains
-    Room "1" -- "*" Chatkeyword : has
-    Kanban "1" -- "*" Content : contains
-```
-
-<br>
-
-## 시퀀스 다이어그램
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant Frontend
-    participant AuthController
-    participant RoomController
-    participant ChatController
-    participant KanbanController
-    participant Database
-    participant Socket.IO
-
-    User->>Frontend: 로그인 요청
-    Frontend->>AuthController: 소셜 로그인 요청
-    AuthController->>Database: 사용자 정보 확인/생성
-    Database-->>AuthController: 사용자 정보 반환
-    AuthController-->>Frontend: JWT 토큰 반환
-    Frontend-->>User: 로그인 성공
-
-    User->>Frontend: 메인 페이지 접속
-    Frontend->>RoomController: 방 목록 요청
-    RoomController->>Database: 방 목록 조회
-    Database-->>RoomController: 방 목록 반환
-    RoomController-->>Frontend: 방 목록 전송
-    Frontend-->>User: 방 목록 표시
-
-    User->>Frontend: 방 생성 요청
-    Frontend->>RoomController: 방 생성 요청
-    RoomController->>Database: 방 정보 저장
-    Database-->>RoomController: 저장 결과 반환
-    RoomController-->>Frontend: 방 생성 결과 반환
-    Frontend-->>User: 방 생성 결과 표시
-
-    User->>Frontend: 방 입장
-    Frontend->>Socket.IO: 방 입장 이벤트 발생
-    Socket.IO->>ChatController: 사용자 입장 처리
-    ChatController->>Database: 멤버 정보 저장
-    Database-->>ChatController: 저장 결과 반환
-    ChatController-->>Socket.IO: 입장 알림 브로드캐스트
-    Socket.IO-->>Frontend: 입장 알림 수신
-    Frontend-->>User: 채팅방/칸반보드 UI 표시
-
-    User->>Frontend: 채팅 메시지 전송
-    Frontend->>Socket.IO: 메시지 전송 이벤트 발생
-    Socket.IO->>ChatController: 메시지 처리
-    ChatController->>Database: 메시지 저장
-    Database-->>ChatController: 저장 결과 반환
-    ChatController-->>Socket.IO: 메시지 브로드캐스트
-    Socket.IO-->>Frontend: 새 메시지 수신
-    Frontend-->>User: 새 메시지 표시
-
-    User->>Frontend: 칸반 보드 카드 이동 (호스트만)
-    Frontend->>Socket.IO: 카드 이동 이벤트 발생
-    Socket.IO->>KanbanController: 카드 이동 처리
-    KanbanController->>Database: 카드 위치 업데이트
-    Database-->>KanbanController: 업데이트 결과 반환
-    KanbanController-->>Socket.IO: 카드 이동 브로드캐스트
-    Socket.IO-->>Frontend: 카드 이동 정보 수신
-    Frontend-->>User: 칸반 보드 UI 업데이트
-
-    User->>Frontend: 키워드 관리 (추가/삭제/클릭)
-    Frontend->>Socket.IO: 키워드 이벤트 발생
-    Socket.IO->>ChatController: 키워드 처리
-    ChatController->>Database: 키워드 정보 업데이트
-    Database-->>ChatController: 업데이트 결과 반환
-    ChatController-->>Socket.IO: 키워드 변경 브로드캐스트
-    Socket.IO-->>Frontend: 키워드 변경 정보 수신
-    Frontend-->>User: 키워드 UI 업데이트
-
-    User->>Frontend: 방 나가기
-    Frontend->>Socket.IO: 방 나가기 이벤트 발생
-    Socket.IO->>ChatController: 사용자 퇴장 처리
-    ChatController->>Database: 멤버 정보 업데이트
-    Database-->>ChatController: 업데이트 결과 반환
-    ChatController-->>Socket.IO: 퇴장 알림 브로드캐스트
-    Socket.IO-->>Frontend: 퇴장 알림 수신
-    Frontend-->>User: 메인 페이지로 리다이렉트
-```
-
-<br>
-
 ## 트러블 슈팅
 
 - 실시간 양방향 통신: Socket.io를 사용한 실시간 업데이트 구현
@@ -353,9 +192,3 @@ sequenceDiagram
   원인: React (SPA) Router의 기본 동작과 브라우저의 기본 동작의 충돌<br>
   해결: scrollto(0,0) 컴포넌트 추가함 <br>
   <br>
-
-## 회고
-
-<br>
-<br>
-<br>
