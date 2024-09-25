@@ -55,7 +55,7 @@ const MyPage: React.FC = () => {
     setNickname(user?.nickname ?? "");
     setJob(user?.job ?? "");
     if (user?.profile && !user.profile.startsWith("data:")) {
-      setProfile(`data:image/jpeg;base64,${user.profile}`);
+      setProfile(`${user.profile}`);
     } else {
       setProfile(user?.profile ?? null);
     }
@@ -301,11 +301,7 @@ const MyPage: React.FC = () => {
               >
                 {profile ? (
                   <Image
-                    src={
-                      profile.startsWith("data:")
-                        ? profile
-                        : `${apiUrl}${profile}`
-                    }
+                    src={profile.startsWith("data:") ? profile : `${profile}`}
                     roundedCircle
                     className="w-full h-full object-cover"
                   />
