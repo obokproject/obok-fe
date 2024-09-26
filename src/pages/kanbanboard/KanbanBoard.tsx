@@ -287,11 +287,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ roomId }) => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center h-[50vh]">
         <Loader /> Loading...
       </div>
     );
-  if (error) return <div>Error: {error}</div>;
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        Error: {error}
+      </div>
+    );
 
   return (
     <div className="container w-[1177px] h-[718px] mx-auto px-4 mt-5 mb-[120px] flex">

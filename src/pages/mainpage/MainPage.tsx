@@ -87,11 +87,16 @@ const MainPage: React.FC = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center h-[50vh]">
         <Loader /> Loading...
       </div>
     ); // 로딩 중 표시
-  if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        Error: {error}
+      </div>
+    ); // 에러 발생 시 표시
 
   return (
     <Container className="mt-[120px] font-sans">

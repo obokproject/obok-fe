@@ -48,7 +48,7 @@ const AppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center ">
+      <div className="flex justify-center items-center h-[50vh]">
         <Loader /> Loading...
       </div>
     );

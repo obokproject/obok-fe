@@ -213,12 +213,22 @@ const ChatBoard: React.FC<ChatBoardProps> = ({ roomId }) => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center h-[50vh]">
         <Loader /> Loading...
       </div>
     ); // 로딩 중 표시
-  if (error) return <div>Error: {error}</div>; // 에러 발생 시 표시
-  if (!room) return <div>Room not found</div>; // 방 정보가 없을 때 표시
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        Error: {error}
+      </div>
+    ); // 에러 발생 시 표시
+  if (!room)
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        Room not found
+      </div>
+    ); // 방 정보가 없을 때 표시
 
   return (
     <div className="container bg-white w-[1178px] h-[720px] flex flex-col mt-[40px] mb-[40px] ">
