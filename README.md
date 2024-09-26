@@ -194,7 +194,7 @@ server/
 
 ## API 문서화 [목차](#목차)
 
-<img src="https://github.com/obokproject/razvery-fe/issues/83#issue-2549522460" />
+<img src="https://github.com/user-attachments/assets/3ec3376a-247e-4b6d-bfa6-abe414aa5b23" />
 
 <br>
 
