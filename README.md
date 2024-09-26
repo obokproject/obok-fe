@@ -15,7 +15,7 @@
 6. [WBS](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#WBS-목차)
 7. [폴더 구조](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#폴더-구조-목차)
 8. [페이지 및 URL 구조](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#페이지-및-URL-구조-목차)
-9. [API 문서화](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#API-문서화)
+9. [API 문서화](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#API-문서화-목차)
 10. [시퀀스 다이어그램](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#시퀀스-다이어그램-목차)
 11. [클래스 다이어그램](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#클래스-다이어그램-목차)
 12. [ERD](https://github.com/obokproject/razvery-fe?tab=readme-ov-file#ERD-목차)
@@ -194,7 +194,7 @@ server/
 
 ## API 문서화 [목차](#목차)
 
-![image1](https://github.com/obokproject/razvery-fe/issues/83#issue-2549522460)
+<img src="https://github.com/obokproject/razvery-fe/issues/83#issue-2549522460" />
 
 <br>
 
