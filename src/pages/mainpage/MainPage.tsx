@@ -276,7 +276,7 @@ const MainPage: React.FC = () => {
                     </div>
                   </div>
                   <div
-                    className={`p-0 h-[42px] bottom-0 border-t-[1px] border-[#323232] ${
+                    className={`p-0 h-[42px] bottom-0 border-t-[1px]  ${
                       room.type === "chat" ? "bg-[#FF8A8A]" : "bg-[#FFE27C]"
                     }`}
                   >

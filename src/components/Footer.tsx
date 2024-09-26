@@ -23,6 +23,11 @@ const Footer: React.FC = () => {
             <h6 className="mb-4 font-bold">바로가기</h6>
             <div className="space-y-4 ml-2">
               <div>
+                <Link to="/about" className={linkClasses}>
+                  라즈베리 소개
+                </Link>
+              </div>
+              <div>
                 <Link
                   to="https://www.instagram.com/razvery_/"
                   target="_blank"
@@ -44,11 +49,6 @@ const Footer: React.FC = () => {
                     className="rounded-full hover:scale-125 w-6 h-6"
                     alt="jsoftware"
                   />
-                </Link>
-              </div>
-              <div>
-                <Link to="/about" className={linkClasses}>
-                  소개
                 </Link>
               </div>
             </div>
@@ -79,14 +79,14 @@ const Footer: React.FC = () => {
             </div>
           </Col>
         </Row>
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between items-center">
           <p className="text-sm">
             RazVery &copy; {currentYear} All rights reserved.
           </p>
-          <div className="relative">
+          <div className="relative ">
             <Link
               to="http://tmdedu.com/"
-              className="flex items-center p-2 hover:text-blue-500
+              className="flex items-center p-2
               no-underline"
               target="_blank"
               rel="noopener noreferrer"

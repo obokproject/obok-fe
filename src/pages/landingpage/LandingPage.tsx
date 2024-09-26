@@ -111,7 +111,7 @@ const LandingPage: React.FC = () => {
                 모두와 함께 하는 브레인스토밍
               </p>
               <div className="w-full h-full p-4 bg-white inline-flex justify-center items-center">
-                <div className="h-20 bg-[#F2DCEF] rounded-full flex justify-center items-center">
+                <div className="h-20 bg-[#F2DCEF] rounded-full flex justify-center items-center hover:bg-[rgb(251,182,182)] transform transition-color duration-300">
                   <button
                     className="w-60 h-20 text-center text-[#323232] text-5xl font-bold leading-[72px] break-words mx-5"
                     onClick={handleStartButton}

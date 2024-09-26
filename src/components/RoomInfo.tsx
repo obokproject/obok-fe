@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -49,6 +49,33 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
   const [roomClosedMessage, setRoomClosedMessage] = useState(""); // 방 종료 메시지
   const [showExplainChatModal, setShowExplainChatModal] = useState(false);
   const [showExplainKanbanModal, setShowExplainKanbanModal] = useState(false);
+  const chatModalRef = useRef<HTMLDivElement>(null); // 채팅 모달용 ref
+  const kanbanModalRef = useRef<HTMLDivElement>(null); // 칸반 모달용 ref
+
+  // 모달 외부 클릭 처리를 위한 useEffect
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showExplainChatModal &&
+        chatModalRef.current &&
+        !chatModalRef.current.contains(event.target as Node)
+      ) {
+        setShowExplainChatModal(false);
+      }
+      if (
+        showExplainKanbanModal &&
+        kanbanModalRef.current &&
+        !kanbanModalRef.current.contains(event.target as Node)
+      ) {
+        setShowExplainKanbanModal(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showExplainChatModal, showExplainKanbanModal]);
 
   // 방 정보를 서버로부터 가져오는 useEffect
   useEffect(() => {
@@ -330,7 +357,10 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
       {/* 칸반 도움말 모달 */}
       {showExplainKanbanModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[50px] p-10 min-w-md w-[600px]">
+          <div
+            ref={kanbanModalRef}
+            className="bg-white rounded-[50px] p-10 min-w-md w-[600px]"
+          >
             <div className="mb-4 whitespace-pre-wrap">
               {`방장은 아이디어 카드를 드래그 앤 드랍해서 원하는 섹션으로 옮길 수 있습니다.
 
@@ -354,7 +384,10 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
       {/* 채팅 도움말 모달 */}
       {showExplainChatModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[50px] p-10 min-w-md w-[600px]">
+          <div
+            ref={chatModalRef}
+            className="bg-white rounded-[50px] p-10 min-w-md w-[600px] flex flex-col justify-between"
+          >
             <div className="mb-4 whitespace-pre-wrap">
               {`# 를 써서 키워드를 생성 할 수 있습니다.
 (예시: #키워드)
@@ -366,7 +399,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
 생성된 키워드는 방장이 임의로 삭제 할 수 있습니다.
 복구는 되지 않으니 신중하게!`}
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center items-end mt-8 pb-2">
               <button
                 onClick={() => setShowExplainChatModal(false)}
                 className="w-[100px] rounded-full py-2 text-lg bg-[#ffb662] text-[#323232]"
