@@ -395,7 +395,7 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
                 (예시: #키워드)
               </p>
               <p className="font-bold">
-                생성된 키워드는 키워드 색인창에 등록되고
+                생성된 키워드는 키워드 영역에 등록되고
                 <br />
                 등록된 키워드를 클릭해서 해당 키워드가 포함된 본문으로 이동 할
                 수 있습니다.
