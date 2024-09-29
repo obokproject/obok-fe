@@ -388,16 +388,25 @@ const RoomInfo: React.FC<RoomInfoProps> = ({
             ref={chatModalRef}
             className="bg-white rounded-[50px] p-10 min-w-md w-[600px] flex flex-col justify-between"
           >
-            <div className="mb-4 whitespace-pre-wrap">
-              {`# 를 써서 키워드를 생성 할 수 있습니다.
-(예시: #키워드)
-
-생성된 키워드는 키워드 색인창에 등록되고
-등록된 키워드를 클릭해서 해당 키워드가 포함된 본문으로 이동 할 수 있습니다.
-(중복 키워드 등록은 안돼요!)
-
-생성된 키워드는 방장이 임의로 삭제 할 수 있습니다.
-복구는 되지 않으니 신중하게!`}
+            <div className="mb-4 text-[16px] space-y-4">
+              <p>
+                # 를 써서 키워드를 생성 할 수 있습니다.
+                <br />
+                (예시: #키워드)
+              </p>
+              <p className="font-bold">
+                생성된 키워드는 키워드 색인창에 등록되고
+                <br />
+                등록된 키워드를 클릭해서 해당 키워드가 포함된 본문으로 이동 할
+                수 있습니다.
+                <br />
+                (중복 키워드 등록은 안돼요!)
+              </p>
+              <p>
+                생성된 키워드는 방장이 임의로 삭제 할 수 있습니다.
+                <br />
+                복구는 되지 않으니 신중하게!
+              </p>
             </div>
             <div className="flex justify-center items-end mt-8 pb-2">
               <button

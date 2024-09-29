@@ -29,7 +29,7 @@ const AboutPage: React.FC = () => {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold mt-10 mb-12 flex flex-row items-center">
-          <img src="/images/lightbulb.png" alt="전구" />
+          <img src="/images/lightbulb.png" alt="라즈" />
           베리 소개
         </h1>
         <h1 className="text-3xl font-bold mb-12">About Razvery</h1>
